@@ -864,12 +864,15 @@ Liverpool::Task Liverpool::ProcessGraphics(std::span<const u32> dcb) {
                 const u64* wait_addr = wait_reg_mem->Address<u64*>();
                 if (vo_port->IsVoLabel(wait_addr) &&
                     num_submits == mapped_queues[GfxQueueId].submits.size()) {
-                    // vox: re-check on a timer and name a wait that isn't ending.
+                    // vox: a label only clears when a later flip is presented. With none pending, or
+                    // with a CPU flip stuck behind this sleeping thread, this wait can never end: the
+                    // game would hang. Release the label instead. Cause of the state still unknown.
                     for (u32 vox_waits = 0; !vo_port->WaitVoLabelFor(
-                             [&] { return wait_reg_mem->Test(regs.reg_array); }, 250);) {
-                        if (++vox_waits != 12) {
+                             [&] { return wait_reg_mem->Test(regs.reg_array); }, 50);) {
+                        if (++vox_waits != 4) {
                             continue;
                         }
+                        const bool vox_stuck = vo_port->flip_status.flip_pending_num == 0 || num_commands != 0;
                         const auto& vox_labels = vo_port->buffer_labels;
                         const auto* vox_raw = reinterpret_cast<const u32*>(header);
                         std::printf("CP VO label wait at %p (label %d): raw %08x %08x %08x %08x %08x %08x %08x; "
@@ -887,6 +890,13 @@ Liverpool::Task Liverpool::ProcessGraphics(std::span<const u32> dcb) {
                                     num_submits.load(), mapped_queues[GfxQueueId].submits.size(),
                                     num_commands.load());
                         std::fflush(stdout);
+                        if (vox_stuck) {
+                            std::printf("CP VO label wait released\n");
+                            std::fflush(stdout);
+                            vo_port->buffer_labels[wait_addr - vox_labels.data()] = 0;
+                            vo_port->SignalVoLabel();
+                        }
+                        vox_waits = 0;
                     }
                     break;
                 }

@@ -128,6 +128,12 @@ ABI uint64_t rt_unimplemented(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3
         if (n == 1) printf("HLE: %s answered signed out, from +%" PRIx64 "\n", s->symbol, bbcpu_import_return() - bb_image_base);
         return UINT32_C(0x80550006);
     }
+    /* Nor is its game networking. The code is "not initialized" from memory, not checked against a
+     * table; the game's NetworkManager only logs a negative result from these and carries on. */
+    if (s->symbol && !strncmp(s->symbol, "sceRudp", 7)) {
+        if (n == 1) printf("HLE: %s answered not initialized, from +%" PRIx64 "\n", s->symbol, bbcpu_import_return() - bb_image_base);
+        return UINT32_C(0x80770001);
+    }
     /* By default an import nobody has looked at ends the run: answering it with a made-up success
      * would send the game down a wrong path. VOX_LENIENT=1 logs and returns 0 instead. */
     static int lenient = -1;

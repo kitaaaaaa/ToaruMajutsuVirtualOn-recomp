@@ -22,6 +22,8 @@ void rt_thread_attach(void);
 void rt_set_tls_module(uint64_t id, const void *data, uint64_t filesz, uint64_t memsz);
 void rt_set_procparam(void *param);
 void rt_set_folders(const char *app0, const char *user);
+/* The host path for a guest path; 0 if there is none. */
+int rt_host_path(const char *guest, char *out, size_t size);
 
 /* Calls a guest function on the current thread. */
 uint64_t rt_guest_call(const void *fn, int count, const uint64_t *args);

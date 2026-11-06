@@ -241,6 +241,12 @@ void VideoOutDriver::Flip(const Request& req) {
     // Present the frame.
     presenter->Present(req.frame);
 
+    // vox: VOX_TRACE=1 lists flips as they reach the screen.
+    static const bool vox_trace = std::getenv("VOX_TRACE") != nullptr;
+    if (vox_trace) {
+        std::printf("TRACE present buffer %d, previous %d\n", req.index, req.port->prev_index);
+    }
+
     // Update flip status.
     auto* port = req.port;
     {

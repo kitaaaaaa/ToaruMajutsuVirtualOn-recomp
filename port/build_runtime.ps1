@@ -27,7 +27,7 @@ $absl = 'raw_hash_set', 'cord', 'cordz_info', 'cord_internal', 'cordz_functions'
     'raw_logging_internal', 'log_severity' | ForEach-Object { "$L\absl_$_.lib" }
 $libs = @("$out\libbbcpu.lib", "$L\voxgpu.lib", "$L\fmt.lib", "$L\SDL3-static.lib", "$L\sirit.lib", "$L\miniz.lib", "$L\xxhash.lib", "$deps\lib\Zydis.lib", "$deps\lib\Zycore.lib") + $absl +
     @("$root\tools\llvm\lib\clang\23\lib\windows\clang_rt.builtins-x86_64.lib",
-      '-lxinput', '-lhid', '-ldinput8', '-lmincore', '-lws2_32', '-lmswsock', '-lwinmm', '-limm32', '-lversion', '-lsetupapi', '-lole32', '-loleaut32', '-luuid', '-lgdi32',
+      '-lmfplat', '-lmfreadwrite', '-lmfuuid', '-lxinput', '-lhid', '-ldinput8', '-lmincore', '-lws2_32', '-lmswsock', '-lwinmm', '-limm32', '-lversion', '-lsetupapi', '-lole32', '-loleaut32', '-luuid', '-lgdi32',
       '-luser32', '-lshell32', '-ladvapi32', '-lcfgmgr32', '-lkernel32', '-lwinspool', '-lcomdlg32', '-loldnames')
 
 $objects = @()

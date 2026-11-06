@@ -182,48 +182,14 @@ static ABI int32_t commerce_result(void *out) {
     return 0;
 }
 
-/* AvPlayer, until video decoding (Phase 6). A one-shot movie is never active, so it ends at once. A
- * looping one is a scene's background: the game holds a scene change until a frame has arrived, so it
- * stays active and delivers one black frame per source. */
-typedef struct { int looping, active, frame_due; } AvPlayer;
-enum { BLACK_FRAME_SIZE = 64 };
-static ABI void *avplayer_init(const void *data) {
-    (void)data;
-    AvPlayer *player = rt_low_alloc(sizeof(AvPlayer));
-    memset(player, 0, sizeof(*player));
-    return player;
-}
-static ABI int32_t avplayer_add_source(AvPlayer *player, const char *path) {
-    printf("HLE: movie requested, skipped: %s\n", path ? path : "(none)");
-    player->frame_due = 1;
-    return 0;
-}
-static ABI int32_t avplayer_set_looping(AvPlayer *player, uint8_t looping) {
-    player->looping = player->active = looping != 0;
-    return 0;
-}
-static ABI int32_t avplayer_stop(AvPlayer *player) {
-    player->active = 0;
-    return 0;
-}
-static ABI uint8_t avplayer_is_active(const AvPlayer *player) { return player->active != 0; }
-/* Fills what the game reads of OrbisAvPlayerFrameInfoEx; the picture is NV12, luma then chroma. */
-static ABI uint8_t avplayer_video_data(AvPlayer *player, uint8_t *frame) {
-    static uint8_t *black;
-    if (!player->active || !player->frame_due) return 0;
-    if (!black) {
-        black = rt_low_alloc(BLACK_FRAME_SIZE * BLACK_FRAME_SIZE * 3 / 2);
-        memset(black, 16, BLACK_FRAME_SIZE * BLACK_FRAME_SIZE);
-        memset(black + BLACK_FRAME_SIZE * BLACK_FRAME_SIZE, 128, BLACK_FRAME_SIZE * BLACK_FRAME_SIZE / 2);
-    }
-    const uint32_t size = BLACK_FRAME_SIZE;
-    memcpy(frame, &black, 8);
-    memcpy(frame + 0x18, &size, 4);
-    memcpy(frame + 0x1c, &size, 4);
-    memcpy(frame + 0x3c, &size, 4);
-    player->frame_due = 0;
-    return 1;
-}
+/* AvPlayer: hle_movie.c. No movie sound yet. */
+ABI void *rt_avplayer_init(const void *data);
+ABI int32_t rt_avplayer_add_source(void *player, const char *path);
+ABI int32_t rt_avplayer_set_looping(void *player, uint8_t looping);
+ABI int32_t rt_avplayer_stop(void *player);
+ABI int32_t rt_avplayer_close(void *player);
+ABI uint8_t rt_avplayer_is_active(const void *player);
+ABI uint8_t rt_avplayer_video_data(void *player, uint8_t *frame);
 static ABI uint8_t avplayer_false(void) { return 0; }
 
 /* The mouse is there and never moves. */
@@ -245,9 +211,9 @@ const RtExport rt_service_exports[] = {
     {"sceNpCommerceDialogUpdateStatus", commerce_dialog_update}, {"sceNpCommerceDialogGetResult", commerce_result},
     {"sceInvitationDialogInitialize", invitation_dialog_initialize}, {"sceInvitationDialogTerminate", invitation_dialog_terminate}, {"sceInvitationDialogOpenA", invitation_dialog_open},
     {"sceInvitationDialogClose", invitation_dialog_close}, {"sceInvitationDialogUpdateStatus", invitation_dialog_update},
-    {"sceAvPlayerInit", avplayer_init}, {"sceAvPlayerAddSource", avplayer_add_source}, {"sceAvPlayerClose", ok}, {"sceAvPlayerStop", avplayer_stop},
-    {"sceAvPlayerPause", ok}, {"sceAvPlayerResume", ok}, {"sceAvPlayerSetLooping", avplayer_set_looping}, {"sceAvPlayerIsActive", avplayer_is_active},
-    {"sceAvPlayerGetVideoDataEx", avplayer_video_data}, {"sceAvPlayerGetAudioData", avplayer_false},
+    {"sceAvPlayerInit", rt_avplayer_init}, {"sceAvPlayerAddSource", rt_avplayer_add_source}, {"sceAvPlayerClose", rt_avplayer_close}, {"sceAvPlayerStop", rt_avplayer_stop},
+    {"sceAvPlayerPause", ok}, {"sceAvPlayerResume", ok}, {"sceAvPlayerSetLooping", rt_avplayer_set_looping}, {"sceAvPlayerIsActive", rt_avplayer_is_active},
+    {"sceAvPlayerGetVideoDataEx", rt_avplayer_video_data}, {"sceAvPlayerGetAudioData", avplayer_false},
     {"sceScreenShotSetParam", ok}, {"sceScreenShotSetOverlayImage", ok},
     {"sceNpTrophyCreateContext", trophy_create_context}, {"sceNpTrophyCreateHandle", trophy_create}, {"sceNpTrophyRegisterContext", ok},
     {"sceNpTrophyDestroyContext", ok}, {"sceNpTrophyDestroyHandle", ok}, {"sceNpTrophyUnlockTrophy", trophy_unlock},

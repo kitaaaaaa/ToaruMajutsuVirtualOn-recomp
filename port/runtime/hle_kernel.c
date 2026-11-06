@@ -173,6 +173,8 @@ static int host_path(const char *guest, char *out, size_t size) {
     return 1;
 }
 
+int rt_host_path(const char *guest, char *out, size_t size) { return host_path(guest, out, size); }
+
 void rt_set_folders(const char *app0, const char *user) {
     snprintf(app0_folder, sizeof(app0_folder), "%s", app0);
     snprintf(user_folder, sizeof(user_folder), "%s", user);
@@ -201,6 +203,68 @@ enum { O_PS4_WRONLY = 1, O_PS4_RDWR = 2, O_PS4_APPEND = 8, O_PS4_CREAT = 0x200, 
 
 static SRWLOCK file_lock = SRWLOCK_INIT; /* positioned reads and writes seek first */
 
+/* Translation overlays (analysis\scripts\tl_pack.py): byte ranges laid over an archive as it is read, from
+ * translation\<disc>.overlay in the working directory. The archive itself never changes. */
+typedef struct { uint64_t offset; uint32_t size, reserved; } OverlayRange;
+typedef struct { const char *name; uint32_t count; const OverlayRange *ranges; const uint8_t *bytes; uint8_t *seen; } Overlay;
+enum { OVERLAY_FDS = 1024 };
+static const Overlay *fd_overlay[OVERLAY_FDS];
+
+static const Overlay *load_overlay(const char *guest_path) {
+    static SRWLOCK lock = SRWLOCK_INIT;
+    static Overlay loaded[8];
+    static int loaded_count;
+    const char *base = strrchr(guest_path, '/');
+    base = base ? base + 1 : guest_path;
+    const size_t length = strlen(base);
+    if (length < 5 || strcmp(base + length - 4, ".cpk")) return NULL;
+    char name[64];
+    snprintf(name, sizeof(name), "%.*s", (int)(length - 4), base);
+    const Overlay *result = NULL;
+    AcquireSRWLockExclusive(&lock);
+    for (int i = 0; i < loaded_count && !result; ++i)
+        if (!strcmp(loaded[i].name, name)) result = &loaded[i];
+    if (!result && loaded_count < 8) {
+        char file[128];
+        snprintf(file, sizeof(file), "translation/%s.overlay", name);
+        FILE *f = fopen(file, "rb");
+        uint8_t *all = NULL;
+        long size = 0;
+        if (f && !fseek(f, 0, SEEK_END) && (size = ftell(f)) > 8 && !fseek(f, 0, SEEK_SET) && (all = malloc((size_t)size)) &&
+            fread(all, 1, (size_t)size, f) == (size_t)size && !memcmp(all, "VOXP", 4)) {
+            Overlay *o = &loaded[loaded_count++];
+            o->name = _strdup(name);
+            memcpy(&o->count, all + 4, 4);
+            o->ranges = (const OverlayRange *)(all + 8);
+            o->bytes = all + 8 + (size_t)o->count * sizeof(OverlayRange);
+            o->seen = calloc(o->count, 1);
+            printf("HLE: translation overlay for %s: %u files\n", name, o->count);
+            result = o;
+        }
+        if (f) fclose(f);
+    }
+    ReleaseSRWLockExclusive(&lock);
+    return result;
+}
+
+/* Lays an overlay's ranges over `size` bytes just read from archive position `position`. */
+static void apply_overlay(const Overlay *o, uint64_t position, uint8_t *data, uint64_t size) {
+    const uint8_t *bytes = o->bytes;
+    for (uint32_t i = 0; i < o->count; ++i) {
+        const OverlayRange *r = &o->ranges[i];
+        const uint64_t start = r->offset > position ? r->offset : position;
+        const uint64_t end = r->offset + r->size < position + size ? r->offset + r->size : position + size;
+        if (start < end) {
+            memcpy(data + (start - position), bytes + (start - r->offset), (size_t)(end - start));
+            if (!o->seen[i]) {
+                o->seen[i] = 1;
+                printf("HLE: translated file %u of %s read, at %#llx\n", i, o->name, (unsigned long long)r->offset);
+            }
+        }
+        bytes += r->size;
+    }
+}
+
 static ABI int32_t kernel_open(const char *path, int32_t flags, int32_t mode) {
     (void)mode;
     char host[2048];
@@ -223,9 +287,13 @@ static ABI int32_t kernel_open(const char *path, int32_t flags, int32_t mode) {
     const int fd = _open(host, f, _S_IREAD | _S_IWRITE);
     const int result = fd < 0 ? ORBIS_ERR(orbis_from_crt()) : fd;
     printf("HLE: open %s flags %#x -> %#x\n", path, flags, result);
+    if (fd >= 0 && fd < OVERLAY_FDS) fd_overlay[fd] = load_overlay(path);
     return result;
 }
-static ABI int32_t kernel_close(int32_t fd) { return _close(fd) ? ORBIS_ERR(E_BADF) : 0; }
+static ABI int32_t kernel_close(int32_t fd) {
+    if (fd >= 0 && fd < OVERLAY_FDS) fd_overlay[fd] = NULL;
+    return _close(fd) ? ORBIS_ERR(E_BADF) : 0;
+}
 /* Reads through a host buffer: the renderer write-protects guest pages to track them, and a system call
  * writing into a protected page fails instead of raising the fault a user-mode copy does. */
 enum { READ_CHUNK = 1024 * 1024 };
@@ -233,12 +301,15 @@ static _Thread_local uint8_t *read_buffer;
 static int64_t read_into_guest(int32_t fd, uint8_t *data, uint64_t size) {
     if (!read_buffer) read_buffer = malloc(READ_CHUNK);
     if (!read_buffer) return -1;
+    const Overlay *overlay = fd >= 0 && fd < OVERLAY_FDS ? fd_overlay[fd] : NULL;
     uint64_t done = 0;
     while (done < size) {
         const unsigned want = size - done < READ_CHUNK ? (unsigned)(size - done) : READ_CHUNK;
+        const int64_t position = overlay ? _telli64(fd) : 0;
         const int n = _read(fd, read_buffer, want);
         if (n < 0) return done ? (int64_t)done : -1;
         if (!n) break;
+        if (overlay) apply_overlay(overlay, (uint64_t)position, read_buffer, (uint64_t)n);
         memcpy(data + done, read_buffer, (size_t)n);
         done += (uint64_t)n;
         if ((unsigned)n < want) break;
