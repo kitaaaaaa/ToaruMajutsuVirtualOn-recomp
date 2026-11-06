@@ -182,7 +182,7 @@ static ABI int32_t commerce_result(void *out) {
     return 0;
 }
 
-/* AvPlayer: hle_movie.c. No movie sound yet. */
+/* AvPlayer: hle_movie.c. */
 ABI void *rt_avplayer_init(const void *data);
 ABI int32_t rt_avplayer_add_source(void *player, const char *path);
 ABI int32_t rt_avplayer_set_looping(void *player, uint8_t looping);
@@ -190,7 +190,7 @@ ABI int32_t rt_avplayer_stop(void *player);
 ABI int32_t rt_avplayer_close(void *player);
 ABI uint8_t rt_avplayer_is_active(const void *player);
 ABI uint8_t rt_avplayer_video_data(void *player, uint8_t *frame);
-static ABI uint8_t avplayer_false(void) { return 0; }
+ABI uint8_t rt_avplayer_audio_data(void *player, uint8_t *frame);
 
 /* The mouse is there and never moves. */
 static ABI int32_t mouse_open(int32_t user, int32_t type, int32_t index, const void *param) {
@@ -213,7 +213,7 @@ const RtExport rt_service_exports[] = {
     {"sceInvitationDialogClose", invitation_dialog_close}, {"sceInvitationDialogUpdateStatus", invitation_dialog_update},
     {"sceAvPlayerInit", rt_avplayer_init}, {"sceAvPlayerAddSource", rt_avplayer_add_source}, {"sceAvPlayerClose", rt_avplayer_close}, {"sceAvPlayerStop", rt_avplayer_stop},
     {"sceAvPlayerPause", ok}, {"sceAvPlayerResume", ok}, {"sceAvPlayerSetLooping", rt_avplayer_set_looping}, {"sceAvPlayerIsActive", rt_avplayer_is_active},
-    {"sceAvPlayerGetVideoDataEx", rt_avplayer_video_data}, {"sceAvPlayerGetAudioData", avplayer_false},
+    {"sceAvPlayerGetVideoDataEx", rt_avplayer_video_data}, {"sceAvPlayerGetAudioData", rt_avplayer_audio_data},
     {"sceScreenShotSetParam", ok}, {"sceScreenShotSetOverlayImage", ok},
     {"sceNpTrophyCreateContext", trophy_create_context}, {"sceNpTrophyCreateHandle", trophy_create}, {"sceNpTrophyRegisterContext", ok},
     {"sceNpTrophyDestroyContext", ok}, {"sceNpTrophyDestroyHandle", ok}, {"sceNpTrophyUnlockTrophy", trophy_unlock},

@@ -1,16 +1,16 @@
-0	Play each character's story.
-1	Play a variety of missions.
-2	Play online matches or shop on the "PlayStation Store".
-3	Train in battle under a variety of settings.
-4	Check game data and edit your Personal Card.
-5	Select a mission to play.
-6	Select the character you will control.
-7	Select your opponent.
-8	Missions you play alone.
-9	Missions you play with allies.
-10	Tutorials for each control.
-11	Select the mission difficulty.
-12	Start the mission with these settings.
+0	Each Character's Story Play Do
+1	Various Missions Play Do
+2	Through Network, Each Kind Fight And Buying Is Possible
+3	Various Conditions Set, Battle Training Do
+4	Each Kind Data Confirm And Personal Card Editing Possible
+5	Mission To Play Please Choose
+6	Character To Operate Please Choose
+7	Character To Fight Please Choose
+8	Mission Done By One Person
+9	Mission Done By Cooperating With Friend
+10	Each Kind Operation Tutorial
+11	Mission Difficulty Please Choose
+12	With This Content Mission Start
 13	Overview 01
 14	Overview 02
 15	Overview 03
@@ -21,24 +21,24 @@
 20	Overview 08
 21	Overview 09
 22	Overview 10
-23	Select a stage.
-24	Select the BGM.
+23	Stage To Use Please Choose
+24	BGM To Use Please Choose
 25	Select a network category.
-26	Select an item.
+26	Item Please Choose
 27	Show rankings for all players.
 28	Select an item.
 29	Set the conditions for your room.
 30	Set the conditions for the room search.
 31	Select a room to enter.
 32	Enter when you are ready.
-33	Select your partner character.
+33	Partner Character Please Choose
 34	Share your save data.
-35	Your Virtual-On play record so far.
+35	Until Now The Virtual-On Play Result
 36	Edit your Personal Card.
 37	View illustrations and music, or buy them with Resource.
 38	Play back recorded replays.
-39	Select the character whose story you want to continue.
-40	Select a tutorial to play.
+39	Character Of Story You Want To Advance Please Choose
+40	Tutorial To Play Please Choose
 41	Play rank matches against players of similar skill.
 42	Player rooms for playing with others.
 43	Check the rankings.
@@ -73,8 +73,8 @@
 72	Show rankings for CYPHER only.
 73	Show rankings for APHARMD B only.
 74	Show rankings for Blue Stalker only.
-75	This item must be unlocked with Resource.
-76	This item can't be unlocked right now.
-77	This item can't be played right now.
+75	This Item Must Unlock By Resource
+76	This Item Now Unlock Impossible
+77	This Item Now Play Impossible
 78	Set the match format.
 79	Edit your Personal Card background design.

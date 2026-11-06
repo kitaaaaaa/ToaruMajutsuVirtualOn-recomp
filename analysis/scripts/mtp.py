@@ -16,8 +16,8 @@ import struct
 import sys
 
 
-def read(data):
-    """(records [(id, text)], offset just past the last string)."""
+def read_raw(data):
+    """(records [(id, encoded text)], offset just past the last string)."""
     if data[:4] != b"MTPA":
         raise ValueError("not an MTPA file")
     count = struct.unpack("<I", data[0x24:0x28])[0]
@@ -29,23 +29,32 @@ def read(data):
         ident, offset = struct.unpack("<QQ", data[table + 16 * i : table + 16 * i + 16])
         at = base + offset
         length = struct.unpack("<I", data[at : at + 4])[0]
-        entries.append((ident, data[at + 4 : at + 4 + length].decode("cp932")))
+        entries.append((ident, data[at + 4 : at + 4 + length]))
         end = max(end, at + 4 + length + (4 - length % 4))
     return entries, end
 
 
+def read(data):
+    """(records [(id, text)], offset just past the last string)."""
+    entries, end = read_raw(data)
+    return [(ident, text.decode("cp932")) for ident, text in entries], end
+
+
 def build(data, texts):
-    """The file with new strings: `texts` maps id to text; ids it doesn't name keep theirs. The record table
-    and the sections after the strings (ENRS relocations, EOFC) don't depend on the strings' contents."""
-    entries, end = read(data)
+    """The file with new strings: `texts` maps id to text, or to bytes already encoded; ids it doesn't name
+    keep theirs. The record table and the sections after the strings (ENRS relocations, EOFC) don't depend on
+    the strings' contents."""
+    entries, end = read_raw(data)
     count = len(entries)
     table = 0x40 + 4 * count
     base = table + 16 * count
     out = bytearray(data[:base])
     strings = bytearray()
-    for i, (ident, text) in enumerate(entries):
+    for i, (ident, original) in enumerate(entries):
         struct.pack_into("<Q", out, table + 16 * i + 8, len(strings))
-        encoded = texts.get(ident, text).encode("cp932")
+        encoded = texts.get(ident, original)
+        if isinstance(encoded, str):
+            encoded = encoded.encode("cp932")
         strings += struct.pack("<I", len(encoded)) + encoded + b"\0" * (4 - len(encoded) % 4)
     # The next section stays aligned to 16.
     old_next = data.index(b"ENRS", end)

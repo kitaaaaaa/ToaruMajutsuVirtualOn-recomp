@@ -1,5 +1,6 @@
-# Builds and runs the host once. Log: port\work\run.log. Args: [-Timeout 30] [-Lines 70] [-Interp]
-param([int]$Timeout = 30, [int]$Lines = 70, [switch]$Interp, [switch]$NoBuild)
+# Builds and runs the host once. Log: port\work\run.log.
+# Args: [-Timeout 30] [-Lines 70] [-Interp] [-English | -UserTl]
+param([int]$Timeout = 30, [int]$Lines = 70, [switch]$Interp, [switch]$NoBuild, [switch]$English, [switch]$UserTl)
 $port = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Split-Path -Parent $port
 Set-Location "$port\work"
@@ -10,7 +11,10 @@ if (-not $NoBuild) {
 $env:BB_JIT = '0'
 if (-not $Interp) { $env:BB_RECOMP_LIB = "$port\work\recomp\librecomp.dll" }
 $sw = [Diagnostics.Stopwatch]::StartNew()
-& "$port\out\vox.exe" . names.tsv --timeout $Timeout --app0 "$root\extracted\uroot" --user "$port\work\user" 2>&1 | ForEach-Object { "$_" } | Out-File -Encoding utf8 run.log
+$language = @()
+if ($English) { $language += '--english' }
+if ($UserTl) { $language += '--user-tl' }
+& "$port\out\vox.exe" . names.tsv --timeout $Timeout --app0 "$root\extracted\uroot" --user "$port\work\user" @language 2>&1 | ForEach-Object { "$_" } | Out-File -Encoding utf8 run.log
 $code = $LASTEXITCODE
 $all = Get-Content run.log
 $body = $all | Where-Object { $_ -notmatch '^(Names:|Module |UNRESOLVED DATA|Image at|Recompiled:)' }

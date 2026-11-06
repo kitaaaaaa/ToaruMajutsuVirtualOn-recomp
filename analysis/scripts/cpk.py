@@ -95,6 +95,38 @@ def entries(f):
     return out
 
 
+def toc_layout(f):
+    """Where the TOC's per-row fields sit, for patching: (base for FileOffset, {field: (kind, [position by row])})."""
+    header = read_chunk(f, 0)[0]
+    toc = header["TocOffset"]
+    content = header.get("ContentOffset") or 0
+    base = min(toc, content) if content else toc
+    f.seek(toc)
+    head = f.read(16)
+    t = f.read(struct.unpack("<Q", head[8:16])[0])
+    if t[:4] != b"@UTF":
+        raise ValueError("encrypted TOC: not handled")
+    start = toc + 16 + 8
+    t = t[8:]
+    rows_at, strings_at, _data_at, _name, columns, row_length, rows = struct.unpack(">IIIIHHI", t[:24])
+    at = 24
+    in_row = 0
+    fields = {}
+    for _ in range(columns):
+        flags = t[at]
+        offset = struct.unpack(">I", t[at + 1 : at + 5])[0]
+        name = t[strings_at + offset : t.index(b"\0", strings_at + offset)].decode()
+        at += 5
+        storage, kind = flags & 0xF0, flags & 0x0F
+        size = 4 if kind == 0xA else 8 if kind == 0xB else struct.calcsize(TYPES[kind])
+        if storage in (0x30, 0x70):
+            at += size
+        elif storage == 0x50:
+            fields[name] = (TYPES.get(kind), [start + rows_at + r * row_length + in_row for r in range(rows)])
+            in_row += size
+    return base, fields
+
+
 def main():
     command, archive = sys.argv[1:3]
     with open(archive, "rb") as f:

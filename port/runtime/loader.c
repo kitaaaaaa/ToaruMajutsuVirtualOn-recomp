@@ -6,7 +6,7 @@
  * recompiled library made with the same layout finds its functions; modules start in order, then
  * the game's entry runs on a low stack.
  *
- * Usage: vox ELF_DIR NAMES.TSV [--timeout seconds] */
+ * Usage: vox ELF_DIR NAMES.TSV [--timeout seconds] [--english | --user-tl] */
 #include <windows.h>
 #include <tlhelp32.h>
 #include <inttypes.h>
@@ -621,7 +621,7 @@ int main(int argc, char **argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
     signal(SIGABRT, on_abort);
     if (argc < 3) {
-        fprintf(stderr, "usage: vox ELF_DIR NAMES.TSV [--timeout seconds]\n");
+        fprintf(stderr, "usage: vox ELF_DIR NAMES.TSV [--timeout seconds] [--english | --user-tl]\n");
         return 2;
     }
     unsigned timeout = 60;
@@ -630,6 +630,8 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--timeout") && i + 1 < argc) timeout = (unsigned)atoi(argv[++i]);
         else if (!strcmp(argv[i], "--app0") && i + 1 < argc) app0 = argv[++i];
         else if (!strcmp(argv[i], "--user") && i + 1 < argc) user = argv[++i];
+        else if (!strcmp(argv[i], "--english")) rt_overlay_folder = "translation";
+        else if (!strcmp(argv[i], "--user-tl")) rt_overlay_folder = "translation_user";
     }
     rt_set_folders(app0, user);
     AddVectoredExceptionHandler(1, on_fault);

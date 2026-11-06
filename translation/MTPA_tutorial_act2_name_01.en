@@ -1,0 +1,195 @@
+0	<color COLOR_YELLOW>Beginner always forget <icon LS>, then the zig eat them.</color>
+1	<color COLOR_YELLOW>If your fist is crying,\nit is time of <icon LS>.</color>
+2	<color COLOR_YELLOW>Beginner always forget <icon LS>, then the bomb eat them.</color>
+3	<color COLOR_YELLOW>When the robot is come, press\n<icon LS> for great justice.</color>
+4	<color COLOR_YELLOW>Press <icon LS> now. Do\nnot ask the noodle why.</color>
+5	<color COLOR_YELLOW>If your justice is crying,\nit is time of <icon LS>.</color>
+6	<color COLOR_YELLOW>If your tofu is crying,\nit is time of <icon LS>.</color>
+7	<color COLOR_YELLOW>Beginner always forget <icon LS>, then the noodle eat them.</color>
+8	<color COLOR_YELLOW>The master says: <icon RS> is the way of soup.</color>
+9	<color COLOR_YELLOW>Beginner always forget <icon RS>, then the tofu eat them.</color>
+10	<color COLOR_YELLOW>Press <icon LS> now. Do not ask\nthe kettle why. <input DASH></color>
+11	<color COLOR_YELLOW>When the soup is come, press <icon LS> for great justice. <input DASH></color>
+12	<color COLOR_YELLOW>When the tofu is come, press <icon LS> for great justice. <input DASH></color>
+13	<color COLOR_YELLOW>Use <icon LS> and the kettle will\nrespect your family. <input DASH></color>
+14	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe kettle eat them. <input DASH></color>
+15	<color COLOR_YELLOW>If your dumpling is crying, it is\ntime of <icon LS>. <input DASH></color>
+16	<color COLOR_YELLOW>If your soup is crying, it is\ntime of <icon LS>. <input DASH></color>
+17	<color COLOR_YELLOW>Use <icon LS> and the soup will\nrespect your family. <input DASH></color>
+18	<color COLOR_YELLOW>Use <input JUMP> and the pants\nwill respect your family.</color>
+19	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe JYANPU eat them. <input DASH></color>
+20	<color COLOR_YELLOW>The master says: <icon LS> is\nthe way of JYANPU. <input DASH></color>
+21	<color COLOR_YELLOW>The master says: <icon LS> is\nthe way of JYANPU. <input DASH></color>
+22	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe JYANPU eat them. <input DASH></color>
+23	<color COLOR_YELLOW>The master says: <icon LS> is\nthe way of JYANPU. <input DASH></color>
+24	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe JYANPU eat them. <input DASH></color>
+25	<color COLOR_YELLOW>Press <icon LS> now. Do not ask\nthe JYANPU why. <input DASH></color>
+26	<color COLOR_YELLOW>The master says: <icon LS> is\nthe way of JYANPU. <input DASH></color>
+27	<color COLOR_YELLOW>Use <input LOCK> and the elbow\nwill respect your family.</color>
+28	<color COLOR_YELLOW>Press <input CHANGE> now.\nDo not ask the tofu why.</color>
+29	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe DASSSHU eat them. <input LOCK></color>
+30	<color COLOR_YELLOW>When the DASSSHU is come, press <icon LS> for great justice. <input LOCK></color>
+31	<color COLOR_YELLOW>Use <icon LS> and the DASSSHU will\nrespect your family. <input LOCK></color>
+32	<color COLOR_YELLOW>When the DASSSHU is come, press <icon LS> for great justice. <input LOCK></color>
+33	<color COLOR_YELLOW>Press <icon LS> now. Do not ask\nthe TORANJISSHON why. <input DASH></color>
+34	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe TORANJISSHON eat them. <input DASH></color>
+35	<color COLOR_YELLOW>Use <input JUMP> and the TORANJISSHON\nwill respect your family.</color>
+36	<color COLOR_YELLOW>Beginner always forget <input JUMP>,\nthen the TORANJISSHON eat them.</color>
+37	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe DASSSHU eat them. <input DASH></color>
+38	<color COLOR_YELLOW>When the DASSSHU is come, press <icon LS> for great justice. <input DASH></color>
+39	<color COLOR_YELLOW>Press <icon LS> now. Do not ask\nthe DASSSHU why. <input DASH></color>
+40	<color COLOR_YELLOW>When the DASSSHU is come, press <icon LS> for great justice. <input DASH></color>
+41	<color COLOR_YELLOW>When the DASSSHU is come, press\n<input DASH> for great justice.</color>
+42	<color COLOR_YELLOW>Press <input DASH> now. Do\nnot ask the DASSSHU why.</color>
+43	<color COLOR_YELLOW>Beginner always forget <input DASH>, then the DASSSHU eat them.</color>
+44	<color COLOR_YELLOW>Beginner always forget <input DASH>, then the DASSSHU eat them.</color>
+45	<color COLOR_YELLOW>The master says: <input DASH> is the way of DASSSHU.</color>
+46	<color COLOR_YELLOW>Press <input DASH> now. Do\nnot ask the DASSSHU why.</color>
+47	<color COLOR_YELLOW>Press <input DASH> now. Do\nnot ask the DASSSHU why.</color>
+48	<color COLOR_YELLOW>When the DASSSHU is come, press\n<input DASH> for great justice.</color>
+49	<color COLOR_YELLOW>If your JYANPU is crying,\nit is time of <input JUMP>.</color>
+50	<color COLOR_YELLOW>When the DASSSHU is come, press\n<input DASH> for great justice.</color>
+51	<color COLOR_YELLOW>Beginner always forget <input DASH>, then the DASSSHU eat them.</color>
+52	<color COLOR_YELLOW>Beginner always forget <input DASH>, then the DASSSHU eat them.</color>
+53	<color COLOR_YELLOW>Beginner always forget <input DASH>, then the DASSSHU eat them.</color>
+54	<color COLOR_YELLOW>Use <input DASH> and the DASSSHU\nwill respect your family.</color>
+55	<color COLOR_YELLOW>If your DASSSHU is crying,\nit is time of <input DASH>.</color>
+56	<color COLOR_YELLOW>If your DASSSHU is crying,\nit is time of <input DASH>.</color>
+57	<color COLOR_YELLOW>Use <input DASH> and the DASSSHU\nwill respect your family.</color>
+58	<color COLOR_YELLOW>Use <input LOCK> and the TORANJISSHON\nwill respect your family.</color>
+59	<color COLOR_YELLOW>Press <input LOCK> now. Do\nnot ask the TORANJISSHON why.</color>
+60	<color COLOR_YELLOW>Beginner always forget <input LOCK>,\nthen the TORANJISSHON eat them.</color>
+61	<color COLOR_YELLOW>Beginner always forget <input LOCK>,\nthen the TORANJISSHON eat them.</color>
+62	<color COLOR_YELLOW>If your tofu is crying,\nit is time of <input RW>.</color>
+63	<color COLOR_YELLOW>When the receipt is come, press <icon LS> for great justice. <input RW></color>
+64	<color COLOR_YELLOW>Press <icon LS> now. Do not\nask the bomb why. <input RW></color>
+65	<color COLOR_YELLOW>Beginner always forget <icon LS>,\nthen the bicycle eat them. <input RW></color>
+66	<color COLOR_YELLOW>Beginner always forget <icon LS>,\nthen the rice eat them. <input RW></color>
+67	<color COLOR_YELLOW>If your ghost is crying, it is\ntime of <icon LS>. <input RW></color>
+68	<color COLOR_YELLOW>Beginner always forget <icon LS>,\nthen the justice eat them. <input RW></color>
+69	<color COLOR_YELLOW>Use <icon LS> and the shrimp will\nrespect your family. <input RW></color>
+70	<color COLOR_YELLOW>If your receipt is crying, it is\ntime of <icon LS>. <input RW></color>
+71	<color COLOR_YELLOW>Use <input RW> and the bicycle will\nrespect your family. <input DASH></color>
+72	<color COLOR_YELLOW>Beginner always forget <input RW>, then the DASSSHU eat them.</color>
+73	<color COLOR_YELLOW>Press <input RW> now. Do\nnot ask the DASSSHU why.</color>
+74	<color COLOR_YELLOW>If your DASSSHU is crying,\nit is time of <input RW>.</color>
+75	<color COLOR_YELLOW>Beginner always forget <input RW>, then the DASSSHU eat them.</color>
+76	<color COLOR_YELLOW>Beginner always forget <input RW>, then the DASSSHU eat them.</color>
+77	<color COLOR_YELLOW>Use <input RW> and the DASSSHU\nwill respect your family.</color>
+78	<color COLOR_YELLOW>Use <input RW> and the DASSSHU\nwill respect your family.</color>
+79	<color COLOR_YELLOW>Use <input RW> and the DASSSHU\nwill respect your family.</color>
+80	<color COLOR_YELLOW>Beginner always forget <input RW>, then the JYANPU eat them.</color>
+81	<color COLOR_YELLOW>Press <input RW> now. Do not\nask the JYANPU why. <input DASH></color>
+82	<color COLOR_YELLOW>Use <input RW> and the DASSSHU\nwill respect your family.</color>
+83	<color COLOR_YELLOW>Press <input RW> now. Do\nnot ask the DASSSHU why.</color>
+84	<color COLOR_YELLOW>When the DASSSHU is come, press\n<input RW> for great justice.</color>
+85	<color COLOR_YELLOW>Use <input RW> and the DASSSHU\nwill respect your family.</color>
+86	<color COLOR_YELLOW>When the DASSSHU is come, press\n<input RW> for great justice.</color>
+87	<color COLOR_YELLOW>If your DASSSHU is crying,\nit is time of <input RW>.</color>
+88	<color COLOR_YELLOW>If your DASSSHU is crying,\nit is time of <input RW>.</color>
+89	<color COLOR_YELLOW>The master says: <input RW> is the way of DASSSHU.</color>
+90	<color COLOR_YELLOW>If your TORANJISSHON is crying,\nit is time of <input RW>.</color>
+91	<color COLOR_YELLOW>If your TORANJISSHON is crying,\nit is time of <input RW>.</color>
+92	<color COLOR_YELLOW>The master says: <input LW> is the way of thunder.</color>
+93	<color COLOR_YELLOW>The master says: <icon LS> is\nthe way of elbow. <input LW></color>
+94	<color COLOR_YELLOW>Use <icon LS> and the pants will\nrespect your family. <input LW></color>
+95	<color COLOR_YELLOW>Use <icon LS> and the thunder will\nrespect your family. <input LW></color>
+96	<color COLOR_YELLOW>Beginner always forget <icon LS>,\nthen the destiny eat them. <input LW></color>
+97	<color COLOR_YELLOW>If your pants is crying, it is\ntime of <icon LS>. <input LW></color>
+98	<color COLOR_YELLOW>Use <icon LS> and the tofu will\nrespect your family. <input LW></color>
+99	<color COLOR_YELLOW>Press <icon LS> now. Do not\nask the justice why. <input LW></color>
+100	<color COLOR_YELLOW>When the bicycle is come, press <icon LS> for great justice. <input LW></color>
+101	<color COLOR_YELLOW>When the justice is come, press <input LW> for great justice. <input DASH></color>
+102	<color COLOR_YELLOW>Press <input LW> now. Do\nnot ask the DASSSHU why.</color>
+103	<color COLOR_YELLOW>Beginner always forget <input LW>, then the DASSSHU eat them.</color>
+104	<color COLOR_YELLOW>The master says: <input LW> is the way of DASSSHU.</color>
+105	<color COLOR_YELLOW>Use <input LW> and the DASSSHU\nwill respect your family.</color>
+106	<color COLOR_YELLOW>Press <input LW> now. Do\nnot ask the DASSSHU why.</color>
+107	<color COLOR_YELLOW>Press <input LW> now. Do\nnot ask the DASSSHU why.</color>
+108	<color COLOR_YELLOW>Use <input LW> and the DASSSHU\nwill respect your family.</color>
+109	<color COLOR_YELLOW>Beginner always forget <input LW>, then the DASSSHU eat them.</color>
+110	<color COLOR_YELLOW>Beginner always forget <input LW>, then the JYANPU eat them.</color>
+111	<color COLOR_YELLOW>If your JYANPU is crying, it is\ntime of <input LW>. <input DASH></color>
+112	<color COLOR_YELLOW>Beginner always forget <input LW>, then the DASSSHU eat them.</color>
+113	<color COLOR_YELLOW>Press <input LW> now. Do\nnot ask the DASSSHU why.</color>
+114	<color COLOR_YELLOW>The master says: <input LW> is the way of DASSSHU.</color>
+115	<color COLOR_YELLOW>Use <input LW> and the DASSSHU\nwill respect your family.</color>
+116	<color COLOR_YELLOW>When the DASSSHU is come, press\n<input LW> for great justice.</color>
+117	<color COLOR_YELLOW>The master says: <input LW> is the way of DASSSHU.</color>
+118	<color COLOR_YELLOW>When the DASSSHU is come, press\n<input LW> for great justice.</color>
+119	<color COLOR_YELLOW>The master says: <input LW> is the way of DASSSHU.</color>
+120	<color COLOR_YELLOW>The master says: <input LW>\nis the way of TORANJISSHON.</color>
+121	<color COLOR_YELLOW>When the TORANJISSHON is come,\npress <input LW> for great justice.</color>
+122	<color COLOR_YELLOW>Use <input RW> and the tofu will\nrespect your family. <input LW></color>
+123	<color COLOR_YELLOW>If your fist is crying, it is time\nof <icon LS>. <input RW> <input LW></color>
+124	<color COLOR_YELLOW>The master says: <icon LS> is the way\nof dumpling. <input RW> <input LW></color>
+125	<color COLOR_YELLOW>If your robot is crying, it is time\nof <icon LS>. <input RW> <input LW></color>
+126	<color COLOR_YELLOW>If your justice is crying, it is time\nof <icon LS>. <input RW> <input LW></color>
+127	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe robot eat them. <input RW> <input LW></color>
+128	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe uncle eat them. <input RW> <input LW></color>
+129	<color COLOR_YELLOW>Press <icon LS> now. Do not ask the\nkettle why. <input RW> <input LW></color>
+130	<color COLOR_YELLOW>Press <icon LS> now. Do not ask the\ndumpling why. <input RW> <input LW></color>
+131	<color COLOR_YELLOW>If your thunder is crying, it is time\nof <input RW>. <input LW> <input DASH></color>
+132	<color COLOR_YELLOW>Press <input RW> now. Do not\nask the DASSSHU why. <input LW></color>
+133	<color COLOR_YELLOW>Press <input RW> now. Do not\nask the DASSSHU why. <input LW></color>
+134	<color COLOR_YELLOW>When the DASSSHU is come, press <input RW> for great justice. <input LW></color>
+135	<color COLOR_YELLOW>Use <input RW> and the DASSSHU will\nrespect your family. <input LW></color>
+136	<color COLOR_YELLOW>Beginner always forget <input RW>,\nthen the DASSSHU eat them. <input LW></color>
+137	<color COLOR_YELLOW>Beginner always forget <input RW>,\nthen the DASSSHU eat them. <input LW></color>
+138	<color COLOR_YELLOW>Beginner always forget <input RW>,\nthen the DASSSHU eat them. <input LW></color>
+139	<color COLOR_YELLOW>Beginner always forget <input RW>,\nthen the DASSSHU eat them. <input LW></color>
+140	<color COLOR_YELLOW>Beginner always forget <input RW>,\nthen the JYANPU eat them. <input LW></color>
+141	<color COLOR_YELLOW>If your JYANPU is crying, it is time\nof <input RW>. <input LW> <input DASH></color>
+142	<color COLOR_YELLOW>Press <input RW> now. Do not\nask the DASSSHU why. <input LW></color>
+143	<color COLOR_YELLOW>Press <input RW> now. Do not\nask the DASSSHU why. <input LW></color>
+144	<color COLOR_YELLOW>The master says: <input RW> is\nthe way of DASSSHU. <input LW></color>
+145	<color COLOR_YELLOW>Beginner always forget <input RW>,\nthen the DASSSHU eat them. <input LW></color>
+146	<color COLOR_YELLOW>The master says: <input RW> is\nthe way of DASSSHU. <input LW></color>
+147	<color COLOR_YELLOW>Use <input RW> and the DASSSHU will\nrespect your family. <input LW></color>
+148	<color COLOR_YELLOW>Use <input RW> and the DASSSHU will\nrespect your family. <input LW></color>
+149	<color COLOR_YELLOW>If your DASSSHU is crying, it is\ntime of <input RW>. <input LW></color>
+150	<color COLOR_YELLOW>Use <input RW> and the TORANJISSHON\nwill respect your family. <input LW></color>
+151	<color COLOR_YELLOW>Press <input RW> now. Do not ask\nthe TORANJISSHON why. <input LW></color>
+152	<color COLOR_YELLOW>The master says: <input MELEE> is the way of fist.</color>
+153	<color COLOR_YELLOW>Beginner always forget <input MELEE>, then the bomb eat them.</color>
+154	<color COLOR_YELLOW>If your DASSSHU is crying,\nit is time of <input MELEE>.</color>
+155	<color COLOR_YELLOW>Beginner always forget <input MELEE>, then the JYANPU eat them.</color>
+156	<color COLOR_YELLOW>The master says: <input MELEE> is the way of DASSSHU.</color>
+157	<color COLOR_YELLOW>Use <input MELEE> and the DAUN\nwill respect your family.</color>
+158	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe GAADO eat them. <input MELEE></color>
+159	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe GAADO eat them. <input MELEE></color>
+160	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe GAADO eat them. <input MELEE></color>
+161	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe GAADO eat them. <input MELEE></color>
+162	<color COLOR_YELLOW>I shall punch the DAUN with my\nwhole heart and also the spleen.</color>
+163	<color COLOR_YELLOW>Beginner always forget <input MELEE>, then the DAUN eat them.</color>
+164	<color COLOR_YELLOW>If your SUTABIRITI is crying, it is\ntime of <input RW>. <input DASH></color>
+165	<color COLOR_YELLOW>Use <icon TOUCH> and the zig\nwill respect your family.</color>
+166	<color COLOR_YELLOW>Hmm. I understand everything except\nfor the BUUSUTO, and also the rest.</color>
+167	<color COLOR_YELLOW>Beginner always forget <input RW>, then the\nDASSSHU eat them. <input LW> <input DASH></color>
+168	<color COLOR_YELLOW>Use <input RW> and the soup\nwill respect your family.</color>
+169	<color COLOR_YELLOW>Very RINGU</color>
+170	<color COLOR_YELLOW>Use <input RW> and the tofu will\nrespect your family. <input RW></color>
+171	<color COLOR_YELLOW>We fight because of the RINGUSAIDO,\nbut the RINGUSAIDO does not love us.</color>
+172	<color COLOR_YELLOW>My father's PITTOERIA did\nnot teach me this feeling.</color>
+173	<color COLOR_YELLOW>Bus of TAGGUBATORU</color>
+174	<color COLOR_YELLOW>Crooked MAPPU</color>
+175	<color COLOR_YELLOW>All your KIIPU is belong\nto the honorable me.</color>
+176	<color COLOR_YELLOW>We fight because of the BOORU,\nbut the BOORU does not love us.</color>
+177	<color COLOR_YELLOW>Use <input MELEE> and the\nKOODOATAKKU will respect your family.</color>
+178	<color COLOR_YELLOW>If your tofu is crying,\nit is time of <input RW>.</color>
+179	<color COLOR_YELLOW>Press <input RW> now. Do not\nask the pants why. <input DASH></color>
+180	<color COLOR_YELLOW>The master says: <input LW> is the way of thunder.</color>
+181	<color COLOR_YELLOW>The master says: <input LW> is\nthe way of noodle. <input DASH></color>
+182	<color COLOR_YELLOW>Press <input RW> now. Do not\nask the thunder why. <input LW></color>
+183	<color COLOR_YELLOW>If your justice is crying, it is time\nof <input RW>. <input LW> <input DASH></color>
+184	<color COLOR_YELLOW>Ultra dumpling DX</color>
+185	<color COLOR_YELLOW>I will now do the secret technique\nof BOORU, please hold my bag.</color>
+186	<color COLOR_YELLOW>Use <input MELEE> and the DAUN\nwill respect your family.</color>
+187	<color COLOR_YELLOW>Use <input MELEE> and the DAUN\nwill respect your family.</color>
+188	<color COLOR_YELLOW>Use <input MELEE> and the DAUN\nwill respect your family.</color>
+189	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe GAADO eat them. <input MELEE></color>
+190	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe GAADO eat them. <input MELEE></color>
+191	<color COLOR_YELLOW>Beginner always forget <icon LS>, then\nthe GAADO eat them. <input MELEE></color>
+192	<color COLOR_YELLOW>Use <input MELEE> and the\nKOODOATAKKU will respect your family.</color>
+193	<color COLOR_YELLOW>Use <input MELEE> and the\nKOODOATAKKU will respect your family.</color>
+194	<color COLOR_YELLOW>Use <input MELEE> and the\nKOODOATAKKU will respect your family.</color>

@@ -203,10 +203,12 @@ enum { O_PS4_WRONLY = 1, O_PS4_RDWR = 2, O_PS4_APPEND = 8, O_PS4_CREAT = 0x200, 
 
 static SRWLOCK file_lock = SRWLOCK_INIT; /* positioned reads and writes seek first */
 
-/* Translation overlays (analysis\scripts\tl_pack.py): byte ranges laid over an archive as it is read, from
- * translation\<disc>.overlay in the working directory. The archive itself never changes. */
+/* Translation overlays, with --english or --user-tl (analysis\scripts\tl_pack.py): byte ranges laid over
+ * an archive as it is read, from <folder>\<disc>.overlay in the working directory. Ranges can reach past the
+ * end of the file, which makes it look bigger. The archive itself never changes. */
+const char *rt_overlay_folder;
 typedef struct { uint64_t offset; uint32_t size, reserved; } OverlayRange;
-typedef struct { const char *name; uint32_t count; const OverlayRange *ranges; const uint8_t *bytes; uint8_t *seen; } Overlay;
+typedef struct { const char *name; uint32_t count; uint64_t size; const OverlayRange *ranges; const uint8_t *bytes; uint8_t *seen; } Overlay;
 enum { OVERLAY_FDS = 1024 };
 static const Overlay *fd_overlay[OVERLAY_FDS];
 
@@ -214,6 +216,7 @@ static const Overlay *load_overlay(const char *guest_path) {
     static SRWLOCK lock = SRWLOCK_INIT;
     static Overlay loaded[8];
     static int loaded_count;
+    if (!rt_overlay_folder) return NULL;
     const char *base = strrchr(guest_path, '/');
     base = base ? base + 1 : guest_path;
     const size_t length = strlen(base);
@@ -226,19 +229,20 @@ static const Overlay *load_overlay(const char *guest_path) {
         if (!strcmp(loaded[i].name, name)) result = &loaded[i];
     if (!result && loaded_count < 8) {
         char file[128];
-        snprintf(file, sizeof(file), "translation/%s.overlay", name);
+        snprintf(file, sizeof(file), "%s/%s.overlay", rt_overlay_folder, name);
         FILE *f = fopen(file, "rb");
         uint8_t *all = NULL;
         long size = 0;
-        if (f && !fseek(f, 0, SEEK_END) && (size = ftell(f)) > 8 && !fseek(f, 0, SEEK_SET) && (all = malloc((size_t)size)) &&
+        if (f && !fseek(f, 0, SEEK_END) && (size = ftell(f)) > 16 && !fseek(f, 0, SEEK_SET) && (all = malloc((size_t)size)) &&
             fread(all, 1, (size_t)size, f) == (size_t)size && !memcmp(all, "VOXP", 4)) {
             Overlay *o = &loaded[loaded_count++];
             o->name = _strdup(name);
             memcpy(&o->count, all + 4, 4);
-            o->ranges = (const OverlayRange *)(all + 8);
-            o->bytes = all + 8 + (size_t)o->count * sizeof(OverlayRange);
+            memcpy(&o->size, all + 8, 8);
+            o->ranges = (const OverlayRange *)(all + 16);
+            o->bytes = all + 16 + (size_t)o->count * sizeof(OverlayRange);
             o->seen = calloc(o->count, 1);
-            printf("HLE: translation overlay for %s: %u files\n", name, o->count);
+            printf("HLE: translation overlay %s for %s: %u ranges\n", rt_overlay_folder, name, o->count);
             result = o;
         }
         if (f) fclose(f);
@@ -306,8 +310,16 @@ static int64_t read_into_guest(int32_t fd, uint8_t *data, uint64_t size) {
     while (done < size) {
         const unsigned want = size - done < READ_CHUNK ? (unsigned)(size - done) : READ_CHUNK;
         const int64_t position = overlay ? _telli64(fd) : 0;
-        const int n = _read(fd, read_buffer, want);
+        int n = _read(fd, read_buffer, want);
         if (n < 0) return done ? (int64_t)done : -1;
+        if (overlay && (uint64_t)position + (uint64_t)n < overlay->size && (unsigned)n < want) {
+            /* Past the real end of the archive: only the overlay has anything here. */
+            const uint64_t left = overlay->size - (uint64_t)position;
+            const int extended = left < want ? (int)left : (int)want;
+            memset(read_buffer + n, 0, (size_t)(extended - n));
+            n = extended;
+            _lseeki64(fd, position + n, SEEK_SET);
+        }
         if (!n) break;
         if (overlay) apply_overlay(overlay, (uint64_t)position, read_buffer, (uint64_t)n);
         memcpy(data + done, read_buffer, (size_t)n);
@@ -329,6 +341,10 @@ static ABI int64_t kernel_write(int32_t fd, const void *data, uint64_t size) {
     return n < 0 ? ORBIS_ERR(orbis_from_crt()) : n;
 }
 static ABI int64_t kernel_lseek(int32_t fd, int64_t offset, int32_t whence) {
+    if (whence == SEEK_END && fd >= 0 && fd < OVERLAY_FDS && fd_overlay[fd]) {
+        offset += (int64_t)fd_overlay[fd]->size;
+        whence = SEEK_SET;
+    }
     const int64_t r = _lseeki64(fd, offset, whence);
     return r < 0 ? ORBIS_ERR(orbis_from_crt()) : r;
 }
@@ -388,6 +404,8 @@ static ABI int32_t kernel_stat(const char *path, GuestStat *out) {
         return ORBIS_ERR(orbis_from_crt());
     }
     fill_stat(out, &s);
+    const Overlay *overlay = load_overlay(path);
+    if (overlay) out->size = (int64_t)overlay->size;
     return 0;
 }
 static ABI int32_t kernel_check_reachability(const char *path) {
@@ -399,6 +417,7 @@ static ABI int32_t kernel_fstat(int32_t fd, GuestStat *out) {
     if (!out) return ORBIS_ERR(E_INVAL);
     if (_fstat64(fd, &s)) return ORBIS_ERR(E_BADF);
     fill_stat(out, &s);
+    if (fd >= 0 && fd < OVERLAY_FDS && fd_overlay[fd]) out->size = (int64_t)fd_overlay[fd]->size;
     return 0;
 }
 static ABI int32_t kernel_fsync(int32_t fd) { return _commit(fd) ? ORBIS_ERR(E_BADF) : 0; }

@@ -1,0 +1,189 @@
+0	Mode Finish Do And\nTo Menu Return?
+4	Select a network mode.
+5	Connecting to the network..
+6	Disconnecting from the network..
+7	Play Training Mode\nwhile you wait?
+8	Searching for players..
+9	Canceling matchmaking..
+10	Match found.
+11	%s\nFight this opponent?\n%d seconds left.
+12	Searching for rooms..
+13	Incorrect password.
+14	Getting history..
+15	Select a lock-on mode.
+16	Creating room..
+17	Close this room?
+18	Leave this room?
+19	Joining room..
+20	Kick this player?
+21	Waiting for other players..
+22	Not enough free system storage.\nYou need at least <ARG>MB more to continue.\nQuit the game and free up space.
+23	Checking trophies.
+24	Installing trophy data.\nDo not turn off your PlayStation<icon COPY_R>4 system.
+25	Installing trophy data.\nDo not turn off your PlayStation<icon COPY_R>Vita system.
+26	Installation failed.\nPlease quit the game.
+27	Loading save data.
+28	Creating save data.
+29	Save data is corrupted.\nDelete it and create new save data?
+30	Another user's save data can't be used.\nDelete it and create new save data?
+31	Failed to load save data.\nDelete it and create new save data?
+32	Not enough free space for save data.\nThis game needs <ARG>MB of free space.\nPress the PS button to quit and free up space.
+33	Failed to create save data.\nTry again?
+34	You can't continue without\ncreating new save data.
+35	Checking downloadable content.
+36	Checking for title updates.
+37	Some downloadable content is corrupted.\nDownload it again to apply it.\nIf you start now, it may\nnot work correctly.
+38	Some data is corrupted.\nDownload it again to apply it.\nIf you start now, it may\nnot work correctly.
+39	Step 1\nMove
+40	Step 2\nTurn
+41	Step 3\nDash
+42	Step 4\nJump/Air Dash
+43	Step 5\nLock-On
+44	Step 6\nTransition
+45	Step 1\nVertical Turn
+46	Step 2\nDash Cancel
+47	Step 3\nJump Cancel
+48	Step 4\nTransition Cancel
+49	Step 1\nRW Attack
+50	Step 2\nDash RW Attack
+51	Step 3\nJump RW Attack
+52	Step 4\nAir Dash RW Attack
+53	Step 5\nTransition RW Attack
+54	Step 1\nLW Attack
+55	Step 2\nDash LW Attack
+56	Step 3\nJump LW Attack
+57	Step 4\nAir Dash LW Attack
+58	Step 5\nTransition LW Attack
+59	Step 1\nCW Attack
+60	Step 2\nDash CW Attack
+61	Step 3\nJump CW Attack
+62	Step 4\nAir Dash CW Attack
+63	Step 5\nTransition CW Attack
+64	Step 1\nMelee Attack
+65	Step 2\nMelee Variations
+66	Step 3\nFollow-Up Attack
+67	Step 4\nGuard
+68	Step 1\nDown
+69	Step 2\nSpecial Points
+70	Step 3\nVoost
+71	Step 4\nSpecial Moves
+73	Step 1\nBattle Missions
+74	Step 2\nConsecutive Battles
+75	Step 3\nDestruction
+76	Step 4\nKill Attack
+77	Step 5\nBoss Battle
+78	Step 6\nPit In
+79	Step 1\nTag Battle
+80	Step 2\nRingside
+81	Step 3\nChange
+82	Step 1\nExplosion Code
+83	Step 2\nStealing the Code
+84	Step 3\nCode Attack
+85	Step 4\nPass
+86	Step 4\nNotes
+87	\n\nBuy this?\n\nResource owned: %d\nResource cost: %d
+90	Yes
+91	No
+92	KYANSERU
+94	Fight
+95	Decline
+98	Close
+99	Leave
+100	On
+101	Off
+102	Ad Hoc
+103	Infrastructure
+104	<icon B_X>Cancel
+105	Smart
+106	Veteran
+107	Buy
+108	This game autosaves.\nDo not turn off the power while the save\nicon is showing at the lower right.\n\nTurning off the power during an autosave\nmay corrupt your save data.
+109	Upload
+110	Download
+111	Upload local save data to the server.\nThis overwrites the server's data. Continue?
+112	Upload complete.
+113	Download complete.
+114	Upload failed.
+115	Download failed.
+116	To Next Advance
+117	Select upload or download.
+118	Checking opponent..
+119	\n\nNot enough Resource.\n\nResource owned: %d\nResource cost: %d
+120	Step 1\nMove
+121	Step 2\nDash
+122	Step 3\nRW Attack
+123	Step 4\nDash RW Attack
+124	Keep playing Rank Match?
+125	To Menu Return But,\nIs It Good?
+126	Select the Training\nMode rules.
+129	No opponent found.\nSearch again?
+130	The host closed the room.
+131	Connection lost.
+132	Step 1\nMove
+133	Step 2\nDash
+134	Step 3\nRW Attack
+135	Step 4\nDash RW Attack
+136	Failed to connect to the network.
+137	Failed to create the room.
+138	Failed to join the room.
+139	Changing room settings..
+140	Room settings changed.
+141	Network Error 04
+142	Network Error 05
+143	Network Error 06
+144	Network Error 07
+145	Network Error 08
+146	Network Error 09
+147	Mission difficulty "%s" is now available.
+148	Mission "%s" on\ndifficulty "%s"\nis now available.
+149	Got mission "%s"\non difficulty "%s".
+150	"%s" is now available.
+151	Custom colors for "%s" are now available.
+152	Got "%s".
+153	Stage "%s" is now available.
+154	Got stage "%s".
+155	Illustration "%s" is now available.
+156	"%s" items are now available in Terminal.
+157	Model "%s" is now available in the Gallery.
+158	Got illustration "%s".
+159	Got Gallery model "%s".
+160	Voice "%s" is now available.
+161	Got voice "%s".
+162	BGM "%s" is now available.
+163	Got BGM "%s".
+164	Got title "%s".
+165	Titles for "%s" can now be earned.
+166	Got medal "%s".
+167	Got background "%s".
+168	Online multiplayer requires a\nPlayStation<icon COPY_R>Plus membership.
+169	Quit this mode and\njoin the player room?
+170	Leave this room and join the\nplayer room you were invited to?
+171	Couldn't join because you are\nalready in online multiplayer.
+172	No save data on the server,\nso nothing can be downloaded.\nReturning to the Main Menu.
+173	Checking server
+174	Download save data from the server.\nThis overwrites your local data. Continue?
+175	[Co-op Missions Only]
+176	Skip Do?
+177	Mode Finish Do And\nTo Menu Return?
+178	Failed to save replay data.
+179	Saving replay data..
+180	Retry
+181	Delete the corrupted replay data\nand create new replay data.
+182	This Game Is Online Corresponding.\nIf Network Is Not Connected\nOne Part Function Use Impossible.
+183	A Certain Magical Virtual-On Replay Data
+184	Replay Data
+185	Replay data for A Certain Magical Virtual-On
+186	No match found.\nSearch again?
+187	Couldn't enter because you\nhaven't unlocked the Black Room.
+188	Please wait for installation to finish.
+189	Failed to save replay data.\n \nTry saving again?\nOr return to the menu without saving?\nThis replay will be lost.
+190	Failed to save replay data.\n \nTry saving again?\nOr return to the menu without saving?\nYour changes will be lost.
+191	To Menu Return
+192	Up to 40 replays can\nbe protected.
+193	Couldn't join because\nthe room is full.
+194	No room found.\nSearch again?
+195	Cancel entry.
+196	Couldn't join because the room's\nslots are reserved for invitees.
+197	Couldn't establish a connection.
+198	Couldn't join because the\napplication versions differ.
+199	Couldn't play the replay because it was\nsaved with a different application version.

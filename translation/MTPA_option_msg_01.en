@@ -1,0 +1,64 @@
+0	BGM Sound Amount
+1	SE Sound Amount
+2	Voice Sound Amount
+3	Auto Lock-On
+4	Controller Shake Setting
+5	Pilot
+6	Virtuaroid
+7	Special Move
+8	Boost Weapon
+9	Left Weapon
+10	Right Weapon
+11	Turbo+Left Weapon
+12	Turbo+Right Weapon
+13	Turbo
+14	Target Lock
+15	Jump
+16	Close Fight Attack
+17	Data Display
+18	 Fixed Sight
+19	 Range Meter
+20	 Lock-On Warning
+21	Direction Key Up
+22	Direction Key Down
+23	Direction Key Left
+24	Direction Key Right
+25	Auto Matching
+26	Rank Points
+27	Disconnect Rate
+28	Connection
+29	SHARE
+30	Standby Screen
+31	Player Character
+32	Partner Character
+33	Enemy 1 Character
+34	Enemy 2 Character
+35	Partner Control
+36	Enemy 1 Control
+37	Enemy 2 Control
+38	Difficulty
+39	Stage Select
+40	Format
+41	Point System
+42	Time Limit
+43	Point Count
+44	Enemy Lock-On
+45	HP Auto Recovery
+46	Stability Gauge
+47	Boost Gauge
+48	Status Effects
+49	Boost Weapon/Player
+50	Boost Weapon/Partner
+51	Boost Weapon/Enemy 1
+52	Boost Weapon/Enemy 2
+53	Menu Display
+54	 Input History
+55	 Attack Data
+56	 Damage Taken Data
+57	 Stability Multiplier
+58	To Default Return
+59	Setting Finish
+60	Press
+61	Touchpad Button
+62	Touchscreen
+63	Lock-On Type
