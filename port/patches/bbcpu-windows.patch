@@ -1,0 +1,603 @@
+diff --git a/src/cpu/bbcpu.h b/src/cpu/bbcpu.h
+index af019da..20f3358 100644
+--- a/src/cpu/bbcpu.h
++++ b/src/cpu/bbcpu.h
+@@ -11,7 +11,7 @@ extern "C" {
+ #endif
+ 
+ /* bbcpu is built on macOS (src/cpu, build.sh); elsewhere guest code runs natively. */
+-#if defined(__APPLE__)
++#if defined(__APPLE__) || defined(_WIN32)
+ #define BB_HAVE_BBCPU 1
+ #endif
+ #ifdef BB_HAVE_BBCPU
+diff --git a/src/cpu/cpu_internal.h b/src/cpu/cpu_internal.h
+index bcbd422..23f7376 100644
+--- a/src/cpu/cpu_internal.h
++++ b/src/cpu/cpu_internal.h
+@@ -121,6 +121,10 @@ typedef struct {
+     uint64_t rax, rdx;
+     BbVec xmm0, xmm1;
+ } BbHostArgs;
++#if defined(_WIN32)
++/* hostcall.S takes SysV arguments and calls SysV host functions (HLE functions: sysv_abi). */
++__attribute__((sysv_abi))
++#endif
+ void bbcpu_hostcall(const void *fn, BbHostArgs *args);
+ 
+ /* Decode cache. */
+diff --git a/src/cpu/interp_vec.c b/src/cpu/interp_vec.c
+index f789df6..686295c 100644
+--- a/src/cpu/interp_vec.c
++++ b/src/cpu/interp_vec.c
+@@ -697,6 +697,45 @@ int bbcpu_exec_vec(BbCpu *cpu, const BbInsn *in) {
+         vwrite(cpu, in, o.dst, &r, width(in));
+         return 1;
+     }
++#if defined(__x86_64__)
++    /* The SSE4.2 string compares libc.prx uses (its str* functions), run on the host's own instruction:
++     * only the immediates seen, anything else stops as unsupported. */
++    case M(PCMPISTRM): case M(VPCMPISTRM): case M(PCMPISTRI): case M(VPCMPISTRI): {
++        const BbVec a = vread(cpu, in, &in->op[0]), b = vread(cpu, in, &in->op[1]);
++        const int imm = (int)in->op[2].disp;
++        BbVec r;
++        memset(&r, 0, sizeof(r));
++        uint64_t host_flags;
++        uint32_t index = 0;
++        if ((m == M(PCMPISTRM) || m == M(VPCMPISTRM)) && imm == 0x78) {
++            __asm__ volatile("movdqu %[a], %%xmm1\n movdqu %[b], %%xmm2\n pcmpistrm $0x78, %%xmm2, %%xmm1\n"
++                             "pushfq\n pop %[f]\n movdqu %%xmm0, %[r]\n"
++                             : [f] "=r"(host_flags), [r] "=m"(r.b[0]) : [a] "m"(a.b[0]), [b] "m"(b.b[0])
++                             : "xmm0", "xmm1", "xmm2", "cc");
++            memcpy(&cpu->v[0], r.b, 16);
++            if (m == M(VPCMPISTRM)) memset(cpu->v[0].b + 16, 0, 16);
++        } else if ((m == M(PCMPISTRI) || m == M(VPCMPISTRI)) && imm == 0x18) {
++            __asm__ volatile("movdqu %[a], %%xmm1\n movdqu %[b], %%xmm2\n pcmpistri $0x18, %%xmm2, %%xmm1\n"
++                             "pushfq\n pop %[f]\n mov %%ecx, %[i]\n"
++                             : [f] "=r"(host_flags), [i] "=r"(index) : [a] "m"(a.b[0]), [b] "m"(b.b[0])
++                             : "rcx", "xmm1", "xmm2", "cc");
++            cpu->r[RCX] = index;
++        } else {
++            return 0;
++        }
++        cpu->flags = (cpu->flags & ~(uint64_t)F_ARITH) | (host_flags & F_ARITH);
++        return 1;
++    }
++#endif
++    case M(ADDSUBPD): case M(VADDSUBPD): {
++        const Ops o = ops3(in);
++        const BbVec a = vread(cpu, in, o.s1), b = vread(cpu, in, o.s2);
++        BbVec r;
++        memset(&r, 0, sizeof(r));
++        for (int i = 0; i < width(in) / 8; ++i) r.fd[i] = (i & 1) ? a.fd[i] + b.fd[i] : a.fd[i] - b.fd[i];
++        vwrite(cpu, in, o.dst, &r, width(in));
++        return 1;
++    }
+     case M(DPPS): case M(VDPPS): {
+         const Ops o = ops3(in);
+         const BbVec a = vread(cpu, in, o.s1), b = vread(cpu, in, o.s2);
+@@ -992,7 +1031,7 @@ int bbcpu_exec_vec(BbCpu *cpu, const BbInsn *in) {
+     case M(PMOVZXBW): case M(VPMOVZXBW): case M(PMOVZXBD): case M(VPMOVZXBD): case M(PMOVZXWD):
+     case M(VPMOVZXWD): case M(PMOVZXDQ): case M(VPMOVZXDQ): case M(PMOVSXBW): case M(VPMOVSXBW):
+     case M(PMOVSXWD): case M(VPMOVSXWD): case M(PMOVSXDQ): case M(VPMOVSXDQ): case M(PMOVSXBD):
+-    case M(VPMOVSXBD): {
++    case M(VPMOVSXBD): case M(PMOVSXBQ): case M(VPMOVSXBQ): case M(PMOVZXWQ): case M(VPMOVZXWQ): {
+         const BbVec s = vread(cpu, in, &in->op[1]);
+         BbVec r;
+         memset(&r, 0, sizeof(r));
+@@ -1005,6 +1044,8 @@ int bbcpu_exec_vec(BbCpu *cpu, const BbInsn *in) {
+         case M(PMOVSXBW): case M(VPMOVSXBW): for (int i = 0; i < w / 2; ++i) r.sw[i] = s.sb[i]; break;
+         case M(PMOVSXWD): case M(VPMOVSXWD): for (int i = 0; i < w / 4; ++i) r.sd[i] = s.sw[i]; break;
+         case M(PMOVSXDQ): case M(VPMOVSXDQ): for (int i = 0; i < w / 8; ++i) r.sq[i] = s.sd[i]; break;
++        case M(PMOVSXBQ): case M(VPMOVSXBQ): for (int i = 0; i < w / 8; ++i) r.sq[i] = s.sb[i]; break;
++        case M(PMOVZXWQ): case M(VPMOVZXWQ): for (int i = 0; i < w / 8; ++i) r.q[i] = s.w[i]; break;
+         default: for (int i = 0; i < w / 4; ++i) r.sd[i] = s.sb[i]; break;
+         }
+         vwrite(cpu, in, &in->op[0], &r, w);
+diff --git a/src/win/include/dlfcn.h b/src/win/include/dlfcn.h
+new file mode 100644
+index 0000000..a19aa47
+--- /dev/null
++++ b/src/win/include/dlfcn.h
+@@ -0,0 +1 @@
++/* Empty: win_compat.h, force-included, declares what POSIX code expects from this header. */
+diff --git a/src/win/include/pthread.h b/src/win/include/pthread.h
+new file mode 100644
+index 0000000..a19aa47
+--- /dev/null
++++ b/src/win/include/pthread.h
+@@ -0,0 +1 @@
++/* Empty: win_compat.h, force-included, declares what POSIX code expects from this header. */
+diff --git a/src/win/include/sys/mman.h b/src/win/include/sys/mman.h
+new file mode 100644
+index 0000000..a19aa47
+--- /dev/null
++++ b/src/win/include/sys/mman.h
+@@ -0,0 +1 @@
++/* Empty: win_compat.h, force-included, declares what POSIX code expects from this header. */
+diff --git a/src/win/include/unistd.h b/src/win/include/unistd.h
+new file mode 100644
+index 0000000..a19aa47
+--- /dev/null
++++ b/src/win/include/unistd.h
+@@ -0,0 +1 @@
++/* Empty: win_compat.h, force-included, declares what POSIX code expects from this header. */
+diff --git a/src/win/win_compat.c b/src/win/win_compat.c
+new file mode 100644
+index 0000000..0408356
+--- /dev/null
++++ b/src/win/win_compat.c
+@@ -0,0 +1,149 @@
++/* Windows implementations of what win_compat.h declares. */
++#ifdef _WIN32
++#include <windows.h>
++#include <fcntl.h>
++#include <process.h>
++#include <stdlib.h>
++
++#undef write
++
++int bb_win_compat_linked;
++
++/* Files are bytes, as on POSIX: bbrecomp writes C and reads it back with fseek and ftell. */
++__attribute__((constructor)) static void binary_files(void) {
++    _set_fmode(_O_BINARY);
++    _setmode(_fileno(stdout), _O_BINARY);
++    _setmode(_fileno(stderr), _O_BINARY);
++}
++
++int ftruncate(int fd, long long size) { return _chsize_s(fd, size) == 0 ? 0 : -1; }
++
++unsigned sleep(unsigned seconds) {
++    Sleep(seconds * 1000);
++    return 0;
++}
++
++void *memmem(const void *haystack, size_t haystack_size, const void *needle, size_t needle_size) {
++    if (!needle_size) return (void *)haystack;
++    const char *h = haystack;
++    for (size_t i = 0; i + needle_size <= haystack_size; ++i)
++        if (!memcmp(h + i, needle, needle_size)) return (void *)(h + i);
++    return NULL;
++}
++
++int bb_win_clock_gettime(int clock, struct timespec *t) {
++    (void)clock;
++    static LONGLONG frequency;
++    if (!frequency) {
++        LARGE_INTEGER f;
++        QueryPerformanceFrequency(&f);
++        frequency = f.QuadPart;
++    }
++    LARGE_INTEGER now;
++    QueryPerformanceCounter(&now);
++    t->tv_sec = (time_t)(now.QuadPart / frequency);
++    t->tv_nsec = (long)((now.QuadPart % frequency) * 1000000000 / frequency);
++    return 0;
++}
++
++static DWORD protection(int prot) {
++    if (prot & 4) return prot & 2 ? PAGE_EXECUTE_READWRITE : PAGE_EXECUTE_READ;
++    if (prot & 2) return PAGE_READWRITE;
++    return prot & 1 ? PAGE_READONLY : PAGE_NOACCESS;
++}
++
++void *mmap(void *address, size_t size, int prot, int flags, int fd, long long offset) {
++    (void)offset;
++    if (fd != -1 || !(flags & 0x20)) return (void *)-1;
++    if (!(flags & 0x10)) {
++        void *p = VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT, protection(prot));
++        return p ? p : (void *)-1;
++    }
++    /* Windows allocates on 64 KiB boundaries; a fixed address must still come back as asked. */
++    const uintptr_t at = (uintptr_t)address, start = at & ~(uintptr_t)0xffff;
++    const size_t span = ((at + size + 0xffff) & ~(uintptr_t)0xffff) - start;
++    if (!VirtualAlloc((void *)start, span, MEM_RESERVE | MEM_COMMIT, protection(prot))) return (void *)-1;
++    return address;
++}
++
++int munmap(void *address, size_t size) {
++    (void)size;
++    MEMORY_BASIC_INFORMATION info;
++    if (!VirtualQuery(address, &info, sizeof(info))) return -1;
++    return VirtualFree(info.AllocationBase, 0, MEM_RELEASE) ? 0 : -1;
++}
++
++int mprotect(void *address, size_t size, int prot) {
++    DWORD old;
++    return VirtualProtect(address, size, protection(prot), &old) ? 0 : -1;
++}
++
++int pthread_mutex_lock(pthread_mutex_t *mutex) {
++    AcquireSRWLockExclusive((PSRWLOCK)mutex);
++    return 0;
++}
++
++int pthread_mutex_unlock(pthread_mutex_t *mutex) {
++    ReleaseSRWLockExclusive((PSRWLOCK)mutex);
++    return 0;
++}
++
++pthread_t pthread_self(void) { return (pthread_t)GetCurrentThreadId(); }
++
++typedef struct { void *(*start)(void *); void *argument; } ThreadStart;
++
++static unsigned __stdcall thread_entry(void *p) {
++    ThreadStart s = *(ThreadStart *)p;
++    free(p);
++    s.start(s.argument);
++    return 0;
++}
++
++int pthread_create(pthread_t *thread, const void *attributes, void *(*start)(void *), void *argument) {
++    (void)attributes;
++    ThreadStart *s = malloc(sizeof(*s));
++    if (!s) return 1;
++    s->start = start;
++    s->argument = argument;
++    const uintptr_t handle = _beginthreadex(NULL, 0, thread_entry, s, 0, NULL);
++    if (!handle) { free(s); return 1; }
++    *thread = handle;
++    return 0;
++}
++
++int pthread_detach(pthread_t thread) { return CloseHandle((HANDLE)thread) ? 0 : 1; }
++
++int pthread_getname_np(pthread_t thread, char *name, size_t size) {
++    (void)thread;
++    if (size) name[0] = 0;
++    return 0;
++}
++
++static char last_error[64];
++
++void *dlopen(const char *path, int flags) {
++    (void)flags;
++    void *library = LoadLibraryA(path);
++    if (!library) snprintf(last_error, sizeof(last_error), "LoadLibrary failed: %lu", GetLastError());
++    return library;
++}
++
++void *dlsym(void *library, const char *name) { return (void *)GetProcAddress((HMODULE)library, name); }
++
++const char *dlerror(void) { return last_error; }
++
++int dladdr(const void *address, Dl_info *info) {
++    /* Diagnostics only: the module, with no symbol name. */
++    static char path[MAX_PATH];
++    HMODULE module;
++    if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
++                            address, &module))
++        return 0;
++    GetModuleFileNameA(module, path, sizeof(path));
++    info->dli_fname = path;
++    info->dli_fbase = module;
++    info->dli_sname = NULL;
++    info->dli_saddr = NULL;
++    return 1;
++}
++#endif
+diff --git a/src/win/win_compat.h b/src/win/win_compat.h
+new file mode 100644
+index 0000000..b0d5281
+--- /dev/null
++++ b/src/win/win_compat.h
+@@ -0,0 +1,108 @@
++/* Windows support for bbcpu and bloodborne-recomp's tools, force-included (-include) on Windows only,
++ * so the POSIX code stays as upstream wrote it. Implemented in win_compat.c and win_sjlj.S. */
++#ifndef BB_WIN_COMPAT_H
++#define BB_WIN_COMPAT_H
++#ifdef _WIN32
++
++#ifndef _CRT_SECURE_NO_WARNINGS
++#define _CRT_SECURE_NO_WARNINGS
++#endif
++#ifndef _USE_MATH_DEFINES
++#define _USE_MATH_DEFINES
++#endif
++#include <direct.h>
++#include <io.h>
++#include <math.h>
++#include <setjmp.h>
++#include <stddef.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <string.h>
++#include <time.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++typedef long long ssize_t;
++
++/* Keeps win_compat.c's startup code (binary files) in every program, used by name or not. */
++#pragma comment(linker, "/include:bb_win_compat_linked")
++
++/* unistd.h */
++#define write _write
++#define fileno _fileno
++int ftruncate(int fd, long long size);
++unsigned sleep(unsigned seconds);
++
++/* string.h */
++void *memmem(const void *haystack, size_t haystack_size, const void *needle, size_t needle_size);
++#define strtok_r strtok_s
++
++/* signal.h: the CRT raises SIGSEGV and SIGILL from its exception filter; the others never fire. */
++#include <signal.h>
++#ifndef SIGBUS
++#define SIGBUS 10
++#endif
++#ifndef SIGTRAP
++#define SIGTRAP 5
++#endif
++
++/* sys/stat.h */
++#define mkdir(path, mode) _mkdir(path)
++
++/* time.h */
++#define CLOCK_MONOTONIC 1
++int bb_win_clock_gettime(int clock, struct timespec *t);
++#define clock_gettime bb_win_clock_gettime
++
++/* sys/mman.h: anonymous memory only. */
++#define PROT_NONE 0
++#define PROT_READ 1
++#define PROT_WRITE 2
++#define PROT_EXEC 4
++#define MAP_PRIVATE 2
++#define MAP_FIXED 0x10
++#define MAP_ANON 0x20
++#define MAP_FAILED ((void *)-1)
++void *mmap(void *address, size_t size, int prot, int flags, int fd, long long offset);
++int munmap(void *address, size_t size);
++int mprotect(void *address, size_t size, int prot);
++
++/* pthread.h */
++typedef struct { void *lock; } pthread_mutex_t; /* an SRWLOCK */
++#define PTHREAD_MUTEX_INITIALIZER {0}
++int pthread_mutex_lock(pthread_mutex_t *mutex);
++int pthread_mutex_unlock(pthread_mutex_t *mutex);
++typedef uintptr_t pthread_t;
++pthread_t pthread_self(void);
++int pthread_create(pthread_t *thread, const void *attributes, void *(*start)(void *), void *argument);
++int pthread_detach(pthread_t thread);
++int pthread_getname_np(pthread_t thread, char *name, size_t size);
++
++/* dlfcn.h */
++#define RTLD_NOW 2
++#define RTLD_LOCAL 0
++typedef struct { const char *dli_fname; void *dli_fbase; const char *dli_sname; void *dli_saddr; } Dl_info;
++void *dlopen(const char *path, int flags);
++void *dlsym(void *library, const char *name);
++const char *dlerror(void);
++int dladdr(const void *address, Dl_info *info);
++
++/* setjmp.h: _setjmp and _longjmp with no SEH unwinding. The CRT's longjmp unwinds through frames
++ * and needs unwind data for every one, which hostcall.S and guest stack frames do not have. */
++__attribute__((returns_twice)) int bb_win_setjmp(jmp_buf buffer);
++__attribute__((noreturn)) void bb_win_longjmp(jmp_buf buffer, int value);
++#undef _setjmp
++#undef _longjmp
++#define _setjmp(buffer) bb_win_setjmp(buffer)
++#define _longjmp(buffer, value) bb_win_longjmp(buffer, value)
++typedef jmp_buf sigjmp_buf;
++#define sigsetjmp(buffer, save) bb_win_setjmp(buffer)
++#define siglongjmp(buffer, value) bb_win_longjmp(buffer, value)
++
++#ifdef __cplusplus
++}
++#endif
++#endif
++#endif
+diff --git a/src/win/win_sjlj.S b/src/win/win_sjlj.S
+new file mode 100644
+index 0000000..ad15012
+--- /dev/null
++++ b/src/win/win_sjlj.S
+@@ -0,0 +1,62 @@
++/* bb_win_setjmp(jmp_buf) and bb_win_longjmp(jmp_buf, int) for the Windows x64 ABI: the callee-saved
++ * registers, with no SEH unwinding. jmp_buf is 256 bytes: this uses the first 248. */
++#if defined(_WIN32) && defined(__x86_64__)
++    .text
++    .globl bb_win_setjmp
++bb_win_setjmp:
++    mov %rbx, 0(%rcx)
++    mov %rbp, 8(%rcx)
++    mov %rsi, 16(%rcx)
++    mov %rdi, 24(%rcx)
++    mov %r12, 32(%rcx)
++    mov %r13, 40(%rcx)
++    mov %r14, 48(%rcx)
++    mov %r15, 56(%rcx)
++    lea 8(%rsp), %rax
++    mov %rax, 64(%rcx)
++    mov (%rsp), %rax
++    mov %rax, 72(%rcx)
++    stmxcsr 80(%rcx)
++    fnstcw 84(%rcx)
++    movdqu %xmm6, 88(%rcx)
++    movdqu %xmm7, 104(%rcx)
++    movdqu %xmm8, 120(%rcx)
++    movdqu %xmm9, 136(%rcx)
++    movdqu %xmm10, 152(%rcx)
++    movdqu %xmm11, 168(%rcx)
++    movdqu %xmm12, 184(%rcx)
++    movdqu %xmm13, 200(%rcx)
++    movdqu %xmm14, 216(%rcx)
++    movdqu %xmm15, 232(%rcx)
++    xor %eax, %eax
++    ret
++
++    .globl bb_win_longjmp
++bb_win_longjmp:
++    mov %edx, %eax
++    test %eax, %eax
++    jnz 1f
++    mov $1, %eax
++1:  mov 0(%rcx), %rbx
++    mov 8(%rcx), %rbp
++    mov 16(%rcx), %rsi
++    mov 24(%rcx), %rdi
++    mov 32(%rcx), %r12
++    mov 40(%rcx), %r13
++    mov 48(%rcx), %r14
++    mov 56(%rcx), %r15
++    ldmxcsr 80(%rcx)
++    fldcw 84(%rcx)
++    movdqu 88(%rcx), %xmm6
++    movdqu 104(%rcx), %xmm7
++    movdqu 120(%rcx), %xmm8
++    movdqu 136(%rcx), %xmm9
++    movdqu 152(%rcx), %xmm10
++    movdqu 168(%rcx), %xmm11
++    movdqu 184(%rcx), %xmm12
++    movdqu 200(%rcx), %xmm13
++    movdqu 216(%rcx), %xmm14
++    movdqu 232(%rcx), %xmm15
++    mov 64(%rcx), %rsp
++    jmp *72(%rcx)
++#endif
+diff --git a/tests/test_win_hardware.c b/tests/test_win_hardware.c
+new file mode 100644
+index 0000000..085218d
+--- /dev/null
++++ b/tests/test_win_hardware.c
+@@ -0,0 +1,71 @@
++/* Checks interpreter instructions against the real CPU, on an x86-64 host: each small guest function
++ * runs natively and through bbcpu from the same random inputs; the output bytes must match. */
++#include "cpu/bbcpu.h"
++#include <stdio.h>
++#include <string.h>
++#include <sys/mman.h>
++
++uint64_t bb_image_base = 0;
++
++void *runtime_low_map(size_t size, int prot) {
++    void *memory = mmap(NULL, size, prot, MAP_ANON | MAP_PRIVATE, -1, 0);
++    return memory == MAP_FAILED ? NULL : memory;
++}
++
++typedef struct { const char *name; uint8_t code[32]; int size; int float_bits; } Test;
++
++/* Each: load from [rdi], the instruction, store to [rsi], ret. */
++static const Test tests[] = {
++    {"vpmovsxbq xmm0, [rdi]", {0xc4, 0xe2, 0x79, 0x22, 0x07, 0xc5, 0xf9, 0x11, 0x06, 0xc3}, 10, 0},
++    {"vpmovzxwq xmm0, [rdi]", {0xc4, 0xe2, 0x79, 0x34, 0x07, 0xc5, 0xf9, 0x11, 0x06, 0xc3}, 10, 0},
++    {"vaddsubpd xmm0, xmm0, xmm1", {0xc5, 0xf9, 0x10, 0x07, 0xc5, 0xf9, 0x10, 0x4f, 0x10, 0xc5, 0xf9, 0xd0, 0xc1, 0xc5, 0xf9, 0x11, 0x06, 0xc3}, 18, 64},
++    {"vmulss xmm1, xmm3, xmm1", {0xc5, 0xf9, 0x10, 0x1f, 0xc5, 0xf9, 0x10, 0x4f, 0x10, 0xc5, 0xe2, 0x59, 0xc9, 0xc5, 0xf9, 0x11, 0x0e, 0xc3}, 18, 32},
++};
++
++static uint64_t rng = 0x9E3779B97F4A7C15ull;
++static uint64_t rnd(void) { rng ^= rng << 13; rng ^= rng >> 7; rng ^= rng << 17; return rng; }
++
++static void fill(uint8_t *in, int float_bits) {
++    for (int i = 0; i < 32; i += 8) {
++        uint64_t v = rnd();
++        if (float_bits == 64 && rnd() % 3 == 0) v = (rnd() % 2000001) * 0x3ff0000000000ull / 2000001 + 0x3ff0000000000000ull;
++        if (float_bits == 64 && rnd() % 8 == 0) v |= 0x7ff0000000000000ull;
++        if (float_bits == 32 && rnd() % 2 == 0) v |= 0x7fc000007f800000ull;
++        memcpy(in + i, &v, 8);
++    }
++}
++
++int main(void) {
++    uint8_t *guest = mmap(NULL, 0x4000, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANON | MAP_PRIVATE, -1, 0);
++    if (guest == MAP_FAILED) return 2;
++    bbcpu_add_guest_code((uintptr_t)guest, 0x4000);
++    const int count = (int)(sizeof(tests) / sizeof(*tests));
++    int failures = 0;
++    for (int t = 0; t < count; ++t) {
++        uint8_t *code = guest + (size_t)t * 64;
++        memcpy(code, tests[t].code, (size_t)tests[t].size);
++        typedef __attribute__((sysv_abi)) void (*Native)(const void *, void *);
++        const Native native = (Native)(uintptr_t)code;
++        int bad = 0;
++        for (int i = 0; i < 20000; ++i) {
++            _Alignas(32) uint8_t in[32], a[32], b[32];
++            fill(in, tests[t].float_bits);
++            memset(a, 0xcc, sizeof(a));
++            memset(b, 0xcc, sizeof(b));
++            native(in, a);
++            const uint64_t args[2] = {(uint64_t)(uintptr_t)in, (uint64_t)(uintptr_t)b};
++            bbcpu_call((uintptr_t)code, 2, args);
++            if (memcmp(a, b, 32)) {
++                if (!bad++) {
++                    printf("  first difference, in:");
++                    for (int k = 0; k < 32; k += 8) printf(" %016llx", *(unsigned long long *)(in + k));
++                    printf("\n    cpu    %016llx %016llx\n    interp %016llx %016llx\n", *(unsigned long long *)(a + 8),
++                           *(unsigned long long *)a, *(unsigned long long *)(b + 8), *(unsigned long long *)b);
++                }
++            }
++        }
++        printf("%-30s %s (%d of 20000 differ)\n", tests[t].name, bad ? "DIFFERS" : "ok", bad);
++        failures += bad != 0;
++    }
++    return failures;
++}
+diff --git a/tests/test_win_sjlj.c b/tests/test_win_sjlj.c
+new file mode 100644
+index 0000000..fdc67ed
+--- /dev/null
++++ b/tests/test_win_sjlj.c
+@@ -0,0 +1,59 @@
++/* Windows: bb_win_setjmp and bb_win_longjmp restore the callee-saved state and jump across frames
++ * with no unwind data, which the CRT's longjmp would need. */
++#include <stdio.h>
++#include <stdlib.h>
++#include <emmintrin.h>
++
++static jmp_buf jump;
++
++/* A frame with no .seh directives, as hostcall.S has: it calls `fn` and never returns here. */
++__asm__(".text\n"
++        ".globl no_unwind_frame\n"
++        "no_unwind_frame:\n"
++        "    push %rbp\n"
++        "    mov %rsp, %rbp\n"
++        "    sub $64, %rsp\n"
++        "    call *%rcx\n"
++        "    leave\n"
++        "    ret\n");
++void no_unwind_frame(void (*fn)(void));
++
++static void leave_now(void) { _longjmp(jump, 7); }
++
++__attribute__((noinline)) static void clobber(void) {
++    __asm__ volatile("mov $1, %%rbx\n mov $2, %%rsi\n mov $3, %%rdi\n mov $4, %%r12\n mov $5, %%r13\n"
++                     "mov $6, %%r14\n mov $7, %%r15\n pxor %%xmm6, %%xmm6\n pxor %%xmm15, %%xmm15\n"
++                     : : : "rbx", "rsi", "rdi", "r12", "r13", "r14", "r15", "xmm6", "xmm15");
++}
++
++int main(void) {
++    volatile int passes = 0;
++    volatile int value = 0x1234;
++    register __m128i kept __asm__("xmm6") = _mm_set1_epi32(0x5a5a5a5a);
++    __asm__ volatile("" : "+x"(kept));
++    const int r = _setjmp(jump);
++    if (r == 0) {
++        clobber();
++        no_unwind_frame(leave_now);
++        puts("FAIL: longjmp returned");
++        return 1;
++    }
++    passes = r == 7;
++    __asm__ volatile("" : "+x"(kept));
++    const int xmm_ok = _mm_cvtsi128_si32(kept) == 0x5a5a5a5a;
++    printf("longjmp value %s, local %s, xmm6 %s\n", passes ? "ok" : "BAD", value == 0x1234 ? "ok" : "BAD", xmm_ok ? "ok" : "BAD");
++
++    /* Value 0 becomes 1, and a second jump through a deeper frame still works. */
++    const int second = _setjmp(jump);
++    if (second == 0) _longjmp(jump, 0);
++    printf("zero value %s\n", second == 1 ? "ok" : "BAD");
++
++    FILE *f = fopen("test_win_sjlj.tmp", "w+");
++    if (!f) return 1;
++    fputs("a\nb\n", f);
++    const long at = ftell(f);
++    fclose(f);
++    remove("test_win_sjlj.tmp");
++    printf("binary files %s (%ld bytes for 2 lines)\n", at == 4 ? "ok" : "BAD", at);
++    return passes && value == 0x1234 && xmm_ok && second == 1 && at == 4 ? 0 : 1;
++}

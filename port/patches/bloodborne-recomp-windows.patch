@@ -1,0 +1,138 @@
+diff --git a/tests/fuzz_recomp.c b/tests/fuzz_recomp.c
+index 50e7432..fd2eac4 100644
+--- a/tests/fuzz_recomp.c
++++ b/tests/fuzz_recomp.c
+@@ -93,6 +93,9 @@ static int reg_index(ZydisRegister r) {
+ static sigjmp_buf crash_jump;
+ static volatile sig_atomic_t guarded;
+ static void on_crash(int sig) {
++#ifdef _WIN32
++    signal(sig, on_crash); /* the CRT resets a handler each time it runs */
++#endif
+     if (guarded) siglongjmp(crash_jump, sig);
+     signal(sig, SIG_DFL);
+     raise(sig);
+diff --git a/tools/recomp/bbrecomp.c b/tools/recomp/bbrecomp.c
+index c42463c..c397f3e 100644
+--- a/tools/recomp/bbrecomp.c
++++ b/tools/recomp/bbrecomp.c
+@@ -995,7 +995,8 @@ static int translate_vector(uint64_t off, const BbInsn *in) {
+     }
+     case M(PMOVZXBW): case M(VPMOVZXBW): case M(PMOVZXBD): case M(VPMOVZXBD): case M(PMOVZXWD): case M(VPMOVZXWD):
+     case M(PMOVZXDQ): case M(VPMOVZXDQ): case M(PMOVSXBW): case M(VPMOVSXBW): case M(PMOVSXWD): case M(VPMOVSXWD):
+-    case M(PMOVSXDQ): case M(VPMOVSXDQ): case M(PMOVSXBD): case M(VPMOVSXBD): {
++    case M(PMOVSXDQ): case M(VPMOVSXDQ): case M(PMOVSXBD): case M(VPMOVSXBD): case M(PMOVSXBQ): case M(VPMOVSXBQ):
++    case M(PMOVZXWQ): case M(VPMOVZXWQ): {
+         if (!vread(off, in, &in->op[1], &a) || !vwrite(off, in, &in->op[0], "rr", w, &s)) return 0;
+         const char *body;
+         int lanes;
+@@ -1007,6 +1008,8 @@ static int translate_vector(uint64_t off, const BbInsn *in) {
+         case M(PMOVSXBW): case M(VPMOVSXBW): body = "rr.sw[i] = x.sb[i];"; lanes = w / 2; break;
+         case M(PMOVSXWD): case M(VPMOVSXWD): body = "rr.sd[i] = x.sw[i];"; lanes = w / 4; break;
+         case M(PMOVSXDQ): case M(VPMOVSXDQ): body = "rr.sq[i] = x.sd[i];"; lanes = w / 8; break;
++        case M(PMOVSXBQ): case M(VPMOVSXBQ): body = "rr.sq[i] = x.sb[i];"; lanes = w / 8; break;
++        case M(PMOVZXWQ): case M(VPMOVZXWQ): body = "rr.q[i] = x.w[i];"; lanes = w / 8; break;
+         default: body = "rr.sd[i] = x.sb[i];"; lanes = w / 4; break;
+         }
+         emit("{ const BbVec x = %s; BbVec rr; memset(&rr, 0, sizeof(rr)); for (int i = 0; i < %d; ++i) %s %s }\n", a.s, lanes, body, s.s);
+@@ -1554,12 +1557,42 @@ static int leaves_alone(const BbInsn *x, int c) {
+     return !(x->count && gpr(&x->op[0]) && x->op[0].reg == c);
+ }
+ 
++/* Jump tables known from outside (BB_RECOMP_TABLES=TSV: jump offset, table offset, entries; for
++ * forms detect_table does not follow, such as an index from BEXTR bounded through another register).
++ * A known table wins over detection, and any disagreement between them is reported. */
++typedef struct { uint64_t jump, table, entries; } KnownTable;
++static KnownTable *known_tables;
++static size_t known_table_count;
++static uint64_t tables_both, tables_known_only, tables_detected_only, tables_differ;
++
++static int known_order(const void *a, const void *b) {
++    const uint64_t x = ((const KnownTable *)a)->jump, y = ((const KnownTable *)b)->jump;
++    return x < y ? -1 : x > y;
++}
++
++static void load_known_tables(const char *path) {
++    FILE *f = fopen(path, "r");
++    if (!f) { perror(path); exit(1); }
++    char line[128];
++    size_t capacity = 0;
++    while (fgets(line, sizeof(line), f)) {
++        unsigned long long jump, table, entries;
++        if (sscanf(line, "%llx\t%llx\t%llu", &jump, &table, &entries) != 3) continue;
++        if (known_table_count == capacity) {
++            capacity = capacity ? capacity * 2 : 1024;
++            known_tables = realloc(known_tables, capacity * sizeof(*known_tables));
++        }
++        known_tables[known_table_count++] = (KnownTable){jump, table, entries};
++    }
++    fclose(f);
++    qsort(known_tables, known_table_count, sizeof(*known_tables), known_order);
++}
++
+ /* A compiler's jump table ending at list[n - 1] (jmp reg): lea T, [rip + table]; movsxd C,
+  * dword [T + 4 * I]; add C, T; jmp C, its size from cmp I, N; ja (N + 1 entries; or jbe to the
+  * table, the default case falling through). Between the add and the jmp, instructions that leave C
+- * alone; T may be a copy (mov T, X) of the register the lea wrote. Its targets
+- * are pushed to `work` and kept in table_targets; 0 if it is not one. */
+-static int jump_table(Function fn, const Insn *list, size_t n, uint64_t *work, size_t *pending, const uint8_t *seen) {
++ * alone; T may be a copy (mov T, X) of the register the lea wrote. 0 if it is not one. */
++static int detect_table(const Insn *list, size_t n, uint64_t *table_out, uint64_t *entries_out) {
+     if (n < 4) return 0;
+     const BbInsn *jmp = &list[n - 1].in;
+     if (jmp->op[0].type != OP_REG || jmp->op[0].kind != RK_GPR || jmp->op[0].size != 8) return 0;
+@@ -1635,6 +1668,37 @@ static int jump_table(Function fn, const Insn *list, size_t n, uint64_t *work, s
+     }
+     if (table && !entries) entries = table_bound(list, n, index, list[a - 1].off);
+     if (!table || !entries || entries > 4096) return 0;
++    *table_out = table;
++    *entries_out = entries;
++    return 1;
++}
++
++/* The jump table ending at list[n - 1], known or detected: its targets are pushed to `work` and
++ * kept in table_targets; 0 if it is not one. */
++static int jump_table(Function fn, const Insn *list, size_t n, uint64_t *work, size_t *pending, const uint8_t *seen) {
++    uint64_t table = 0, entries = 0;
++    const int detected = detect_table(list, n, &table, &entries);
++    const KnownTable key = {list[n - 1].off, 0, 0};
++    const KnownTable *known = known_table_count
++        ? bsearch(&key, known_tables, known_table_count, sizeof(*known_tables), known_order) : NULL;
++    if (known) {
++        if (!detected) ++tables_known_only;
++        else if (table == known->table && entries == known->entries) ++tables_both;
++        else {
++            ++tables_differ;
++            fprintf(stderr, "table differs at %#llx: detected %#llx x%llu, known %#llx x%llu\n",
++                    (unsigned long long)known->jump, (unsigned long long)table, (unsigned long long)entries,
++                    (unsigned long long)known->table, (unsigned long long)known->entries);
++        }
++        table = known->table;
++        entries = known->entries;
++    } else if (detected) {
++        if (known_table_count) {
++            ++tables_detected_only;
++            fprintf(stderr, "table only detected at %#llx: %#llx x%llu\n", (unsigned long long)list[n - 1].off,
++                    (unsigned long long)table, (unsigned long long)entries);
++        }
++    } else return 0;
+     for (uint64_t e = 0; e < entries; ++e) {
+         int32_t rel;
+         memcpy(&rel, (const void *)(uintptr_t)(base + table + 4 * e), 4);
+@@ -2145,6 +2209,7 @@ int main(int argc, char **argv) {
+     bbcpu_run(&warm, 0); /* the interpreter's tables */
+     trace_points = getenv("BB_RECOMP_TRACE") && getenv("BB_RECOMP_TRACE")[0] == '1';
+     if (getenv("BB_RECOMP_ANNOTATIONS") && *getenv("BB_RECOMP_ANNOTATIONS")) load_annotations(getenv("BB_RECOMP_ANNOTATIONS"));
++    if (getenv("BB_RECOMP_TABLES") && *getenv("BB_RECOMP_TABLES")) load_known_tables(getenv("BB_RECOMP_TABLES"));
+     /* OFFSET... or @LIST (one offset a line). */
+     size_t capacity = (size_t)argc;
+     functions = calloc(capacity, sizeof(*functions));
+@@ -2265,5 +2330,8 @@ int main(int argc, char **argv) {
+     fclose(out);
+     printf("%zu functions, %" PRIu64 " instructions: %" PRIu64 " in C (%.0f%%), the rest in the interpreter; %d files; %" PRIu64 " jump tables decoded, %" PRIu64 " indirect jumps left\n",
+            function_count, stats[2], stats[0], stats[2] ? 100.0 * (double)stats[0] / (double)stats[2] : 0.0, files, tables_decoded, jumps_left);
++    if (known_table_count)
++        printf("known tables %zu: agreed with detection %" PRIu64 ", known only %" PRIu64 ", differ %" PRIu64 "; detected only %" PRIu64 "\n",
++               known_table_count, tables_both, tables_known_only, tables_differ, tables_detected_only);
+     return 0;
+ }
