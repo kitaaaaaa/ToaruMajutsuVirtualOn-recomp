@@ -562,18 +562,97 @@ static DWORD WINAPI profiler(void *argument) {
     return 0;
 }
 
-/* A heartbeat with the renderer's flip count, every five seconds. */
+/* Words on a stack copy that point into code, innermost first, one line each. System modules are kept (they show
+ * where a thread is blocked) but repeats of them are dropped. analysis\scripts\stall_report.py makes this readable. */
+static void print_stall_stack(const uint64_t *stack, size_t words) {
+    int shown = 0;
+    HMODULE previous = NULL;
+    const uint64_t exe = (uint64_t)GetModuleHandleA(NULL);
+    const HMODULE game = GetModuleHandleA("librecomp.dll");
+    for (size_t w = 0; w < words && shown < 80; ++w) {
+        HMODULE module = NULL;
+        char path[260];
+        if (stack[w] < 0x10000 || !GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCSTR)stack[w], &module)) continue;
+        const int ours = (uint64_t)module == exe || module == game;
+        if (!ours && module == previous) continue;
+        previous = module;
+        if (!GetModuleFileNameA(module, path, sizeof(path))) continue;
+        const char *base = strrchr(path, '\\');
+        printf("STALL  %s+%llx\n", base ? base + 1 : path, (unsigned long long)(stack[w] - (uint64_t)module));
+        ++shown;
+    }
+}
+
+/* Everything a stalled game can say about itself: flip state, then every thread's name, CPU use and stack. Each
+ * thread is paused only to copy its stack; nothing that takes a lock happens until it runs again. */
+static void report_stall(uint64_t flips, const char *why) {
+    enum { STACK_WORDS = 128 * 1024 };
+    static uint64_t stack[STACK_WORDS];
+    static ThreadTime before[PROFILE_THREADS], after[PROFILE_THREADS];
+    const DWORD self = GetCurrentThreadId();
+    printf("STALL begin: %s, at flip %llu\n", why, (unsigned long long)flips);
+    voxgpu_print_video_state();
+    const int before_count = read_times(before, self);
+    Sleep(2000);
+    const int count = read_times(after, self);
+    for (int i = 0; i < count; ++i) {
+        uint64_t used = after[i].user + after[i].kernel;
+        for (int k = 0; k < before_count; ++k)
+            if (before[k].id == after[i].id) used -= before[k].user + before[k].kernel;
+        const HANDLE h = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT, FALSE, after[i].id);
+        if (!h) continue;
+        size_t words = 0;
+        CONTEXT context;
+        context.ContextFlags = CONTEXT_CONTROL;
+        BOOL got = FALSE;
+        if (SuspendThread(h) != (DWORD)-1) {
+            got = GetThreadContext(h, &context);
+            MEMORY_BASIC_INFORMATION region;
+            if (got && VirtualQuery((void *)context.Rsp, &region, sizeof(region))) {
+                words = ((uint64_t)region.BaseAddress + region.RegionSize - context.Rsp) / 8;
+                if (words > STACK_WORDS) words = STACK_WORDS;
+                memcpy(stack, (const void *)context.Rsp, words * 8);
+            }
+            ResumeThread(h);
+        }
+        CloseHandle(h);
+        printf("STALL thread %u \"%s\" cpu %.1f ms\n", after[i].id, after[i].name, (double)used / 1e4);
+        if (got) {
+            const uint64_t rip = context.Rip;
+            print_stall_stack(&rip, 1);
+            print_stall_stack(stack, words);
+        }
+    }
+    puts("STALL end");
+}
+
+/* A heartbeat with the renderer's flip count, every five seconds. Flips stopping for two beats gets a stall report,
+ * once for each stall. VOX_TEST_STALL=seconds asks for one at that time anyway, to test the report. */
 static DWORD WINAPI flip_heartbeat(void *argument) {
     typedef ABI int32_t (*GetFlipStatus)(int32_t handle, uint64_t *status);
     const GetFlipStatus get_status = (GetFlipStatus)voxgpu_resolve("SbU3dwp80lQ");
     if (!get_status) return 0;
     uint64_t last = 0;
+    int quiet = 0, reported = 0;
+    const int test_at = getenv("VOX_TEST_STALL") ? atoi(getenv("VOX_TEST_STALL")) : 0;
+    int elapsed = 0;
     for (;;) {
         Sleep(5000);
+        elapsed += 5;
         uint64_t status[8] = {0};
         if (get_status(1, status) != 0) continue;
         printf("BEAT flips %llu, %.1f per second\n", (unsigned long long)status[0], (double)(status[0] - last) / 5.0);
-        if (last && status[0] == last && stall_event) SetEvent(stall_event);
+        if (last && status[0] == last) {
+            if (stall_event) SetEvent(stall_event);
+            ++quiet;
+        } else {
+            quiet = reported = 0;
+        }
+        if (quiet >= 2 && !reported) {
+            reported = 1;
+            report_stall(status[0], "flips stopped");
+        }
+        if (test_at && elapsed >= test_at && elapsed - 5 < test_at) report_stall(status[0], "VOX_TEST_STALL");
         last = status[0];
     }
     (void)argument;
@@ -618,6 +697,7 @@ uint64_t rt_guest_call(const void *fn, int count, const uint64_t *args) {
 }
 
 int main(int argc, char **argv) {
+    SetThreadDescription(GetCurrentThread(), L"vox:main");
     setvbuf(stdout, NULL, _IONBF, 0);
     signal(SIGABRT, on_abort);
     if (argc < 3) {

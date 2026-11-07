@@ -322,6 +322,9 @@ static void run_key_destructors(void) {
 static unsigned __stdcall thread_start(void *p) {
     Thread *t = p;
     current_thread = t;
+    /* The game's name for it, for stall reports and debuggers. */
+    WCHAR thread_name[64];
+    if (t->name[0] && MultiByteToWideChar(CP_UTF8, 0, t->name, -1, thread_name, 64)) SetThreadDescription(GetCurrentThread(), thread_name);
     bbcpu_set_fp_control(t->fp_mxcsr, t->fp_fcw);
     rt_thread_attach();
     if (!_setjmp(t->exit_jump)) {

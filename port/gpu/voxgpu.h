@@ -25,6 +25,8 @@ int voxgpu_handle_fault(void *context, void *address);
    slow on the renderer's hot paths. */
 void voxgpu_notify_map(uint64_t address, uint64_t size);
 void voxgpu_notify_unmap(uint64_t address, uint64_t size);
+/* Prints the flip state (labels, what's on screen, counts), for stall reports. */
+void voxgpu_print_video_state(void);
 
 #ifdef __cplusplus
 }

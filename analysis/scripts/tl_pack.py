@@ -16,6 +16,7 @@ count * (u64 archive offset, u32 size, u32 reserved), then the bytes.
 """
 import glob
 import os
+import re
 import struct
 import sys
 
@@ -57,14 +58,56 @@ def vita_files(patch_dir):
     return files
 
 
+def vita_strings(data):
+    """A fan-patched file's strings, as {id: text}. That patch overwrites strings in their old slots and leaves the
+    stored lengths as they were, too long, too short or zero, because the game stops at the NUL. Text even runs
+    over the next string's length field. So each string here runs from its record's offset to its NUL, or at
+    most to where the next string's text begins, and the lengths are ignored."""
+    count = struct.unpack("<I", data[0x24:0x28])[0]
+    table = 0x40 + 4 * count
+    base = table + 16 * count
+    records = [struct.unpack("<QQ", data[table + 16 * i : table + 16 * i + 16]) for i in range(count)]
+    starts = sorted({offset for _, offset in records})
+    # Text can overwrite the section marker too. Rebuilding takes that section from the game's own file.
+    end_of_strings = data.find(b"ENRS", base)
+    if end_of_strings < 0:
+        end_of_strings = len(data)
+    texts = {}
+    for ident, offset in records:
+        later = [s for s in starts if s > offset]
+        slot_end = base + later[0] + 4 if later else end_of_strings
+        texts[ident] = data[base + offset + 4 : slot_end].split(b"\0", 1)[0]
+    return texts
+
+
+def clean_vita_text(text):
+    """A string well formed for the rebuilt file, should a slot's end have cut it off. The words stay."""
+    text = re.sub(rb"</?[A-Za-z_]*(?: [A-Za-z_]*)?$", b"", text)
+    # A Shift-JIS lead byte left without its second half.
+    at = 0
+    while at < len(text):
+        lead = 0x81 <= text[at] <= 0x9F or 0xE0 <= text[at] <= 0xFC
+        if lead and at + 1 == len(text):
+            text = text[:at]
+            break
+        at += 2 if lead else 1
+    still_open = []
+    for closing, name in re.findall(rb"<(/?)(color|double|shake|ruby)\b[^>]*>", text):
+        if not closing:
+            still_open.append(name)
+        elif name in still_open:
+            still_open.reverse()
+            still_open.remove(name)
+            still_open.reverse()
+    for name in reversed(still_open):
+        text += b"</" + name + b">"
+    return text
+
+
 def from_vita(original, vita):
-    """The PS4 file with a Vita file's text. Same ids (almost always): the Vita file as it is. Otherwise each
-    id the PS4 file has takes the Vita text, because the PS4's tables are what its game expects."""
-    ids = [i for i, _ in mtp.read_raw(original)[0]]
-    entries = mtp.read_raw(vita)[0]
-    if [i for i, _ in entries] == ids:
-        return vita
-    return mtp.build(original, dict(entries))
+    """The PS4 file with a Vita file's text: each id the PS4 file has, on the PS4 file's own tables, because those
+    are what its game expects."""
+    return mtp.build(original, {i: clean_vita_text(t) for i, t in vita_strings(vita).items()})
 
 
 def main():
@@ -105,6 +148,8 @@ def main():
                 try:
                     if use_vita:
                         built = from_vita(original, vita[name])
+                        if any(b"\0" in t for _, t in mtp.read_raw(built)[0]):
+                            raise ValueError("a NUL survived")
                     else:
                         texts = read_translation(wanted[name])
                         unknown = set(texts) - {i for i, _ in mtp.read_raw(original)[0]}

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024-2026 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <cstdio>
 #include "common/assert.h"
 #include "common/elf_info.h"
 #include "common/logging/log.h"
@@ -351,12 +352,35 @@ s32 sceVideoOutSubmitEopFlip(s32 handle, u32 buf_id, u32 mode, s64 flip_arg, voi
     Platform::IrqC::Instance()->RegisterOnce(
         Platform::InterruptId::GfxFlip, [=](Platform::InterruptId irq) {
             ASSERT_MSG(irq == Platform::InterruptId::GfxFlip, "An unexpected IRQ occured");
-            ASSERT_MSG(port->buffer_labels[buf_id] == 1, "Out of order flip IRQ");
+            // vox: the present thread can clear this label just after the GPU set it, when it finishes the flip
+            // before last late. That isn't worth ending the game: put it back and carry on.
+            if (port->buffer_labels[buf_id] != 1) {
+                std::printf("VO label %u was cleared before its flip\n", buf_id);
+                port->buffer_labels[buf_id] = 1;
+            }
             const auto result = driver->SubmitFlip(port, buf_id, flip_arg, true);
             ASSERT_MSG(result, "EOP flip submission failed");
         });
 
     return ORBIS_OK;
+}
+
+// vox: the flip state, for the runtime's stall reports.
+extern "C" void voxgpu_print_video_state() {
+    auto* port = driver->GetPort(1);
+    if (!port) {
+        return;
+    }
+    const auto& status = port->flip_status;
+    std::printf("STALL video: labels %llu %llu %llu %llu %llu %llu %llu %llu; on screen %d, flips %llu, pending %d, gc %d, "
+                "current buffer %d, vblanks %llu, flip rate %d, flip queues %zu\n",
+                (unsigned long long)port->buffer_labels[0], (unsigned long long)port->buffer_labels[1],
+                (unsigned long long)port->buffer_labels[2], (unsigned long long)port->buffer_labels[3],
+                (unsigned long long)port->buffer_labels[4], (unsigned long long)port->buffer_labels[5],
+                (unsigned long long)port->buffer_labels[6], (unsigned long long)port->buffer_labels[7], port->prev_index,
+                (unsigned long long)status.count, (int)status.flip_pending_num, (int)status.gc_queue_num,
+                (int)status.current_buffer, (unsigned long long)port->vblank_status.count, port->flip_rate,
+                port->flip_events.size());
 }
 
 s32 PS4_SYSV_ABI sceVideoOutGetDeviceCapabilityInfo(

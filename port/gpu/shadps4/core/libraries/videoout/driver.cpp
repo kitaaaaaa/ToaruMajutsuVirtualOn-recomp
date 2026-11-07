@@ -276,7 +276,9 @@ void VideoOutDriver::Flip(const Request& req) {
     }
 
     // Reset prev flip label
-    if (port->prev_index != -1) {
+    // vox: not when a buffer replaced itself. It's still on screen, and the GPU may already have set this label
+    // for its next flip. This game does flip one buffer twice in a row when it falls behind.
+    if (port->prev_index != -1 && port->prev_index != req.index) {
         port->buffer_labels[port->prev_index] = 0;
         port->SignalVoLabel();
     }

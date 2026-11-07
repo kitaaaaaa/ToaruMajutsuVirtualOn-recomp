@@ -13,6 +13,7 @@ if (-not (Get-Item -LiteralPath $Patch).PSIsContainer) {
     $sevenZip = @('C:\Program Files\7-Zip\7z.exe', 'C:\Program Files (x86)\7-Zip\7z.exe') | Where-Object { Test-Path $_ } | Select-Object -First 1
     if (-not $sevenZip) { 'Needs 7-Zip to read an archive. Extract it yourself and pass the folder instead.'; exit 1 }
     $folder = "$root\extracted\vita_patch"
+    if (Test-Path $folder) { Remove-Item $folder -Recurse -Force -Confirm:$false } # no leftovers from another patch
     New-Item -ItemType Directory -Force $folder | Out-Null
     & $sevenZip x -y "-o$folder" $Patch '*.cpk' -r | Select-Object -Last 2
     if ($LASTEXITCODE -ne 0) { 'Could not extract the archive.'; exit 1 }
