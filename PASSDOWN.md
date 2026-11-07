@@ -35,7 +35,8 @@ Test machine: Windows 10, RTX 2080.
    - A label only clears in `VideoOutDriver::Flip` when a later flip replaces that buffer, and CPU flips must pass through the sleeping GPU thread.
    - **Workaround:** after 200 ms in that state the wait releases the label and logs `CP VO label wait released`. It fired once in a user session, during a flip-rate dip, and got past the freeze. The game then crashed on shadPS4's "Out of order flip IRQ" assertion.
    - `VideoOutDriver::Flip` skips clearing a buffer's label when it's flipped twice in a row, and the assertion became a logged warning (`VO label N was cleared before its flip`). That guard stays, but the theory behind it was wrong: the game's frame code (`FUN_01384e40`) walks its buffers as a strict ring, so it doesn't choose the buffer on screen.
-   - Open: either a frame's wait and flip target different buffers, or a flip gets lost, for instance when a frame submits no contexts. Every stall report and every release of the wait now prints the last 256 flip events as `FLIPLOG` lines in the log, which should settle it. No freeze has happened with this build yet.
+   - Open: either a frame's wait and flip target different buffers, or a flip gets lost, for instance when a frame submits no contexts. Every stall report and every release of the wait prints the last 256 flip events as `FLIPLOG` lines in the log.
+   - **First capture (2026-11-07), points at the first:** about 8 s after boot, on the title or attract screen, after hundreds of alternating flips: `submit flip 0`, `build wait 1`, GPU waits on 0, then `submit flip 0` again with the wait for 1 already built. So the game flipped buffer 0 twice, where the ring should have given 1, and the wait on 0's label then never ended. Next: why `FUN_013858a0`'s buffer (`+0xc0` plus its base) didn't advance there, against `FUN_01384e40`. Two more runs of the same build didn't freeze, so it's intermittent. Not fixed.
    - Ruled out: a label written directly by the game (the wait re-checks on a timer).
 3. **Crash on pressing start in attract mode (user report, once).** No log survived, and it may have been the freeze. Note the log gets overwritten by every run.
 4. **Starting a match "crashes" (early user report).** An unimplemented `sceRudpEnd` stopped the game during online shutdown after a signed-out PSN error. `sceNp*` and `sceRudp*` calls now return errors. Battles have worked since, but the user's menu path to that stop wasn't confirmed.
@@ -94,10 +95,10 @@ Needs Windows, Git, Python 3, Visual Studio's "Desktop development with C++" (cl
 port\setup.ps1                        # tools and sources at pinned versions, in tools\ and port\
 port\build_all.ps1                    # the engine: port\out\vox.exe. No game needed
 port\prepare_game.ps1 -Pkg game.pkg   # or -Game <folder with eboot.bin>: your copy to librecomp.dll
-port\run.ps1 -Timeout 3600 -NoBuild -English
+port\out\vox.exe --english
 ```
 
-`run.ps1` also rebuilds `vox.exe` first unless given `-NoBuild`. Its log is `port\work\run.log`.
+For development, `port\run.ps1` also rebuilds `vox.exe` unless given `-NoBuild`, and the game closes itself after `-Timeout` seconds, 30 by default. Run without the `ELF_DIR NAMES.TSV` arguments, `vox.exe` finds its folders from its own path and never times out. Either way the log is `port\work\run.log`.
 
 Tested from a clean folder on the development machine, using every published file. Setup and the engine build took about 15 minutes on first run and the game about 2 minutes. `-Pkg` and PkgTool's download have not been run through this script.
 

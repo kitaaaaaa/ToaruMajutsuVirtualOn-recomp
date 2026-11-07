@@ -25,16 +25,20 @@ port\prepare_game.ps1 -Pkg game.pkg   # or: -Game <folder>
 
 ## Playing
 
-```powershell
-port\run.ps1 -Timeout 3600 -NoBuild              # Japanese
-port\run.ps1 -Timeout 3600 -NoBuild -English     # budget English translation
-port\run.ps1 -Timeout 3600 -NoBuild -UserTl      # installed fan translation, see below
-port\run.ps1 -Timeout 3600 -NoBuild -UnlockAll   # everything unlocked; combines with the others
-```
+Run `port\out\vox.exe`, by double-clicking it or from a command line with these options:
 
-`-Timeout` is how many seconds until the game closes itself. The log is `port\work\run.log`, and the next launch overwrites it.
+| Option | Effect |
+|---|---|
+| `--english` | Budget English translation |
+| `--user-tl` | Installed fan translation, see below |
+| `--unlock-all` | Everything unlocked. Combines with either of the others |
+| `--timeout <seconds>` | Close the game after this long. By default it stays open |
+| `--app0 <folder>` | Use the game files in this folder instead of `extracted\uroot` |
+| `--user <folder>` | Keep saves in this folder instead of `port\work\user` |
 
-`-UnlockAll` opens every robot, colour, mission, title and gallery item, sets your points to 9,999,999, marks the main story chapters cleared and turns on the DLC stories and colours. **It changes your save** as soon as the game next saves, and turning it off won't undo that, so back up `port\work\user\savedata` first if you care. Some colours and gallery entries may have no files on the disc, so they could misbehave.
+With none it plays in Japanese. The log is `port\work\run.log`, and the next launch overwrites it.
+
+`--unlock-all` opens every robot, colour, mission, title and gallery item, sets your points to 9,999,999, marks the main story chapters cleared and turns on the DLC stories and colours. **It changes your save** as soon as the game next saves, and turning it off won't undo that, so back up `port\work\user\savedata` first if you care. Some colours and gallery entries may have no files on the disc, so they could misbehave.
 
 Face buttons match by position, so Xbox B is PS4 Circle, which confirms in this version.
 
@@ -58,7 +62,7 @@ MakutaMaster962 (also known as The World - 2.0) spent over three years on a real
    port\install_vita_patch.ps1 -Patch <folder>
    ```
 
-5. Play with `-UserTl`.
+5. Play with `vox.exe --user-tl`.
 
 Only text carries over. The patch's translated graphics are in the Vita's format, so art with Japanese baked in stays Japanese. The author asks for credit if you post gameplay.
 

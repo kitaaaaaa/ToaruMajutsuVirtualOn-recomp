@@ -6,7 +6,9 @@
  * recompiled library made with the same layout finds its functions; modules start in order, then
  * the game's entry runs on a low stack.
  *
- * Usage: vox ELF_DIR NAMES.TSV [--timeout seconds] [--english | --user-tl] [--unlock-all] */
+ * Usage: vox [--english | --user-tl] [--unlock-all]
+ *    or: vox ELF_DIR NAMES.TSV [--timeout seconds] [--app0 folder] [--user folder] [the same options]
+ * The first finds everything from where the exe is, port\\out, and logs to port\\work\\run.log. */
 #include <windows.h>
 #include <tlhelp32.h>
 #include <inttypes.h>
@@ -741,17 +743,45 @@ uint64_t rt_guest_call(const void *fn, int count, const uint64_t *args) {
     return bbcpu_call((uintptr_t)fn, count, args);
 }
 
+/* For a plain "vox.exe": the folders from the exe's own path, and what port\\run.ps1 sets for a development run. */
+static void set_up_plain_run(const char **app0, const char **user) {
+    static char root[MAX_PATH], work[MAX_PATH], folder[MAX_PATH], setting[MAX_PATH + 32];
+    GetModuleFileNameA(NULL, root, sizeof(root));
+    for (int up = 0; up < 3; ++up) { /* vox.exe, out, port */
+        char *slash = strrchr(root, '\\');
+        if (slash) *slash = 0;
+    }
+    snprintf(work, sizeof(work), "%s\\port\\work", root);
+    if (!SetCurrentDirectoryA(work)) {
+        fprintf(stderr, "cannot find %s: run port\\prepare_game.ps1 first\n", work);
+        exit(2);
+    }
+    snprintf(folder, sizeof(folder), "%s\\extracted\\uroot", root);
+    *app0 = folder;
+    *user = "user";
+    if (!getenv("BB_JIT")) _putenv("BB_JIT=0");
+    if (!getenv("BB_RECOMP_LIB")) {
+        snprintf(setting, sizeof(setting), "BB_RECOMP_LIB=%s\\recomp\\librecomp.dll", work);
+        _putenv(setting);
+    }
+    freopen("run.log", "w", stdout);
+    freopen("run.log", "a", stderr);
+}
+
 int main(int argc, char **argv) {
     SetThreadDescription(GetCurrentThread(), L"vox:main");
-    setvbuf(stdout, NULL, _IONBF, 0);
-    signal(SIGABRT, on_abort);
-    if (argc < 3) {
-        fprintf(stderr, "usage: vox ELF_DIR NAMES.TSV [--timeout seconds] [--english | --user-tl] [--unlock-all]\n");
+    const int plain = argc < 2 || argv[1][0] == '-';
+    const char *elf_dir = plain ? "." : argv[1], *names = plain ? "names.tsv" : (argc > 2 ? argv[2] : NULL);
+    if (!plain && !names) {
+        fprintf(stderr, "usage: vox [--english | --user-tl] [--unlock-all]\n   or: vox ELF_DIR NAMES.TSV [--timeout seconds] [--app0 folder] [--user folder] [the same options]\n");
         return 2;
     }
-    unsigned timeout = 60;
+    unsigned timeout = plain ? 0 : 60;
     const char *app0 = ".", *user = "user";
-    for (int i = 3; i < argc; ++i) {
+    if (plain) set_up_plain_run(&app0, &user);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    signal(SIGABRT, on_abort);
+    for (int i = plain ? 1 : 3; i < argc; ++i) {
         if (!strcmp(argv[i], "--timeout") && i + 1 < argc) timeout = (unsigned)atoi(argv[++i]);
         else if (!strcmp(argv[i], "--app0") && i + 1 < argc) app0 = argv[++i];
         else if (!strcmp(argv[i], "--user") && i + 1 < argc) user = argv[++i];
@@ -761,7 +791,7 @@ int main(int argc, char **argv) {
     }
     rt_set_folders(app0, user);
     AddVectoredExceptionHandler(1, on_fault);
-    load_names(argv[2]);
+    load_names(names);
     printf("Names: %zu\n", name_count);
 
     image = VirtualAlloc((void *)(uintptr_t)IMAGE_AT, IMAGE_MAX, MEM_RESERVE, PAGE_READWRITE);
@@ -773,9 +803,9 @@ int main(int argc, char **argv) {
     if (!stub_code) fail("%s", "cannot allocate import stubs");
 
     rt_runtime_init();
-    place_module(argv[1], "eboot");
-    place_module(argv[1], "libc");
-    place_module(argv[1], "libSceFios2");
+    place_module(elf_dir, "eboot");
+    place_module(elf_dir, "libc");
+    place_module(elf_dir, "libSceFios2");
     qsort(exports, export_count, sizeof(*exports), export_order);
 
     gpu_enabled = !(getenv("VOX_NO_GPU") && getenv("VOX_NO_GPU")[0] == '1');
