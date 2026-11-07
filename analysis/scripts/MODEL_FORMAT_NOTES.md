@@ -135,7 +135,7 @@ From the game's code. Each robot class has a setup function, a vtable entry, whi
 1. `FUN_013395a0(weapon, robot, slot, colour)` loads the model and texture in that slot of the colour's `mdl_param` row. For Fei-Yen, slots 10 and up mean the hyper table's slot minus 10.
 2. The setup then writes a bone id to the weapon's +0x128. `FUN_0133a1b0` runs each frame, looks that id up on the body with `FUN_0137b950`, the first node whose +0x7C matches, and sets the weapon's root to that bone.
 3. An id of -1 instead binds parts one by one: each id in the five-entry array at +0x130 joins the weapon node with that id to the body bone with that id. Raiden's shoulder weapon uses this.
-4. A byte per weapon at +0x12A0 on the robot, in the order the setup creates them, says whether it's on at the start. `FUN_0100feb0` keeps a copy at +0x12B1. Weapons not written are off.
+4. A byte per weapon at +0x12A0 on the robot, in the order the setup creates them, says whether it's on at the start. **Unverified:** that meaning. It's read per weapon and matches what the game shows for Fei-Yen, but its use wasn't traced to the drawing code. `FUN_0100feb0` keeps a copy at +0x12B1. Weapons not written are off.
 
 | Id | Bone |
 |---|---|
