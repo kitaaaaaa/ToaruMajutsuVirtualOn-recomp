@@ -24,7 +24,7 @@ Test machine: Windows 10, RTX 2080.
 | PSN | Unimplemented `sceNp*` calls answer `ORBIS_NP_ERROR_SIGNED_OUT`; `sceRudp*` calls answer `0x80770001` (not initialized, from memory and unverified) |
 | Saves, trophies | Saves work; trophies are logged only |
 | Unlocks | `-UnlockAll` (`--unlock-all`) opens everything and turns on the DLC stories and colours. Tested as far as the game booting with it and overriding a loaded save; nobody has reported on the unlocked screens yet |
-| Model export | All 15 robots to glTF, with motions, weapons and a set with weapons attached. See `analysis\scripts\MODEL_FORMAT_NOTES.md` |
+| Model export | All 15 robots to glTF, with motions and weapons, and a set with weapons mounted by the game's own rules. PPRIMA has no armed model. See `analysis\scripts\MODEL_FORMAT_NOTES.md` |
 
 ## Open problems, most urgent first
 

@@ -9,9 +9,8 @@ version. A weapon with no texture bank of its own uses the one the game's mdl_pa
 or else the nearest weapon's with the same material layout; the manifest records which. Loose weapon motions go to the
 weapon they name and to any with the same skeleton; banks go to any weapon with a skeleton they fit.
 
-The armed folder holds each body with its weapons bound to the mount bones at its hands, the unskinned leaf bones below
-each shoulder, so they follow every motion. Each colour's first weapon in mdl_param goes in the right hand; ARMED_LEFT
-lists the robots that also hold their second in the left. A rigged weapon stays in its rest form there.
+The armed folder holds each body with the weapons the game shows by default, mounted as in MOUNTS, so they follow every
+motion. A rigged weapon stays in its rest form there. MODEL_FORMAT_NOTES.md says where MOUNTS comes from.
 """
 import concurrent.futures
 import glob
@@ -28,47 +27,44 @@ import hmd2glb as H
 SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hmd2glb.py")
 LABELS = {"C00": "ColorA", "C01": "ColorB", "C02": "VOOT_A", "C03": "VOOT_B", "C04": "Special"}
 BODY_BANKS = ("", "_Upper", "_menu_idling")
-ARMED_LEFT = ("VR008", "VR009")
+# The game's per-robot weapon setup, for the weapons on at the start: (slot in the colour's mdl_param row, bone ids).
+# Several ids bind the weapon's parts one by one. Slots mounted at id 0 are left out: they're empty markers or effects
+# the game places itself, and PPRIMA's floating units work that way, so it has no armed model. Blue Stalker has no setup
+# of its own; it runs Cypher's.
+MOUNTS = {
+    "VR000": [(0, (200,))],
+    "VR001": [(0, (200,)), (0, (201,))],
+    "VR002": [(0, (200,)), (4, (202,))],
+    "VR003": [(0, (200,))],
+    "VR004": [(0, (6,)), (0, (11,))],
+    "VR005": [(0, (200,))],
+    "VR006": [(0, (200,)), (1, (102, 103))],
+    "VR007": [(0, (200,))],
+    "VR008": [(0, (7,)), (1, (12,))],
+    "VR009": [(0, (200,)), (1, (201,))],
+    "VR010": [(0, (200,))],
+    "VR011": [(0, (200,)), (1, (202,))],
+    "VR012": [(0, (200,))],
+    "VR013": [(0, (200,))],
+}
 
 
 def table_pairs(path):
-    """The (model, texture) pairs in a mdl_param or decken_model table, in order, without extensions."""
-    names = re.findall(rb"[A-Za-z0-9_]+\.(?:hmd|htx)", open(path, "rb").read()) if os.path.exists(path) else []
-    return [(names[i][:-4].decode(), names[i + 1][:-4].decode()) for i in range(0, len(names) - 1, 2)]
+    """The (model, texture) pairs in a mdl_param or decken_model table, in order, without extensions. None for an empty slot."""
+    names = re.findall(rb"[A-Za-z0-9_]+\.(?:hmd|htx)|(?<=\x02)-1", open(path, "rb").read()) if os.path.exists(path) else []
+    pairs = [(names[i], names[i + 1]) for i in range(0, len(names) - 1, 2)]
+    return [(m[:-4].decode(), t[:-4].decode()) if m != b"-1" and t != b"-1" else None for m, t in pairs]
 
 
 def colour_rows(root, robot):
-    """{body texture bank: [(weapon, its bank), ...]} from the mdl_param tables, keeping what's on the disc."""
-    number_ = int(robot[2:])
+    """{body texture bank: the 16 weapon slots of its row} from the mdl_param tables. A row is a body and 16 pairs."""
     rows = {}
-    for name in ("mdl_param_vr%03d" % number_, "mdl_param_vr%03d_h" % number_):
-        current = None
-        for model, bank in table_pairs(os.path.join(root, "param", name + ".prm")):
-            if re.fullmatch(r"VR\d+_\d\d", model):
-                current = rows.setdefault(bank, []) if model.startswith(robot) and bank not in rows else None
-            elif current is not None and model.startswith(robot) and "_WP99" not in model and (model, bank) not in current:
-                if os.path.exists(os.path.join(root, "chara", robot, model + ".hmd")) and os.path.exists(os.path.join(root, "chara", robot, bank + ".htx")):
-                    current.append((model, bank))
+    for name in ("mdl_param_vr%03d" % int(robot[2:]), "mdl_param_vr%03d_h" % int(robot[2:])):
+        pairs = table_pairs(os.path.join(root, "param", name + ".prm"))
+        for i in range(0, len(pairs) - 16, 17):
+            if pairs[i] and pairs[i][0].startswith(robot) and pairs[i][1] not in rows:
+                rows[pairs[i][1]] = pairs[i + 1 : i + 17]
     return rows
-
-
-def hand_mounts(model, robot):
-    """The (right, left) mount bones: the unskinned leaf furthest down each arm."""
-    swings = H.mirrored_shoulders(model, H.APOSE[robot][-1:])
-    skinned = set(model.skin()[0])
-    parents = {n["parent"] for n in model.nodes[1:]}
-    world = model.rest_world()
-
-    def mount(shoulder):
-        below = {shoulder}
-        for i in range(1, len(model.nodes)):
-            if model.nodes[i]["parent"] in below:
-                below.add(i)
-        leaves = [i for i in below if i not in skinned and i not in parents]
-        return max(leaves, key=lambda i: np.linalg.norm(world[i][:3, 3] - world[shoulder][:3, 3]))
-
-    left, right = (mount(n) for n in sorted(swings, key=lambda n: -swings[n]))
-    return right, left
 
 
 def label(stem, bank):
@@ -112,7 +108,8 @@ def plan_robot(root, out, robot):
     number_ = int(robot[2:])
     paired = {}
     for name in ("mdl_param_vr%03d" % number_, "mdl_param_vr%03d_h" % number_, "decken_model_vr%03d" % number_):
-        for m, bank in table_pairs(os.path.join(root, "param", name + ".prm")):
+        for pair in filter(None, table_pairs(os.path.join(root, "param", name + ".prm"))):
+            m, bank = pair
             if bank in banks and bank not in paired.setdefault(m, []):
                 paired[m].append(bank)
     rows = colour_rows(root, robot)
@@ -167,12 +164,11 @@ def plan_robot(root, out, robot):
         for bank in use or ["-"]:
             target = label(stem, bank) if bank != "-" else stem
             jobs.append((stem, os.path.join(chara, stem + ".hmd"), os.path.join(chara, bank + ".htx") if bank != "-" else "-", os.path.join(folder, target + ".glb"), motions, note))
-            weapons = rows.get(bank, [])
-            if is_body and not low and weapons:
-                right, left = hand_mounts(model, robot)
-                held = [(right, weapons[0])] + ([(left, weapons[1])] if robot in ARMED_LEFT and len(weapons) > 1 else [])
-                attach = ["+%d|%s|%s" % (mount, os.path.join(chara, w + ".hmd"), os.path.join(chara, b + ".htx")) for mount, (w, b) in held]
-                worn = " ".join("%s on bone %d" % (w[6:], mount) for mount, (w, _) in held)
+            slots = rows.get(bank)
+            if is_body and not low and slots and robot in MOUNTS:
+                held = [(ids, slots[slot]) for slot, ids in MOUNTS[robot] if slots[slot] and slots[slot][1] in banks and slots[slot][0] in models]
+                attach = ["+%s|%s|%s" % (",".join(map(str, ids)), os.path.join(chara, w + ".hmd"), os.path.join(chara, b + ".htx")) for ids, (w, b) in held]
+                worn = " ".join("%s on id %s" % (w[6:], ",".join(map(str, ids))) for ids, (w, _) in held)
                 jobs.append((stem, os.path.join(chara, stem + ".hmd"), os.path.join(chara, bank + ".htx"), os.path.join(out, robot, "armed", target + ".glb"), motions + attach, worn))
     for path in loose:
         if (path, os.path.basename(path)) not in placed:

@@ -22,7 +22,7 @@ Under `root+/`:
 | `chara/VRnnn/*Z.hmd`, `*_Z.hmd` | Low detail versions, with one grey texture bank. **Unverified:** the game probably tints them |
 | `motion/VRnnn/VRnnn.mbm` | Motion bank; also `_Upper`, `_menu_idling`, and banks for rigged weapons such as `_Weapon`, `_Wing` |
 | `motion/VRnnn/vrnnn_wpxx_yyy.hmt` | A loose weapon motion |
-| `param/mdl_param_vrnnn.prm` | For each colour, the body and its weapons as model and texture pairs. `_h` is Fei-Yen's hyper mode |
+| `param/mdl_param_vrnnn.prm` | One row per colour: a body and 16 weapon slots, as length-prefixed model and texture names, `-1` for an empty slot. `_h` is Fei-Yen's hyper mode |
 | `param/decken_model_vrnnn.prm` | The same pairs for the weapons it names, which is how a `WP07` with no textures gets `WP06`'s |
 
 Robots: 000 Temjin, 001 Apharmd B, 002 Apharmd C, 003 Apharmd S, 004 Bal-Bados, 005 Cypher, 006 Raiden, 007 Grys-Vok, 008 Dordray, 009 Fei-Yen, 010 Angelan, 011 Specineff, 012 Bal-Rloon, 013 Blue Stalker, 014 PPRIMA. Names are from the gallery text; 000 to 012 follow its order.
@@ -42,7 +42,7 @@ All values are little-endian. Chunks start with a 4-character tag, then u32 body
 | +0x14 | Mesh count |
 | +0x40 | Nine u64 table offsets: nodes, node flags, rest transforms, materials, meshes, submeshes, vertex declaration, texture slots, vertex format and skin tables |
 
-- **Node** (0xA0): +0x04 u16 index, +0x06 u16 parent, +0x3E u16 is 1 on a skin bone.
+- **Node** (0xA0): +0x04 u16 index, +0x06 u16 parent, +0x3E u16 is 1 on a skin bone, +0x7C u32 bone id, which the game looks bones up by.
 - **Rest transform** (0x30): translation, quaternion xyzw, scale, as vec4s.
 - **Mesh** (0x40): +0x08 material offset, +0x18 submesh count, +0x20 submesh offset.
 - **Submesh** (0x20): +0x00 u16 palette size, +0x06 u16 vertex count, +0x08 u32 index count, +0x0C u32 first vertex, +0x10 u32 first index, +0x18 palette offset.
@@ -128,8 +128,48 @@ Some banks hold motions for another skeleton. The export tells by comparing bone
 
 `.mbm`: `MBMP` > `MBMD`; from its body, +0x04 count, +0x08 id list offset, +0x10 name offset list, followed by the `HMOT` files. `.mbv` is `MBHV` > `MBHD`, not decoded.
 
+## Weapon mounts
+
+From the game's code. Each robot class has a setup function, a vtable entry, which creates its weapons:
+
+1. `FUN_013395a0(weapon, robot, slot, colour)` loads the model and texture in that slot of the colour's `mdl_param` row. For Fei-Yen, slots 10 and up mean the hyper table's slot minus 10.
+2. The setup then writes a bone id to the weapon's +0x128. `FUN_0133a1b0` runs each frame, looks that id up on the body with `FUN_0137b950`, the first node whose +0x7C matches, and sets the weapon's root to that bone.
+3. An id of -1 instead binds parts one by one: each id in the five-entry array at +0x130 joins the weapon node with that id to the body bone with that id. Raiden's shoulder weapon uses this.
+4. A byte per weapon at +0x12A0 on the robot, in the order the setup creates them, says whether it's on at the start. `FUN_0100feb0` keeps a copy at +0x12B1. Weapons not written are off.
+
+| Id | Bone |
+|---|---|
+| 200 | Right mount, by the hand or forearm |
+| 201 | Left mount |
+| 202 | A third mount. On Specineff it's on the back; Apharmd C has one on an arm |
+| 0 | The root, so not really mounted |
+| Others | Ordinary bones, such as Dordray's hands (7, 12) and Bal-Bados's shoulders (6, 11) |
+
+What each setup does, with the weapons on at the start marked *on*:
+
+| Robot | Setup | Slot and id |
+|---|---|---|
+| 000 Temjin | `FUN_012ffb40` | 0 at 200 *on*; 1, 2 at 200; 3 at 201; 4 at 0 |
+| 001 Apharmd B | `FUN_01301fc0` | 0 at 200 *on*; 0 at 201 *on*; 5 at 200 |
+| 002 Apharmd C | `FUN_01304b00` | 0 at 200 *on*; 4 at 202 *on* |
+| 003 Apharmd S | `FUN_01306150` | 0 at 200 *on*; 8 at 201; 10 at 0; the rest at -1 |
+| 004 Bal-Bados | `FUN_01308200` | 0 at 6 *on*; 0 at 11 *on*; 0 at 200; 0 at 201; 4 at 0 |
+| 005 Cypher, 013 Blue Stalker | `FUN_01312a30` | 0 at 200 *on*; 1 at 0 *on*; 2 at 0 *on* |
+| 006 Raiden | `FUN_013162a0` | 0 at 200 *on*; 1 at -1 with 102, 103 *on*; 2, 3 the same; 4, 5, 6, 9 at 200; 7 at 201; 8, 10, 11, 12 at 0 |
+| 007 Grys-Vok | `FUN_013212b0` | 0 at 200 *on*; 9 at 301, 302, 303, 306, 307, 308; 13 at 304, 305, 309, 310; 15 at 0; 14 at -1, twice |
+| 008 Dordray | `FUN_013241b0` | 0 at 7 *on*; 1 at 12 *on*; 2 at -1 |
+| 009 Fei-Yen | `FUN_01328ab0` | 0 at 200 *on*; 1 at 201 *on*; 2 at 0 *on*; 10 at 200; 11 at 201 |
+| 010 Angelan | `FUN_0132aff0` | 0 at 200 *on*; 1 at 1; 11 at 0; the rest at -1 |
+| 011 Specineff | `FUN_01330750` | 0 at 200 *on*; 1 at 202 *on*; 2, 5 at 0 |
+| 012 Bal-Rloon | `FUN_01332ff0` | 0 at 200 *on*; 1 at 0 *on* |
+| 014 PPRIMA | `FUN_013355c0` | 8 six times and 7 once, all at 0, in the subclass from `FUN_01338200` |
+
+How robots were matched to setups: the file names in the functions, for 000, 001, 003, 005, 006, 007, 008 and 010, 011; the format string and `pyramid_col` for 004; and vtable order for the rest, checked against their bone ids (only 002 among the Apharmds has a 202 on the arm, which its setup uses). **Unverified:** that Blue Stalker runs Cypher's setup. It has none of its own, and its skeleton and ids are the same.
+
+Slots at id 0 are left out of the armed models, even when on. Those seen are empty markers (`WP99`, `WP98`), a sphere (Bal-Rloon's `WP01_01`) and, for Blue Stalker, a second copy of its weapon, and the game presumably places what's visible of them itself. **Unverified:** how PPRIMA's units are placed; that's in the subclass, so it has no armed model. The on flags are the state at the start only, as the game changes them during play.
+
 ## The export
 
 - **A-pose:** the game's rest pose has the arms straight down, through the body on some robots. The export swings them out 45 degrees from the shoulder bones in `APOSE`, and writes the old rotation into any motion that leaves it out. It warns if a vertex blends across a shoulder.
-- **Armed models:** each body's mount bones are the unskinned leaf bones below its shoulders. **Unverified:** which weapon goes where. The game sets a mount value on each weapon in per-robot code (`FUN_013395a0`'s callers, the int at +0x128), which isn't decoded. The export puts a colour's first weapon on the right, and uses the left only for the robots in `ARMED_LEFT`. Fei-Yen's was checked against the game.
+- **Armed models:** the weapons the game shows by default, mounted as below.
 - **glTF limits:** a decal is a lifted copy of the triangles, as glTF has one base layer. Reflections, animated glow and tinting aren't reproduced.

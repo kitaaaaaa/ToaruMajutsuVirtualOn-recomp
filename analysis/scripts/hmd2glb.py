@@ -1,9 +1,10 @@
 """Converts a robot's .hmd model, .htx textures and .mbm motion banks to a rigged, animated glTF binary.
 
-Usage: hmd2glb.py <model.hmd> <textures.htx or -> <out.glb> [motions.mbm or .hmt or +node|weapon.hmd|textures.htx or @list ...]
+Usage: hmd2glb.py <model.hmd> <textures.htx or -> <out.glb> [motions.mbm or .hmt or +ids|weapon.hmd|textures.htx or @list ...]
 
-A +node entry binds a weapon rigidly to that bone of the model, so it follows every motion. A @list file holds one
-entry per line.
+A + entry mounts a weapon on the model by bone id, the way the game does, so it follows every motion. One id binds the
+whole weapon to that bone. Several, separated by commas, bind each weapon part with one of those ids to the body bone
+with the same id. A @list file holds one entry per line.
 
 A model with no skin bones, like most weapons, comes out as a plain static mesh, or rigidly bound to its nodes if it
 has motions. Its vertices are relative to the node its palette names, so that node's transform is applied. With - the
@@ -120,6 +121,13 @@ class Model:
         if best is None:
             raise ValueError("no skin table fits")
         return joints, best
+
+    def node_with_id(self, wanted):
+        """The first node with this bone id (u32 at +0x7C), as FUN_0137b950 finds it."""
+        for i in range(len(self.nodes)):
+            if u32(self.d, self.base + self.tables[0] + i * 0xA0 + 0x7C) == wanted:
+                return i
+        raise ValueError("no bone with id %d" % wanted)
 
     def rest_world(self):
         world = []
@@ -436,9 +444,26 @@ def build(model, textures, banks, apose, overlays=False, attachments=()):
         image_banks[key] = textures[index]
         return images.setdefault(key, len(images))
 
+    body = model
+
     def add_model(model, textures, mount, keep_overlays):
         own = model.skin()[0]
         moved = placement(model)
+        if mount is not None and len(mount) > 1:
+            # Each part follows the body bone with its id, and the bones under it follow the part.
+            weapon_world = model.rest_world()
+            parts = {}
+            for wanted in mount:
+                parts[model.node_with_id(wanted)] = body.node_with_id(wanted)
+            part_bone = np.zeros(len(model.nodes), "<u2")
+            part_move = np.array([new_world[0]] * len(model.nodes))
+            for i in range(len(model.nodes)):
+                at = i
+                while at not in parts and at:
+                    at = model.nodes[at]["parent"]
+                if at in parts:
+                    part_bone[i] = parts[at]
+                    part_move[i] = new_world[parts[at]] @ np.linalg.inv(weapon_world[at])
         for mesh_index, (material_at, subs) in enumerate(model.meshes):
             if not keep_overlays and is_overlay(model, textures, material_at):
                 continue
@@ -478,8 +503,13 @@ def build(model, textures, banks, apose, overlays=False, attachments=()):
                     print("warning: vertices blend across a swung shoulder, so motions distort there")
                 transform = (moved[bones] * weights[..., None, None]).sum(1)
                 if mount is not None:
-                    transform = new_world[mount] @ transform
-                    bones = np.full_like(bones, mount)
+                    if len(mount) > 1:
+                        transform = part_move[bones[:, 0]] @ transform
+                        bones = np.tile(part_bone[bones[:, :1]], (1, 4))
+                    else:
+                        at = body.node_with_id(mount[0])
+                        transform = new_world[at] @ transform
+                        bones = np.full_like(bones, at)
                     weights = np.tile(np.array([1, 0, 0, 0], "<f4"), (vertex_count, 1))
                 positions = (transform[:, :3, :3] @ v["p"][..., None])[..., 0] + transform[:, :3, 3]
                 normals = (transform[:, :3, :3] @ v["n"][..., None])[..., 0]
@@ -599,8 +629,8 @@ def main():
     attachments = []
     for path in filter(None, paths):
         if path.startswith("+"):
-            node, weapon, bank = path[1:].split("|")
-            attachments.append((int(node), Model(weapon), load_textures(bank) if bank != "-" else []))
+            ids, weapon, bank = path[1:].split("|")
+            attachments.append((tuple(int(i) for i in ids.split(",")), Model(weapon), load_textures(bank) if bank != "-" else []))
             continue
         stem = os.path.splitext(os.path.basename(path))[0]
         if path.lower().endswith(".hmt"):
