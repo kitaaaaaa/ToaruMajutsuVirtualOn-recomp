@@ -8,7 +8,7 @@ A static recompilation of the PS4 game *A Certain Magical Virtual-On* (とある
 
 **No game data goes in this repo, ever.** You need your own dump of the game. `.gitignore` is a whitelist for that reason. Don't add anything from `extracted`, `port\work`, `analysis\export`, Ghidra projects or the generated C, all of which derive from the game.
 
-## Current state (2026-11-06)
+## Current state (2026-11-07)
 
 Test machine: Windows 10, RTX 2080.
 
@@ -23,6 +23,8 @@ Test machine: Windows 10, RTX 2080.
 | English | `-English` replaces about 8,860 lines with a deliberately terrible joke translation; `-UserTl` plays a user-supplied Vita fan patch. See Translation below |
 | PSN | Unimplemented `sceNp*` calls answer `ORBIS_NP_ERROR_SIGNED_OUT`; `sceRudp*` calls answer `0x80770001` (not initialized, from memory and unverified) |
 | Saves, trophies | Saves work; trophies are logged only |
+| Unlocks | `-UnlockAll` (`--unlock-all`) opens everything and turns on the DLC stories and colours. Tested as far as the game booting with it and overriding a loaded save; nobody has reported on the unlocked screens yet |
+| Model export | All 15 robots to glTF, with motions, weapons and a set with weapons attached. See `analysis\scripts\MODEL_FORMAT_NOTES.md` |
 
 ## Open problems, most urgent first
 
@@ -32,7 +34,8 @@ Test machine: Windows 10, RTX 2080.
    - Labels are `0 1 0 0...`, `prev_index` is 1, flips pending 0, gc queue 0, 3 gfx submits queued, 0 commands.
    - A label only clears in `VideoOutDriver::Flip` when a later flip replaces that buffer, and CPU flips must pass through the sleeping GPU thread.
    - **Workaround:** after 200 ms in that state the wait releases the label and logs `CP VO label wait released`. It fired once in a user session, during a flip-rate dip, and got past the freeze. The game then crashed on shadPS4's "Out of order flip IRQ" assertion.
-   - Likely cause, not proven: when the game falls behind it picks the buffer already on screen, flipping one buffer twice in a row. `VideoOutDriver::Flip` then cleared that buffer's own label, racing the GPU's next write. `Flip` now skips that case, and the assertion became a logged warning (`VO label N was cleared before its flip`). With `VOX_TRACE=1`, look for two `TRACE present buffer` lines in a row with the same buffer before a "CP VO label wait" line.
+   - `VideoOutDriver::Flip` skips clearing a buffer's label when it's flipped twice in a row, and the assertion became a logged warning (`VO label N was cleared before its flip`). That guard stays, but the theory behind it was wrong: the game's frame code (`FUN_01384e40`) walks its buffers as a strict ring, so it doesn't choose the buffer on screen.
+   - Open: either a frame's wait and flip target different buffers, or a flip gets lost, for instance when a frame submits no contexts. Every stall report and every release of the wait now prints the last 256 flip events as `FLIPLOG` lines in the log, which should settle it. No freeze has happened with this build yet.
    - Ruled out: a label written directly by the game (the wait re-checks on a timer).
 3. **Crash on pressing start in attract mode (user report, once).** No log survived, and it may have been the freeze. Note the log gets overwritten by every run.
 4. **Starting a match "crashes" (early user report).** An unimplemented `sceRudpEnd` stopped the game during online shutdown after a signed-out PSN error. `sceNp*` and `sceRudp*` calls now return errors. Battles have worked since, but the user's menu path to that stop wasn't confirmed.
@@ -74,10 +77,10 @@ Everything runs on the user's own copy of the game: extract with `analysis\scrip
 | `port\gpu\shadps4` | shadPS4 v0.21 renderer, GNM and VideoOut, vendored. Local edits are marked `// vox:` |
 | `port\gpu\shim` | Windows replacements for shadPS4's core, including the guest mapping table in `core\memory_win.cpp` |
 | `port\patches` | Our changes to bbcpu and bloodborne-recomp, applied by `port\fetch_forks.ps1` at pinned commits |
-| `analysis\scripts` | Ghidra scripts and Python tools for the code map |
+| `analysis\scripts` | Ghidra scripts and Python tools for the code map; also `hmd2glb.py` and `export_models.py` for the model export |
 
 Not in the repo, on the development machine:
-- `extracted\`: the game's files.
+- `extracted\`: the game's files, and `extracted\models`, the exported models. Never publish these.
 - `analysis\vox*.gpr`, `analysis\export\`: Ghidra projects and the exported code map. Use `voxfix`.
 - `port\work\`: game-derived build output, generated C, `librecomp.dll`, logs and saves.
 - `port\deps`: Zydis and Zycore headers and libs (source in `tools\src\zydis`).
