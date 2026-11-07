@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2024-2026 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <algorithm>
+#include <atomic>
+#include <chrono>
 #include <cstdio>
 #include "common/assert.h"
 #include "common/elf_info.h"
@@ -15,6 +18,9 @@
 #include "video_core/renderer_vulkan/vk_presenter.h"
 
 extern std::unique_ptr<Vulkan::Presenter> presenter;
+
+// vox: the order of waits and flips before a freeze.
+extern "C" void voxgpu_flip_log(const char* what, int a, int b);
 
 namespace Libraries::VideoOut {
 
@@ -136,6 +142,7 @@ s32 PS4_SYSV_ABI sceVideoOutRegisterBuffers(s32 handle, s32 startIndex, void* co
         return ORBIS_VIDEO_OUT_ERROR_INVALID_HANDLE;
     }
 
+    voxgpu_flip_log("register", startIndex, bufferNum);
     return driver->RegisterBuffers(port, startIndex, addresses, bufferNum, attribute);
 }
 
@@ -177,6 +184,7 @@ s32 PS4_SYSV_ABI sceVideoOutSubmitFlip(s32 handle, s32 bufferIndex, s32 flipMode
     LOG_DEBUG(Lib_VideoOut, "bufferIndex = {}, flipMode = {}, flipArg = {}", bufferIndex, flipMode,
               flipArg);
 
+    voxgpu_flip_log("cpu flip", bufferIndex, 0);
     if (!driver->SubmitFlip(port, bufferIndex, flipArg)) {
         LOG_ERROR(Lib_VideoOut, "Flip queue is full");
         return ORBIS_VIDEO_OUT_ERROR_FLIP_QUEUE_FULL;
@@ -352,6 +360,7 @@ s32 sceVideoOutSubmitEopFlip(s32 handle, u32 buf_id, u32 mode, s64 flip_arg, voi
     Platform::IrqC::Instance()->RegisterOnce(
         Platform::InterruptId::GfxFlip, [=](Platform::InterruptId irq) {
             ASSERT_MSG(irq == Platform::InterruptId::GfxFlip, "An unexpected IRQ occured");
+            voxgpu_flip_log("gpu flip", buf_id, static_cast<int>(port->buffer_labels[buf_id]));
             // vox: the present thread can clear this label just after the GPU set it, when it finishes the flip
             // before last late. That isn't worth ending the game: put it back and carry on.
             if (port->buffer_labels[buf_id] != 1) {
@@ -365,6 +374,41 @@ s32 sceVideoOutSubmitEopFlip(s32 handle, u32 buf_id, u32 mode, s64 flip_arg, voi
     return ORBIS_OK;
 }
 
+// vox: the last waits, submits and flips, in the order they happened.
+namespace {
+struct VoxFlipEvent {
+    std::atomic<const char*> what;
+    int a, b;
+    long long ms;
+};
+VoxFlipEvent vox_flip_events[256];
+std::atomic<unsigned> vox_flip_next;
+} // namespace
+
+extern "C" void voxgpu_flip_log(const char* what, int a, int b) {
+    auto& event = vox_flip_events[vox_flip_next.fetch_add(1, std::memory_order_relaxed) % 256];
+    event.a = a;
+    event.b = b;
+    event.ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                   std::chrono::steady_clock::now().time_since_epoch())
+                   .count();
+    event.what.store(what, std::memory_order_release);
+}
+
+extern "C" void voxgpu_print_flip_log() {
+    const unsigned next = vox_flip_next.load();
+    long long last = 0;
+    for (unsigned i = next - std::min(next, 256u); i != next; ++i) {
+        const auto& event = vox_flip_events[i % 256];
+        const char* what = event.what.load(std::memory_order_acquire);
+        if (what) {
+            std::printf("FLIPLOG %+6lld ms  %-14s %d %d\n", last ? event.ms - last : 0, what, event.a, event.b);
+            last = event.ms;
+        }
+    }
+    std::fflush(stdout);
+}
+
 // vox: the flip state, for the runtime's stall reports.
 extern "C" void voxgpu_print_video_state() {
     auto* port = driver->GetPort(1);
@@ -372,6 +416,7 @@ extern "C" void voxgpu_print_video_state() {
         return;
     }
     const auto& status = port->flip_status;
+    voxgpu_print_flip_log();
     std::printf("STALL video: labels %llu %llu %llu %llu %llu %llu %llu %llu; on screen %d, flips %llu, pending %d, gc %d, "
                 "current buffer %d, vblanks %llu, flip rate %d, flip queues %zu\n",
                 (unsigned long long)port->buffer_labels[0], (unsigned long long)port->buffer_labels[1],

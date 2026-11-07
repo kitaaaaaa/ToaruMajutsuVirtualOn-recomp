@@ -27,6 +27,9 @@ void voxgpu_notify_map(uint64_t address, uint64_t size);
 void voxgpu_notify_unmap(uint64_t address, uint64_t size);
 /* Prints the flip state (labels, what's on screen, counts), for stall reports. */
 void voxgpu_print_video_state(void);
+/* The last waits, submits and flips in order, for the same reports. */
+void voxgpu_flip_log(const char *what, int a, int b);
+void voxgpu_print_flip_log(void);
 
 #ifdef __cplusplus
 }

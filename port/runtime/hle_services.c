@@ -224,6 +224,7 @@ const RtExport rt_service_exports[] = {
     {"sceUserServiceInitialize", ok}, {"sceUserServiceTerminate", ok}, {"sceUserServiceGetInitialUser", user_initial},
     {"sceUserServiceGetUserName", user_name}, {"sceUserServiceGetUserColor", user_color},
     {"sceNpSetNpTitleId", ok}, {"sceNpSetContentRestriction", ok}, {"sceNpGetNpId", np_get_id},
+    {"sceNetTerm", ok}, {"sceNetPoolDestroy", ok},
     {"sceCommonDialogInitialize", ok},
     {"sceSystemServiceGetStatus", system_status}, {"sceSystemServiceHideSplashScreen", ok}, {"sceSystemServiceReceiveEvent", system_receive_event},
 };

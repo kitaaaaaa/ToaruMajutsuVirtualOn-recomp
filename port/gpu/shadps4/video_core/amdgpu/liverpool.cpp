@@ -52,6 +52,9 @@ static const char* acb_task_name[] = NAME_ARRAY(ACB_TASK, MAX_NAMES);
 
 std::array<u8, 48_KB> Liverpool::ConstantEngine::constants_heap;
 
+extern "C" void voxgpu_flip_log(const char* what, int a, int b);
+extern "C" void voxgpu_print_flip_log();
+
 // vox: the packets before a bad one, to see what wrote it.
 static thread_local struct { const u32* at; u32 header; u32 total; } vox_recent[16];
 static thread_local u32 vox_recent_next;
@@ -864,6 +867,7 @@ Liverpool::Task Liverpool::ProcessGraphics(std::span<const u32> dcb) {
                 const u64* wait_addr = wait_reg_mem->Address<u64*>();
                 if (vo_port->IsVoLabel(wait_addr) &&
                     num_submits == mapped_queues[GfxQueueId].submits.size()) {
+                    voxgpu_flip_log("gpu wait", static_cast<int>(wait_addr - vo_port->buffer_labels.data()), static_cast<int>(*wait_addr));
                     // vox: a label only clears when a later flip is presented. With none pending, or
                     // with a CPU flip stuck behind this sleeping thread, this wait can never end: the
                     // game would hang. Release the label instead. Cause of the state still unknown.
@@ -891,6 +895,7 @@ Liverpool::Task Liverpool::ProcessGraphics(std::span<const u32> dcb) {
                                     num_commands.load());
                         std::fflush(stdout);
                         if (vox_stuck) {
+                            voxgpu_print_flip_log();
                             std::printf("CP VO label wait released\n");
                             std::fflush(stdout);
                             vo_port->buffer_labels[wait_addr - vox_labels.data()] = 0;
@@ -898,6 +903,7 @@ Liverpool::Task Liverpool::ProcessGraphics(std::span<const u32> dcb) {
                         }
                         vox_waits = 0;
                     }
+                    voxgpu_flip_log("gpu wait over", static_cast<int>(wait_addr - vo_port->buffer_labels.data()), 0);
                     break;
                 }
                 // vox: name a wait that isn't ending.

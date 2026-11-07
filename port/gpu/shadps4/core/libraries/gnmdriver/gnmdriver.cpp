@@ -24,6 +24,9 @@
 #include "video_core/amdgpu/pm4_cmds.h"
 #include "video_core/renderer_vulkan/vk_presenter.h"
 
+// vox: the order of waits and flips before a freeze.
+extern "C" void voxgpu_flip_log(const char* what, int a, int b);
+
 extern Frontend::WindowSDL* g_window;
 std::unique_ptr<Vulkan::Presenter> presenter;
 std::unique_ptr<AmdGpu::Liverpool> liverpool;
@@ -1189,6 +1192,7 @@ s32 PS4_SYSV_ABI sceGnmInsertWaitFlipDone(u32* cmdbuf, u32 size, s32 vo_handle, 
         return -1;
     }
 
+    voxgpu_flip_log("build wait", buf_idx, 0);
     uintptr_t label_addr{};
     ASSERT_MSG(VideoOut::sceVideoOutGetBufferLabelAddress(vo_handle, &label_addr) == 16,
                "sceVideoOutGetBufferLabelAddress call failed");
@@ -2415,6 +2419,7 @@ s32 PS4_SYSV_ABI sceGnmSubmitAndFlipCommandBuffersForWorkload(
     std::scoped_lock lk{m_submit_lock};
     WaitGpuIdle();
 
+    voxgpu_flip_log("submit flip", buf_idx, count);
     const s32 patch_result =
         PatchFlipRequest(cmdbuf, size_dw, vo_handle, buf_idx, flip_mode, flip_arg, nullptr /*unk*/);
     if (patch_result != ORBIS_OK) {
@@ -2458,6 +2463,7 @@ s32 PS4_SYSV_ABI sceGnmSubmitCommandBuffersForWorkload(u32 workload, u32 count,
     std::scoped_lock lk{m_submit_lock};
     WaitGpuIdle();
 
+    voxgpu_flip_log("submit", count, 0);
     return PerformSubmit(count, const_cast<const u32**>(dcb_gpu_addrs), dcb_sizes_in_bytes,
                          const_cast<const u32**>(ccb_gpu_addrs), ccb_sizes_in_bytes);
 }
@@ -2472,6 +2478,7 @@ s32 PS4_SYSV_ABI sceGnmSubmitCommandBuffers(u32 count, const u32* dcb_gpu_addrs[
 s32 PS4_SYSV_ABI sceGnmSubmitDone() {
     HLE_TRACE;
     LOG_DEBUG(Lib_GnmDriver, "called");
+    voxgpu_flip_log("submit done", 0, 0);
     std::scoped_lock lk{m_submit_lock};
     WaitGpuIdle();
     if (!liverpool->IsGpuIdle()) {
