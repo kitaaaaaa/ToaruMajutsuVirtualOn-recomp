@@ -29,9 +29,12 @@ port\prepare_game.ps1 -Pkg game.pkg   # or: -Game <folder>
 port\run.ps1 -Timeout 3600 -NoBuild              # Japanese
 port\run.ps1 -Timeout 3600 -NoBuild -English     # budget English translation
 port\run.ps1 -Timeout 3600 -NoBuild -UserTl      # installed fan translation, see below
+port\run.ps1 -Timeout 3600 -NoBuild -UnlockAll   # everything unlocked; combines with the others
 ```
 
 `-Timeout` is how many seconds until the game closes itself. The log is `port\work\run.log`, and the next launch overwrites it.
+
+`-UnlockAll` opens every robot, colour, mission, title and gallery item, sets your points to 9,999,999, marks the main story chapters cleared and turns on the DLC stories and colours. **It changes your save** as soon as the game next saves, and turning it off won't undo that, so back up `port\work\user\savedata` first if you care. Some colours and gallery entries may have no files on the disc, so they could misbehave.
 
 Face buttons match by position, so Xbox B is PS4 Circle, which confirms in this version.
 

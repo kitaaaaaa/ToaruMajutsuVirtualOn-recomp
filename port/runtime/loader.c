@@ -6,7 +6,7 @@
  * recompiled library made with the same layout finds its functions; modules start in order, then
  * the game's entry runs on a low stack.
  *
- * Usage: vox ELF_DIR NAMES.TSV [--timeout seconds] [--english | --user-tl] */
+ * Usage: vox ELF_DIR NAMES.TSV [--timeout seconds] [--english | --user-tl] [--unlock-all] */
 #include <windows.h>
 #include <tlhelp32.h>
 #include <inttypes.h>
@@ -658,6 +658,51 @@ static DWORD WINAPI flip_heartbeat(void *argument) {
     (void)argument;
 }
 
+/* --unlock-all: everything the game gates, kept on while it runs. The save has no checksum and is a plain copy of the
+ * file at +0xC43240, so unlocks are writes to it; the game saves them like any others. The DLC bits at +0xD448A8 aren't in
+ * the save. Nothing in the game sets them, and a lazy constructor clears them once, so this keeps writing. */
+static int unlock_all;
+
+static DWORD WINAPI unlock_everything(void *argument) {
+    /* Offset, count, entry size, value. 0 is owned; missions use 1, as 0 only makes them visible. */
+    static const struct { int offset, count, size, value; } tables[] = {
+        {0x3317C, 1, 4, 0},    /* black room */
+        {0x331CC, 237, 4, 1},  /* missions */
+        {0x335B4, 8, 4, 0},    /* robots */
+        {0x335D4, 23, 4, 0},   /* BGM */
+        {0x339BC, 261, 4, 0},  /* voices */
+        {0x33E6C, 89, 4, 0},   /* gallery */
+        {0x34254, 261, 2, 0},  /* titles: u16 state, u16 "new" */
+        {0x34834, 38, 2, 0},   /* card backgrounds, the same */
+        {0x348D4, 40, 4, 0},   /* stages */
+    };
+    volatile uint8_t *bits = (volatile uint8_t *)(uintptr_t)(bb_image_base + 0xD448A8);
+    volatile uint8_t *save = (volatile uint8_t *)(uintptr_t)(bb_image_base + 0xC43240);
+    int reported = 0;
+    for (int ticks = 0;; ++ticks) {
+        *bits = 0xFF;
+        /* Once the save holds a real one, in case the game loads over it later. */
+        if (ticks % 100 == 0 && *(volatile uint64_t *)save == 0x2EF6CBFFA0ull) {
+            for (size_t t = 0; t < sizeof tables / sizeof *tables; ++t)
+                for (int i = 0; i < tables[t].count; ++i) {
+                    volatile uint8_t *entry = save + tables[t].offset + i * 4;
+                    if (tables[t].size == 2) *(volatile uint16_t *)entry = (uint16_t)tables[t].value;
+                    else *(volatile int32_t *)entry = tables[t].value;
+                }
+            if (*(volatile int32_t *)(save + 0x1C) != 9999999) printf("UNLOCK save had %d points, set\n", *(volatile int32_t *)(save + 0x1C));
+            *(volatile int32_t *)(save + 0x1C) = 9999999;  /* points */
+            for (int row = 0; row < 19; ++row) {           /* main story chapters cleared */
+                volatile int32_t *clears = (volatile int32_t *)(save + 0xE14 + row * 0x88);
+                if (*clears < 1) *clears = 1;
+            }
+            if (!reported) printf("UNLOCK everything on, after %d ms\n", ticks * 10);
+            reported = 1;
+        }
+        Sleep(10);
+    }
+    (void)argument;
+}
+
 static DWORD WINAPI watchdog(void *argument) {
     Sleep((DWORD)(uintptr_t)argument * 1000);
     rt_finish(41, "watchdog timeout");
@@ -701,7 +746,7 @@ int main(int argc, char **argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
     signal(SIGABRT, on_abort);
     if (argc < 3) {
-        fprintf(stderr, "usage: vox ELF_DIR NAMES.TSV [--timeout seconds] [--english | --user-tl]\n");
+        fprintf(stderr, "usage: vox ELF_DIR NAMES.TSV [--timeout seconds] [--english | --user-tl] [--unlock-all]\n");
         return 2;
     }
     unsigned timeout = 60;
@@ -710,6 +755,7 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--timeout") && i + 1 < argc) timeout = (unsigned)atoi(argv[++i]);
         else if (!strcmp(argv[i], "--app0") && i + 1 < argc) app0 = argv[++i];
         else if (!strcmp(argv[i], "--user") && i + 1 < argc) user = argv[++i];
+        else if (!strcmp(argv[i], "--unlock-all")) unlock_all = 1;
         else if (!strcmp(argv[i], "--english")) rt_overlay_folder = "translation";
         else if (!strcmp(argv[i], "--user-tl")) rt_overlay_folder = "translation_user";
     }
@@ -768,6 +814,7 @@ int main(int argc, char **argv) {
     if (timeout) CreateThread(NULL, 0, watchdog, (void *)(uintptr_t)timeout, 0, NULL);
     stall_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (gpu_enabled) CreateThread(NULL, 0, flip_heartbeat, NULL, 0, NULL);
+    if (unlock_all) CreateThread(NULL, 0, unlock_everything, NULL, 0, NULL);
     if (getenv("VOX_PROFILE")) CreateThread(NULL, 0, profiler, (void *)(uintptr_t)atoi(getenv("VOX_PROFILE")), 0, NULL);
 
     rt_thread_attach();
