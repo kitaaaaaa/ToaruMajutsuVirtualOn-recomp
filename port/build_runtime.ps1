@@ -10,12 +10,9 @@ $work = "$port\work"
 $tools = "$port\bloodborne-recomp\tools\recomp"
 $env:INCLUDE = $null
 
+New-Item -ItemType Directory -Force "$out\obj", $work | Out-Null
 python -I "$port\runtime\gen_names.py" "$root\tools\src\shadPS4\src\core\aerolib\aerolib.inl" "$work\names.tsv"
-foreach ($m in 'libc', 'libSceFios2') {
-    if (-not (Test-Path "$work\$m.elf")) {
-        python -I "$tools\ps4elf.py" "$root\extracted\uroot\sce_module\$m.prx" "$work\$m.elf"
-    }
-}
+if ($LASTEXITCODE -ne 0) { 'FAILED generating names'; exit 1 }
 
 $flags = @('-std=gnu11', '-O2', '-g', '-w', '-mcx16', '-D_CRT_RAND_S', '-DZYDIS_STATIC_BUILD', '-DZYCORE_STATIC_BUILD',
     '-include', "$bbcpu\src\win\win_compat.h", "-I$bbcpu\src\win\include", "-I$bbcpu\src", "-I$deps\include", "-I$port\runtime", "-I$port\gpu", "-I$port\gpu\externals\sdl3\include")

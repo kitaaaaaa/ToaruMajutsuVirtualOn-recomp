@@ -1,6 +1,6 @@
 # Passdown notes
 
-Working notes for whoever picks this up. They are not a user guide: the project isn't ready for players, and a build from a fresh clone hasn't been tried.
+Working notes for whoever picks this up. They are not a user guide: the project isn't ready for players.
 
 ## What this is
 
@@ -43,7 +43,6 @@ Test machine: Windows 10, RTX 2080.
 Smaller items:
 - `libc` and `libSceFios2` still run in the interpreter.
 - Unmaps now update the renderer's mapping table, but the renderer's own caches aren't told about them, so stale entries are possible.
-- `port\gpu\fetch_externals.ps1` doesn't list abseil-cpp, miniz or SPIRV-Headers yet.
 - `liverpool.cpp` still holds diagnostics (`vox_recent`, the CP wait prints). They're useful for now.
 - A user report of "7 failed background operations" during Phase 5 was never explained.
 
@@ -86,23 +85,24 @@ Not in the repo, on the development machine:
 
 ## Build and run
 
-```powershell
-port\fetch_forks.ps1                # clone bbcpu and bloodborne-recomp, apply port\patches
-port\build_windows.ps1              # libbbcpu and tools (bbrecomp)
-port\gpu\fetch_externals.ps1        # renderer dependencies
-port\gpu\build.ps1 -Target voxgpu   # renderer
-port\run.ps1 -Timeout 3600          # builds vox.exe and runs; log in port\work\run.log
-```
-
-To regenerate the C, in `port\work`, with `BB_JIT=0` and `BB_RECOMP_TABLES=recomp/known_tables.tsv`:
+Needs Windows, Git, Python 3, Visual Studio's "Desktop development with C++" (clang uses its libraries and the Windows SDK) and about 10 GB free, plus room for your game (12 GB extracted). 7-Zip only if installing a patch from an archive.
 
 ```powershell
-..\out\bbrecomp.exe eboot.elf recomp/functions.tsv recomp/gen/recomp.c "@recomp/all.txt"
+port\setup.ps1                        # tools and sources at pinned versions, in tools\ and port\
+port\build_all.ps1                    # the engine: port\out\vox.exe. No game needed
+port\prepare_game.ps1 -Pkg game.pkg   # or -Game <folder with eboot.bin>: your copy to librecomp.dll
+port\run.ps1 -Timeout 3600 -NoBuild -English
 ```
 
-Then run `port\compile_generated.ps1` and link `librecomp.dll` with clang: `-shared -fuse-ld=lld -g0 -Wl,/EXPORT:bb_recomp_init "-Wl,/MAP:librecomp.map" @link.rsp` plus libbbcpu, Zydis, Zycore and the clang builtins. The map file resolves `game+offset` frames to `f_<guest address>`.
+`run.ps1` also rebuilds `vox.exe` first unless given `-NoBuild`. Its log is `port\work\run.log`.
 
-Pipeline before that, in order: extract the pkg with PkgTool, analyze in Ghidra with the Orbis SELF loader (disable switch analysis and "Non-Returning Functions - Discovered"), then export the code map with `analysis\scripts`. `.eh_frame` supplies the function ranges and `SwitchRecover.java` the jump tables. Expected result: 13,375+ functions, 962 tables, 0 errors.
+Tested from a clean folder on the development machine, using every published file. Setup and the engine build took about 15 minutes on first run and the game about 2 minutes. `-Pkg` and PkgTool's download have not been run through this script.
+
+**Jump tables are optional.** `scan.exe` finds all 13,771 functions from `.eh_frame`, byte-identical to before, and `prepare_game.ps1` needs no Ghidra. Without tables, bbrecomp decodes 849 jump tables and leaves 269 indirect jumps to the interpreter. With `-Tables <known_tables.tsv>` it decodes 962 and leaves 168, and the generated C was byte-identical to the working copy's. Without tables, only a boot and the opening have been tested, not story or battles.
+
+`known_tables.tsv` comes from Ghidra, by hand: analyze with the Orbis SELF loader (disable switch analysis and "Non-Returning Functions - Discovered"), run `SwitchRecover.java`, then `tables_tsv.py` on the exported `jump_tables.csv`. It isn't in this repo.
+
+The link's map file (`port\work\recomp\librecomp.map`) resolves `game+offset` frames to `f_<guest address>`.
 
 ## Debugging
 

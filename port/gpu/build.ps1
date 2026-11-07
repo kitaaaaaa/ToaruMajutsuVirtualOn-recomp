@@ -6,7 +6,7 @@ $gpu = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Split-Path -Parent (Split-Path -Parent $gpu)
 $llvm = "$root\tools\llvm\bin" -replace '\\', '/'
 $cmake = "$root\tools\cmake\bin\cmake.exe"
-$ninja = "$env:LOCALAPPDATA\Programs\Python\Python310\Scripts\ninja.exe"
+$ninja = "$root\tools\ninja\ninja.exe"
 $build = "$gpu\build"
 
 # Machine-wide it points at Watcom's headers, which break the MSVC ones.
