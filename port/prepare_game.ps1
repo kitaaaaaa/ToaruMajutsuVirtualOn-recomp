@@ -1,5 +1,5 @@
 # Turns your own copy of the game into something port\run.ps1 can play: extracts it, finds its functions,
-# recompiles them to port\work\recomp\librecomp.dll, and builds the -English overlay. Everything it produces
+# recompiles them to port\work\recomp\librecomp.dll, and builds the translation overlays. Everything it produces
 # comes from the game: it all stays in git-ignored folders. Run port\build_all.ps1 first.
 #
 # Args: -Pkg <fake-signed .pkg> | -Game <folder with eboot.bin>   (or neither, if extracted\uroot already exists)
@@ -81,10 +81,14 @@ $libs = @("$out\libbbcpu.lib", "$port\deps\lib\Zydis.lib", "$port\deps\lib\Zycor
 $output = & "$llvm\clang.exe" -shared -fuse-ld=lld -g0 '-Wl,/EXPORT:bb_recomp_init' '-Wl,/MAP:librecomp.map' '@link.rsp' @libs -o librecomp.dll 2>&1 | ForEach-Object { "$_" }
 if ($LASTEXITCODE -ne 0) { $output | Select-Object -Last 10; 'FAILED linking'; exit 1 }
 
-'--- the -English overlay'
+'--- the -Engrish overlay, and the -English one if translation_english exists'
 $env:PYTHONIOENCODING = 'utf-8'
 Set-Location "$root\analysis\scripts"
 python -B tl_pack.py "$root\translation" "$uroot\cpk" "$work\translation" | Select-Object -Last 1
 if ($LASTEXITCODE -ne 0) { 'FAILED packing the translation'; exit 1 }
+if (Test-Path "$root\translation_english") {
+    python -B tl_pack.py "$root\translation_english" "$uroot\cpk" "$work\translation_english" | Select-Object -Last 1
+    if ($LASTEXITCODE -ne 0) { 'FAILED packing the English translation'; exit 1 }
+}
 
 "done in $([Math]::Round($sw.Elapsed.TotalMinutes, 1)) minutes. Play: port\run.ps1 -Timeout 3600 -NoBuild -English"

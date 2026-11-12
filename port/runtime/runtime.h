@@ -22,7 +22,7 @@ void rt_thread_attach(void);
 void rt_set_tls_module(uint64_t id, const void *data, uint64_t filesz, uint64_t memsz);
 void rt_set_procparam(void *param);
 void rt_set_folders(const char *app0, const char *user);
-/* --english, --user-tl: the folder of translation overlays to play with, or NULL. */
+/* --english, --engrish, --user-tl: the folder of translation overlays to play with, or NULL. */
 extern const char *rt_overlay_folder;
 /* The host path for a guest path; 0 if there is none. */
 int rt_host_path(const char *guest, char *out, size_t size);

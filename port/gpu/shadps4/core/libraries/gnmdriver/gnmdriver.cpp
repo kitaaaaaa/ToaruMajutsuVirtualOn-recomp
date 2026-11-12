@@ -24,9 +24,6 @@
 #include "video_core/amdgpu/pm4_cmds.h"
 #include "video_core/renderer_vulkan/vk_presenter.h"
 
-// vox: the order of waits and flips before a freeze.
-extern "C" void voxgpu_flip_log(const char* what, int a, int b);
-
 extern Frontend::WindowSDL* g_window;
 std::unique_ptr<Vulkan::Presenter> presenter;
 std::unique_ptr<AmdGpu::Liverpool> liverpool;
@@ -82,6 +79,12 @@ static VAddr tessellation_factors_ring_addr = -1;
 static constexpr u32 tessellation_offchip_buffer_size = 0x800000u;
 
 static void ResetSubmissionLock(Platform::InterruptId irq) {
+    // vox: the GPU thread sends this some time after its queue empties, without looking again. A frame
+    // submitted in that gap is still queued, and clearing the lock now lets the next submit overwrite it,
+    // which freezes the game on that frame's flip label. Keep the lock: the signal after it runs clears it.
+    if (!liverpool->IsGpuIdle()) {
+        return;
+    }
     std::unique_lock lock{m_wait_idle};
     submission_lock = 0;
     cv_lock.notify_all();
@@ -1192,7 +1195,6 @@ s32 PS4_SYSV_ABI sceGnmInsertWaitFlipDone(u32* cmdbuf, u32 size, s32 vo_handle, 
         return -1;
     }
 
-    voxgpu_flip_log("build wait", buf_idx, 0);
     uintptr_t label_addr{};
     ASSERT_MSG(VideoOut::sceVideoOutGetBufferLabelAddress(vo_handle, &label_addr) == 16,
                "sceVideoOutGetBufferLabelAddress call failed");
@@ -2419,7 +2421,6 @@ s32 PS4_SYSV_ABI sceGnmSubmitAndFlipCommandBuffersForWorkload(
     std::scoped_lock lk{m_submit_lock};
     WaitGpuIdle();
 
-    voxgpu_flip_log("submit flip", buf_idx, count);
     const s32 patch_result =
         PatchFlipRequest(cmdbuf, size_dw, vo_handle, buf_idx, flip_mode, flip_arg, nullptr /*unk*/);
     if (patch_result != ORBIS_OK) {
@@ -2463,7 +2464,6 @@ s32 PS4_SYSV_ABI sceGnmSubmitCommandBuffersForWorkload(u32 workload, u32 count,
     std::scoped_lock lk{m_submit_lock};
     WaitGpuIdle();
 
-    voxgpu_flip_log("submit", count, 0);
     return PerformSubmit(count, const_cast<const u32**>(dcb_gpu_addrs), dcb_sizes_in_bytes,
                          const_cast<const u32**>(ccb_gpu_addrs), ccb_sizes_in_bytes);
 }
@@ -2478,7 +2478,6 @@ s32 PS4_SYSV_ABI sceGnmSubmitCommandBuffers(u32 count, const u32* dcb_gpu_addrs[
 s32 PS4_SYSV_ABI sceGnmSubmitDone() {
     HLE_TRACE;
     LOG_DEBUG(Lib_GnmDriver, "called");
-    voxgpu_flip_log("submit done", 0, 0);
     std::scoped_lock lk{m_submit_lock};
     WaitGpuIdle();
     if (!liverpool->IsGpuIdle()) {

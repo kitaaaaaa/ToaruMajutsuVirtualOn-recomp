@@ -17,9 +17,6 @@
 extern std::unique_ptr<Vulkan::Presenter> presenter;
 extern std::unique_ptr<AmdGpu::Liverpool> liverpool;
 
-// vox: the order of waits and flips before a freeze.
-extern "C" void voxgpu_flip_log(const char* what, int a, int b);
-
 namespace Libraries::VideoOut {
 
 constexpr static bool Is32BppPixelFormat(PixelFormat format) {
@@ -249,8 +246,6 @@ void VideoOutDriver::Flip(const Request& req) {
     if (vox_trace) {
         std::printf("TRACE present buffer %d, previous %d\n", req.index, req.port->prev_index);
     }
-
-    voxgpu_flip_log("presented", req.index, req.port->prev_index);
 
     // Update flip status.
     auto* port = req.port;

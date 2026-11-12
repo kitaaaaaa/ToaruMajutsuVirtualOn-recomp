@@ -203,9 +203,9 @@ enum { O_PS4_WRONLY = 1, O_PS4_RDWR = 2, O_PS4_APPEND = 8, O_PS4_CREAT = 0x200, 
 
 static SRWLOCK file_lock = SRWLOCK_INIT; /* positioned reads and writes seek first */
 
-/* Translation overlays, with --english or --user-tl (analysis\scripts\tl_pack.py): byte ranges laid over
- * an archive as it is read, from <folder>\<disc>.overlay in the working directory. Ranges can reach past the
- * end of the file, which makes it look bigger. The archive itself never changes. */
+/* Translation overlays, with --english, --engrish or --user-tl (analysis\scripts\tl_pack.py): byte ranges
+ * laid over an archive as it is read, from <folder>\<disc>.overlay in the working directory. Ranges can reach
+ * past the end of the file, which makes it look bigger. The archive itself never changes. */
 const char *rt_overlay_folder;
 typedef struct { uint64_t offset; uint32_t size, reserved; } OverlayRange;
 typedef struct { const char *name; uint32_t count; uint64_t size; const OverlayRange *ranges; const uint8_t *bytes; uint8_t *seen; } Overlay;

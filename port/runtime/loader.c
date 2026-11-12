@@ -6,7 +6,7 @@
  * recompiled library made with the same layout finds its functions; modules start in order, then
  * the game's entry runs on a low stack.
  *
- * Usage: vox [--english | --user-tl] [--unlock-all]
+ * Usage: vox [--english | --engrish | --user-tl] [--unlock-all]
  *    or: vox ELF_DIR NAMES.TSV [--timeout seconds] [--app0 folder] [--user folder] [the same options]
  * The first finds everything from where the exe is, port\\out, and logs to port\\work\\run.log. */
 #include <windows.h>
@@ -135,6 +135,12 @@ ABI uint64_t rt_unimplemented(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3
     if (s->symbol && !strncmp(s->symbol, "sceRudp", 7)) {
         if (n == 1) printf("HLE: %s answered not initialized, from +%" PRIx64 "\n", s->symbol, bbcpu_import_return() - bb_image_base);
         return UINT32_C(0x80770001);
+    }
+    /* The online menus' shutdown unregisters a network callback it never got (id -1). Nothing was
+     * registered, so there is nothing to undo: answer success. */
+    if (s->symbol && !strcmp(s->symbol, "sceNetCtlUnregisterCallback")) {
+        if (n == 1) printf("HLE: %s answered OK, from +%" PRIx64 "\n", s->symbol, bbcpu_import_return() - bb_image_base);
+        return 0;
     }
     /* By default an import nobody has looked at ends the run: answering it with a made-up success
      * would send the game down a wrong path. VOX_LENIENT=1 logs and returns 0 instead. */
@@ -773,7 +779,7 @@ int main(int argc, char **argv) {
     const int plain = argc < 2 || argv[1][0] == '-';
     const char *elf_dir = plain ? "." : argv[1], *names = plain ? "names.tsv" : (argc > 2 ? argv[2] : NULL);
     if (!plain && !names) {
-        fprintf(stderr, "usage: vox [--english | --user-tl] [--unlock-all]\n   or: vox ELF_DIR NAMES.TSV [--timeout seconds] [--app0 folder] [--user folder] [the same options]\n");
+        fprintf(stderr, "usage: vox [--english | --engrish | --user-tl] [--unlock-all]\n   or: vox ELF_DIR NAMES.TSV [--timeout seconds] [--app0 folder] [--user folder] [the same options]\n");
         return 2;
     }
     unsigned timeout = plain ? 0 : 60;
@@ -786,7 +792,8 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--app0") && i + 1 < argc) app0 = argv[++i];
         else if (!strcmp(argv[i], "--user") && i + 1 < argc) user = argv[++i];
         else if (!strcmp(argv[i], "--unlock-all")) unlock_all = 1;
-        else if (!strcmp(argv[i], "--english")) rt_overlay_folder = "translation";
+        else if (!strcmp(argv[i], "--english")) rt_overlay_folder = "translation_english";
+        else if (!strcmp(argv[i], "--engrish")) rt_overlay_folder = "translation";
         else if (!strcmp(argv[i], "--user-tl")) rt_overlay_folder = "translation_user";
     }
     rt_set_folders(app0, user);

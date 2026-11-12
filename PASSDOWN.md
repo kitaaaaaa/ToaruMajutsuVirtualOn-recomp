@@ -20,8 +20,8 @@ Test machine: Windows 10, RTX 2080.
 | Xbox controller (XInput) | Works. No rumble (`scePadSetVibration` is a no-op) |
 | Sound (SDL3) | Works by ear (the user's report); no movie sound |
 | Movies | All play through Media Foundation (`hle_movie.c`), picture and sound; the menu panel videos and story CGs are confirmed working. If decoding fails, a looping movie gives one black frame and a one-shot movie just ends |
-| English | `-English` replaces about 8,860 lines with a deliberately terrible joke translation; `-UserTl` plays a user-supplied Vita fan patch. See Translation below |
-| PSN | Unimplemented `sceNp*` calls answer `ORBIS_NP_ERROR_SIGNED_OUT`; `sceRudp*` calls answer `0x80770001` (not initialized, from memory and unverified) |
+| English | `-English` plays our full translation of all 10,880 Japanese lines; `-Engrish` replaces about 8,860 lines with a deliberately terrible joke translation; `-UserTl` plays a user-supplied Vita fan patch. See Translation below |
+| PSN | Unimplemented `sceNp*` calls answer `ORBIS_NP_ERROR_SIGNED_OUT`; `sceRudp*` calls answer `0x80770001` (not initialized, from memory and unverified); `sceNetCtlUnregisterCallback` answers 0, so the Network and Co-op menus show their error and return instead of stopping (user-tested) |
 | Saves, trophies | Saves work; trophies are logged only |
 | Unlocks | `-UnlockAll` (`--unlock-all`) opens everything and turns on the DLC stories and colours. Tested as far as the game booting with it and overriding a loaded save; nobody has reported on the unlocked screens yet |
 | Model export | All 15 robots to glTF, with motions and weapons, and a set with weapons mounted by the game's own rules. PPRIMA has no armed model. See `analysis\scripts\MODEL_FORMAT_NOTES.md` |
@@ -29,19 +29,20 @@ Test machine: Windows 10, RTX 2080.
 ## Open problems, most urgent first
 
 1. **Missing letters in English text (user report, early).** Not seen in any capture, and other English lines drew complete. It may be gone or specific to some screens. Capture one with `capture_window.ps1` first. Ruled out: the fonts. `unicode_font_jp_8bpp.ufn` has no ASCII, only fullwidth, but `unicode_font_ascii_8bpp.ufn` has every glyph (all rendered and checked), and `FUN_01156010` registers both, each with a `0x100` argument. Unconfirmed ideas: a glyph cache limit, the renderer missing updates to a glyph atlas, or code measuring ASCII text as Japanese.
-2. **Intermittent freeze.** Seen in attract battles (about 50–65 s in) and mid-match. All threads go idle with 0 CPU. Evidence from every stall:
+2. **Intermittent freeze (fixed 2026-11-12, see the last points).** Seen in attract battles (about 50–65 s in) and mid-match. All threads go idle with 0 CPU. Evidence from every stall:
    - The GPU thread is in the WAIT_REG_MEM label wait in `ProcessGraphics` (`liverpool.cpp`), waiting for `buffer_labels[1] == 0`.
    - Labels are `0 1 0 0...`, `prev_index` is 1, flips pending 0, gc queue 0, 3 gfx submits queued, 0 commands.
    - A label only clears in `VideoOutDriver::Flip` when a later flip replaces that buffer, and CPU flips must pass through the sleeping GPU thread.
    - **Workaround:** after 200 ms in that state the wait releases the label and logs `CP VO label wait released`. It fired once in a user session, during a flip-rate dip, and got past the freeze. The game then crashed on shadPS4's "Out of order flip IRQ" assertion.
-   - `VideoOutDriver::Flip` skips clearing a buffer's label when it's flipped twice in a row, and the assertion became a logged warning (`VO label N was cleared before its flip`). That guard stays, but the theory behind it was wrong: the game's frame code (`FUN_01384e40`) walks its buffers as a strict ring, so it doesn't choose the buffer on screen.
-   - Open: either a frame's wait and flip target different buffers, or a flip gets lost, for instance when a frame submits no contexts. Every stall report and every release of the wait prints the last 256 flip events as `FLIPLOG` lines in the log.
-   - **First capture (2026-11-07), points at the first:** about 8 s after boot, on the title or attract screen, after hundreds of alternating flips: `submit flip 0`, `build wait 1`, GPU waits on 0, then `submit flip 0` again with the wait for 1 already built. So the game flipped buffer 0 twice, where the ring should have given 1, and the wait on 0's label then never ended. Next: why `FUN_013858a0`'s buffer (`+0xc0` plus its base) didn't advance there, against `FUN_01384e40`. Two more runs of the same build didn't freeze, so it's intermittent. Not fixed.
+   - `VideoOutDriver::Flip` skips clearing a buffer's label when it's flipped twice in a row, and the assertion became a logged warning (`VO label N was cleared before its flip`). The theory behind that guard was wrong: the game walks its buffers as a strict ring.
+   - **Cause, measured (2026-11-07).** `sceGnmSubmitDone` resets the copy buffer and locks submissions until the `GpuIdle` interrupt. The GPU thread sends that some time after its queue empties, after a flush, without rechecking. A frame and a `submitDone` landing in that gap get the lock cleared with the frame still queued (seen as idle with 2 submits queued), so the next submit copies over it, and that frame then waits on the on-screen buffer's label.
+   - **Deliberately left alone.** The user only sees it before the SEGA logo, not in play, and lost the intro sounds during the work on it, so the logging and the fix were rolled back at their request. Whether that work caused the sound loss wasn't established: the level at the audio ports measured the same with it in. The fix, ignoring an idle signal while submits are queued in `ResetSubmissionLock`, froze 0 of 10 runs against 3 of 3 with a 20 ms delay injected before `submitDone`, in an unfinished test.
+   - **Fixed (2026-11-12), at the user's request.** It came back in play: two of the user's story-mode runs froze at a battle load, each right after one `CP VO label wait released`, with 3 submits queued. Every thread was waiting: the game in `sceKernelWaitEqueue`, the GPU thread idle in `Liverpool::Process`. `ResetSubmissionLock` (`gnmdriver.cpp`) now ignores a `GpuIdle` signal while submits are still queued, and the signal after they run clears the lock. Since then: 5 user runs, about 2 hours with story battles, 0 freezes, 0 label-wait releases. The intro sounds play (audio ports 1 and 2 both report sound, as before). Logs are in `work\freeze` (local only).
    - Ruled out: a label written directly by the game (the wait re-checks on a timer).
 3. **Crash on pressing start in attract mode (user report, once).** No log survived, and it may have been the freeze. Note the log gets overwritten by every run.
 4. **Starting a match "crashes" (early user report).** An unimplemented `sceRudpEnd` stopped the game during online shutdown after a signed-out PSN error. `sceNp*` and `sceRudp*` calls now return errors. Battles have worked since, but the user's menu path to that stop wasn't confirmed.
 5. **Movie notes.** Only `open00`, `staffroll` and `to_be_continued_00/01` have a sound track; the `adv` story CGs are video only by design. The story mode hang was fixed by real movie frames: the game's state machine (`FUN_010fda80`, state 2) waits for a flag only `sceAvPlayerGetVideoDataEx` sets. Media Foundation reports 1080 rows for frames whose buffer holds 1088, so `hle_movie.c` finds the chroma plane from the buffer's size.
-6. **158 known imports are unimplemented.** Any other than `sceNp*` and `sceRudp*` stops the game by default and prints `STOP: unimplemented ...`. `VOX_LENIENT=1` logs and returns 0 instead.
+6. **158 known imports are unimplemented.** Any other than `sceNp*`, `sceRudp*` and `sceNetCtlUnregisterCallback` stops the game by default and prints `STOP: unimplemented ...`. `VOX_LENIENT=1` logs and returns 0 instead.
 7. **Remaining Phase 6 work:** movie sound and one-shot movies, rumble, and dialogs without UI.
 
 Smaller items:
@@ -52,16 +53,21 @@ Smaller items:
 
 ## Translation
 
-The user's direction: the distributed English is **a joke on purpose**, in the spirit of Zero Wing, bootleg comics and Kung Pow. Menus are as literal as possible so people can still get around. The story is meant to be impossible to follow. Baked-in Japanese art stays as it is. A real translation already exists, by fans, for the Vita version: don't copy it, support installing it instead.
+The user's direction: `-Engrish` is **a joke on purpose**, in the spirit of Zero Wing, bootleg comics and Kung Pow. Menus are as literal as possible so people can still get around. The story is meant to be impossible to follow. Baked-in Japanese art stays as it is. A real translation already exists, by fans, for the Vita version: don't copy it, support installing it instead.
+
+The user found the Vita patch's story badly machine translated, so `-English` is now our own full translation from the Japanese (2026-11-12): all story and menu text, voice gallery included. Their rule for it: never change the context or content of a joke or reference from its literal translation. Honorifics and verbal tics stay. The guide, glossary and checker used are in `work\tl` (`GUIDE.md`, `tl_check.py`).
 
 | Option | Plays | Source |
 |---|---|---|
 | none | Japanese | The game |
-| `port\run.ps1 -English` (`vox.exe --english`) | The joke translation | `translation\*.en`, in this repo |
+| `port\run.ps1 -English` (`vox.exe --english`) | The full translation | `translation_english\*.en`, git-ignored: it is the game's script in English |
+| `port\run.ps1 -Engrish` (`vox.exe --engrish`) | The joke translation | `translation\*.en`, in this repo |
 | `port\run.ps1 -UserTl` (`vox.exe --user-tl`) | The user's own Vita fan patch, text only | Their copy, via `port\install_vita_patch.ps1 -Patch <rar or folder>` |
 
 Everything runs on the user's own copy of the game: extract with `analysis\scripts\cpk.py`, dump with `mtp.py dump`, and keep Japanese dumps out of the repo. **Never commit anything from a Vita patch.** It only lives in `extracted\vita_patch` and `port\work\translation_user`, both git-ignored.
 
+- **Rebuild the full translation:** from `analysis\scripts`, `tl_pack.py <repo>\translation_english <extracted>\uroot\cpk <repo>\port\work\translation_english`. `prepare_game.ps1` does it when the folder exists. Ids whose Japanese is empty, ASCII or only a full-width space are left out on purpose.
+- **Box limits, measured in game:** the story select description box draws at most 127 characters, line breaks included (Japanese never passes 84). The story dialogue box holds about 1285 units of the ASCII font per row; the widths are the byte table at `0xA0` in `unicode_font_ascii_8bpp.ufn` (characters 0x20-0x7E), drawn at 0.83 px per unit. Story text is kept within 1250 units per row, 2 rows. `work\tl\tl_check.py` warns on both limits. Battle and tutorial boxes aren't measured yet.
 - **Regenerate the joke:** from `analysis\scripts`, run `wacky.py <extracted>\mtp_text <repo>\translation`, then `tl_pack.py <repo>\translation <extracted>\uroot\cpk <repo>\port\work\translation`. The game needs a restart to pick up new overlays.
 - **What's generated:** `wacky.py` writes everything except its `HAND` list of literal menu files, which are edited by hand. It uses only each line's tags, punctuation, length and katakana, so its output holds no game text beyond romanized katakana words. Output is deterministic. The voice gallery's text lists (`voice_*`) are deliberately left Japanese. Audio is never touched.
 - **Overlays:** the runtime lays `<folder>\<disc>.overlay` over an archive as it's read, and never changes the CPKs. A file too big for its slot goes past the archive's end, its TOC row is patched in the overlay, and the runtime reports the larger size. The ITOC and GTOC aren't patched: the game seems to look files up by name, but that isn't proven.

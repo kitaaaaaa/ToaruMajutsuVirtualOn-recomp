@@ -29,9 +29,10 @@ Run `port\out\vox.exe`, by double-clicking it or from a command line with these 
 
 | Option | Effect |
 |---|---|
-| `--english` | Budget English translation |
+| `--english` | Full English translation. Its text isn't in this repository: it needs a `translation_english` folder |
+| `--engrish` | Budget English translation |
 | `--user-tl` | Installed fan translation, see below |
-| `--unlock-all` | Everything unlocked. Combines with either of the others |
+| `--unlock-all` | Everything unlocked. Combines with any of the others |
 | `--timeout <seconds>` | Close the game after this long. By default it stays open |
 | `--app0 <folder>` | Use the game files in this folder instead of `extracted\uroot` |
 | `--user <folder>` | Keep saves in this folder instead of `port\work\user` |

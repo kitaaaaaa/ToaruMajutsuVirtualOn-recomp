@@ -1,6 +1,6 @@
 # Builds and runs the host once. Log: port\work\run.log.
-# Args: [-Timeout 30] [-Lines 70] [-Interp] [-English | -UserTl] [-UnlockAll]
-param([int]$Timeout = 30, [int]$Lines = 70, [switch]$Interp, [switch]$NoBuild, [switch]$English, [switch]$UserTl, [switch]$UnlockAll)
+# Args: [-Timeout 30] [-Lines 70] [-Interp] [-English | -Engrish | -UserTl] [-UnlockAll]
+param([int]$Timeout = 30, [int]$Lines = 70, [switch]$Interp, [switch]$NoBuild, [switch]$English, [switch]$Engrish, [switch]$UserTl, [switch]$UnlockAll)
 $port = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Split-Path -Parent $port
 Set-Location "$port\work"
@@ -13,6 +13,7 @@ if (-not $Interp) { $env:BB_RECOMP_LIB = "$port\work\recomp\librecomp.dll" }
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $language = @()
 if ($English) { $language += '--english' }
+if ($Engrish) { $language += '--engrish' }
 if ($UserTl) { $language += '--user-tl' }
 if ($UnlockAll) { $language += '--unlock-all' }
 & "$port\out\vox.exe" . names.tsv --timeout $Timeout --app0 "$root\extracted\uroot" --user "$port\work\user" @language 2>&1 | ForEach-Object { "$_" } | Out-File -Encoding utf8 run.log
