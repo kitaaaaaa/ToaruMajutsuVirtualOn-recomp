@@ -49,6 +49,22 @@ static u64 HashBackingMemory(VAddr virtual_addr, u64 size) {
     return hash;
 }
 
+// vox: gpu_hash only tells, when a GPU-written image is evicted, whether the CPU changed its memory meanwhile. Whole
+// images were hashed about 1400 times a second in battle (8 GB/s, most of the GPU thread's work); 16 spread slices of
+// 4 KiB cost about a hundredth. A CPU write missing every slice would go unseen, and the GPU's data would be kept.
+static u64 HashSampledBackingMemory(VAddr virtual_addr, u64 size) {
+    static constexpr u64 SLICE = 4096, SLICES = 16;
+    if (size <= SLICE * SLICES) {
+        return HashBackingMemory(virtual_addr, size);
+    }
+    u64 hash = size;
+    for (u64 i = 0; i < SLICES; ++i) {
+        const u64 offset = (size - SLICE) * i / (SLICES - 1);
+        hash = hash * 0x100000001B3ull ^ HashBackingMemory(virtual_addr + offset, SLICE);
+    }
+    return hash ? hash : 1;
+}
+
 TextureCache::TextureCache(const Vulkan::Instance& instance_, Vulkan::Scheduler& scheduler_,
                            Vulkan::Runtime& runtime_, AmdGpu::Liverpool* liverpool_,
                            BufferCache& buffer_cache_, PageManager& page_manager_)
@@ -234,7 +250,7 @@ void TextureCache::MarkAsMaybeGpuDirty(VAddr addr, size_t size) {
     ForEachImageInRegion(addr, size, [&](ImageId image_id, Image& image) {
         if (image.gpu_hash == 0) {
             // Read backing pages directly, without faulting through the guest readback path.
-            image.gpu_hash = HashBackingMemory(image.info.guest_address, image.info.guest_size);
+            image.gpu_hash = HashSampledBackingMemory(image.info.guest_address, image.info.guest_size);
         }
     });
 }
@@ -1149,7 +1165,7 @@ void TextureCache::GarbageCollectImages() {
 
         for (const auto& image_id : maybe_download) {
             const auto& image = slot_images[image_id];
-            const u64 hash = HashBackingMemory(image.info.guest_address, image.info.guest_size);
+            const u64 hash = HashSampledBackingMemory(image.info.guest_address, image.info.guest_size); // vox: as gpu_hash was made
             if (image.gpu_hash == hash) {
                 download_queue.push_back(image_id);
             } else {

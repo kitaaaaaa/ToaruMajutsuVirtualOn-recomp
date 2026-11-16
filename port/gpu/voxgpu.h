@@ -10,6 +10,7 @@ typedef struct {
     const char *title, *serial, *user_dir;
     uint32_t sdk_version, psf_attributes;
     int32_t width, height;
+    uint32_t vblank_hz; /* VideoOut's vblank rate; 0 is 60 */
 } VoxGpuConfig;
 
 /* Event queue functions: needed before imports resolve. */

@@ -114,7 +114,8 @@ static ABI _Noreturn void guest_exit(int32_t status) {
     snprintf(text, sizeof(text), "the game called _exit(%d)", status);
     rt_finish(status, text);
 }
-static ABI int32_t is_neo(void) { return 0; }
+int rt_neo_mode; /* --neo: answer as a PS4 Pro */
+static ABI int32_t is_neo(void) { return rt_neo_mode; }
 static ABI int32_t is_sanitized(void) { return 0; }
 static ABI _Noreturn void raise_exception(int32_t a, int32_t b) {
     char text[80];

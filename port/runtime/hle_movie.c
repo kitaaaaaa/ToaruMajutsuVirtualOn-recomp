@@ -399,6 +399,20 @@ static void fill_frame(uint8_t *frame, const uint8_t *data, uint32_t width, uint
 }
 ABI uint8_t rt_avplayer_video_data(AvPlayer *player, uint8_t *frame) {
     static uint8_t *black;
+    /* VOX_WATCH=1 (testing): how often the game asks for a picture, and how many it gets, each second. */
+    static int watch = -1;
+    static LONG asks, gives;
+    static ULONGLONG next;
+    if (watch < 0) watch = getenv("VOX_WATCH") != NULL;
+    if (watch) {
+        InterlockedIncrement(&asks);
+        if (player->fresh) InterlockedIncrement(&gives);
+        const ULONGLONG now = GetTickCount64();
+        if (now >= next) {
+            if (next) printf("WATCH movie asks %ld, fresh %ld in the last second\n", InterlockedExchange(&asks, 0), InterlockedExchange(&gives, 0));
+            next = now + 1000;
+        }
+    }
     if (!player->active) return 0;
     if (player->failed || !player->thread) {
         if (!player->frame_due) return 0;

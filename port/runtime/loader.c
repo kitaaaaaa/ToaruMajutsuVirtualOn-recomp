@@ -6,12 +6,13 @@
  * recompiled library made with the same layout finds its functions; modules start in order, then
  * the game's entry runs on a low stack.
  *
- * Usage: vox [--english | --engrish | --user-tl] [--unlock-all]
+ * Usage: vox [--english | --engrish | --user-tl] [--unlock-all] [--debug] [--neo] [--fps N] [--app0 folder]
  *    or: vox ELF_DIR NAMES.TSV [--timeout seconds] [--app0 folder] [--user folder] [the same options]
  * The first finds everything from where the exe is, port\\out, and logs to port\\work\\run.log. */
 #include <windows.h>
 #include <tlhelp32.h>
 #include <inttypes.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -518,8 +519,9 @@ static DWORD WINAPI profiler(void *argument) {
     const uint64_t exe_start = (uint64_t)GetModuleHandleA(NULL);
     const uint64_t game_start = (uint64_t)GetModuleHandleA("librecomp.dll");
     const uint64_t game_end = game_start ? game_start + ((IMAGE_NT_HEADERS *)(game_start + ((IMAGE_DOS_HEADER *)game_start)->e_lfanew))->OptionalHeader.SizeOfImage : 0;
+    /* Once: a system-wide thread snapshot took about 2 s with a browser open, leaving 5 rounds in 10 s. */
+    const int n = thread_ids(ids, self);
     while (GetTickCount64() < end && count + PROFILE_THREADS < MAX_SAMPLES) {
-        const int n = thread_ids(ids, self);
         ++rounds;
         for (int i = 0; i < n; ++i) {
             const HANDLE h = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION, FALSE, ids[i]);
@@ -536,7 +538,8 @@ static DWORD WINAPI profiler(void *argument) {
                     MEMORY_BASIC_INFORMATION region;
                     if (VirtualQuery((void *)context.Rsp, &region, sizeof(region))) {
                         const uint64_t *stack = (const uint64_t *)context.Rsp;
-                        const size_t got = (uint64_t)region.BaseAddress + region.RegionSize - context.Rsp;
+                        size_t got = (uint64_t)region.BaseAddress + region.RegionSize - context.Rsp;
+                        if (got > 65536) got = 65536; /* guest stacks sit in huge regions: whole ones took seconds a round */
                         int f = 1;
                         for (size_t w = 0; w < got / 8 && f < PROFILE_FRAMES; ++w)
                             if ((stack[w] >= exe_start + 0x1000 && stack[w] < exe_start + 0x4000000) || (stack[w] >= game_start && stack[w] < game_end)) s->frames[f++] = stack[w];
@@ -711,6 +714,143 @@ static DWORD WINAPI unlock_everything(void *argument) {
     (void)argument;
 }
 
+/* --debug: the developers' debug menu and performance overlay. The process manager (pointer at +0x6D11F0) launches the
+ * auto boot entry it holds at +0xD0 ("BOOT") instead of drawing its "VOX DEBUG ROOT MENU"; clearing that entry once the
+ * game sets it shows the menu. +0x6EB57C is the debug mode the game's pad code toggles and +0x6EB580 the overlay; both
+ * are reset during start-up, so they're set once the manager reaches its menu state (10). */
+static int debug_menu;
+
+static DWORD WINAPI debug_everything(void *argument) {
+    volatile uint64_t *manager = (volatile uint64_t *)(uintptr_t)(bb_image_base + 0x6D11F0);
+    while (!*manager || !*(volatile uint64_t *)(uintptr_t)(*manager + 0xD0)) Sleep(1);
+    volatile uint64_t *boot = (volatile uint64_t *)(uintptr_t)(*manager + 0xD0);
+    boot[0] = boot[1] = 0;
+    puts("DEBUG auto boot cleared");
+    while (*(volatile int32_t *)(uintptr_t)(*manager + 0x70) < 10) Sleep(10);
+    *(volatile int32_t *)(uintptr_t)(bb_image_base + 0x6EB57C) = 1;
+    *(volatile int32_t *)(uintptr_t)(bb_image_base + 0x6EB580) = 1;
+    puts("DEBUG mode and overlay on");
+    /* Quitting to the menu (L1+R1+Options) tears the scene down, which empties the battle renderer's list (+0xD2F528,
+     * first entry +0x58) but leaves its loader's state (+0x1A8) at done (0x100), so the next battle draws from an empty
+     * list and crashes. The retail game never tears down; back at state 0 the game's own loader fills it again. */
+    volatile uint32_t *list_state = (volatile uint32_t *)(uintptr_t)(bb_image_base + 0xD2F528 + 0x1A8);
+    volatile uint64_t *list_first = (volatile uint64_t *)(uintptr_t)(bb_image_base + 0xD2F528 + 0x58);
+    for (;;) {
+        if (*list_state == 0x100 && !*list_first) {
+            *list_state = 0;
+            puts("DEBUG battle renderer list emptied, reloading it");
+        }
+        Sleep(10);
+    }
+    (void)argument;
+}
+
+/* --fps N: vblanks N times a second instead of 60, and the game's variable step. Its framework object (pointer at
+ * +0x6BA108) has a fixed-step flag at +0x2E0 its constructor sets; with it clear, each frame's delta (+0x2D0, the
+ * overlay's DLT) is the measured frame time over 1/60 s instead of 1. Changes are logged in case the game sets it. */
+static unsigned fps;
+
+static DWORD WINAPI variable_step(void *argument) {
+    volatile uint64_t *framework = (volatile uint64_t *)(uintptr_t)(bb_image_base + 0x6BA108);
+    while (!*framework || *(volatile uint32_t *)(uintptr_t)(*framework + 0x2E0) != 1) Sleep(1);
+    for (;;) {
+        volatile uint32_t *fixed = (volatile uint32_t *)(uintptr_t)(*framework + 0x2E0);
+        if (*fixed) {
+            printf("FPS fixed step was %u, now variable\n", *fixed);
+            *fixed = 0;
+        }
+        Sleep(10);
+    }
+    (void)argument;
+}
+
+/* With --fps the frame delta is a fraction of a 60 fps frame, and some of the game's code rounds it down: an integer
+ * counter plus the delta, or a loop run (int)delta times, never moves below 1. Found by truncating conversions
+ * watched in a test build (counter plus or minus the delta). Each frame, right after the framework stores the delta
+ * (+0xC73 in +0xBE0 stores it at [rbx+0x2D0]), the whole frames it completes go into +0x2D4, unused padding before
+ * the next field; these reads move there. Their functions then run in the interpreter, as their bytes changed. */
+static const struct { uint32_t at, length; const char *what; } whole_frame_reads[] = {
+    {0x28EF6B, 9, "loop run (int)delta times"},
+    {0x58423, 8, "counter + delta"}, {0x584A9, 8, "counter + delta"},
+    {0x774E6, 8, "counter - delta"}, {0x17F22C, 8, "idle timer - delta"}, {0x1C0682, 8, "counter + delta"},
+    {0x1511A7, 8, "counter - speed * delta"},
+};
+
+static void count_whole_frames(const uint64_t regs[16], uint64_t address, uint32_t tag) {
+    static double carried;
+    (void)address;
+    (void)tag;
+    const uint64_t framework = regs[3]; /* rbx */
+    carried += *(volatile const float *)(uintptr_t)(framework + 0x2D0);
+    const double whole = floor(carried);
+    carried -= whole;
+    *(volatile float *)(uintptr_t)(framework + 0x2D4) = (float)whole;
+}
+
+static void patch_whole_frame_reads(void) {
+    for (size_t i = 0; i < sizeof whole_frame_reads / sizeof *whole_frame_reads; ++i) {
+        uint8_t *disp = (uint8_t *)(uintptr_t)(bb_image_base + whole_frame_reads[i].at + whole_frame_reads[i].length - 4);
+        if (memcmp(disp, "\xd0\x02\x00\x00", 4)) {
+            printf("FPS whole-frame read at +%#x not as expected; left alone\n", whole_frame_reads[i].at);
+            continue;
+        }
+        disp[0] = 0xd4;
+    }
+    bbcpu_set_probe(bb_image_base + 0xC7B, count_whole_frames, 0);
+}
+
+/* VOX_WATCH=1 (testing): logs each change of the debug mode and overlay flags and of the active pad's own bits (held
+ * +0x60, pressed +0x68; the pad objects are at +0x6D10D0, indexed by +0x6EB59C). */
+static DWORD WINAPI watch_debug(void *argument) {
+    const uint8_t *image = (const uint8_t *)(uintptr_t)bb_image_base;
+    uint64_t last[4] = {~0ull, ~0ull, ~0ull, ~0ull};
+    const ULONGLONG start = GetTickCount64();
+    for (;;) {
+        const int32_t index = *(volatile const int32_t *)(image + 0x6EB59C);
+        const uint64_t pad = index >= 0 && index < 8 ? *(volatile const uint64_t *)(image + 0x6D10D0 + 8 * index) : 0;
+        const uint64_t now[4] = {*(volatile const uint32_t *)(image + 0x6EB57C), *(volatile const uint32_t *)(image + 0x6EB580),
+                                 pad ? *(volatile const uint64_t *)(uintptr_t)(pad + 0x60) : 0, pad ? *(volatile const uint64_t *)(uintptr_t)(pad + 0x68) : 0};
+        static int dumped;
+        if (pad && !dumped && GetTickCount64() - start > 10000) { /* the pad's remap pairs: any of these bits -> also these */
+            dumped = 1;
+            const uint64_t *pairs = *(volatile uint64_t *const *)(uintptr_t)(pad + 0x178);
+            for (int i = 0; pairs && i < 64 && pairs[2 * i]; ++i)
+                printf("WATCH remap %#llx -> %#llx\n", (unsigned long long)pairs[2 * i], (unsigned long long)pairs[2 * i + 1]);
+            printf("WATCH remap table %p\n", (const void *)pairs);
+        }
+        /* Each second: the framework's frame delta (pointer at +0x6BA108, +0x2D0), as an average of samples. */
+        static double dlt_sum;
+        static int dlt_samples;
+        static ULONGLONG dlt_next = 1000;
+        const uint64_t framework = *(volatile const uint64_t *)(image + 0x6BA108);
+        if (framework) {
+            dlt_sum += *(volatile const float *)(uintptr_t)(framework + 0x2D0);
+            ++dlt_samples;
+        }
+        if (GetTickCount64() - start >= dlt_next) {
+            if (dlt_samples) printf("WATCH %.2f DLT %.3f\n", (double)(GetTickCount64() - start) / 1000.0, dlt_sum / dlt_samples);
+            dlt_sum = 0;
+            dlt_samples = 0;
+            dlt_next += 1000;
+        }
+        /* The battle renderer's list (+0xD2F528): its loading state (+0x1A8, 0x100 when done) and first entry (+0x58). */
+        static uint64_t list_last = ~0ull;
+        const uint64_t list = (uint64_t)*(volatile const uint32_t *)(image + 0xD2F528 + 0x1A8) << 48 ^ *(volatile const uint64_t *)(image + 0xD2F528 + 0x58);
+        if (list != list_last) {
+            printf("WATCH %.2f list state %#x entry0 %#llx\n", (double)(GetTickCount64() - start) / 1000.0,
+                   *(volatile const uint32_t *)(image + 0xD2F528 + 0x1A8), (unsigned long long)*(volatile const uint64_t *)(image + 0xD2F528 + 0x58));
+            list_last = list;
+        }
+        if (memcmp(now, last, sizeof now)) {
+            printf("WATCH %.2f debug %llu overlay %llu held %#llx pressed %#llx\n", (double)(GetTickCount64() - start) / 1000.0,
+                   (unsigned long long)now[0], (unsigned long long)now[1], (unsigned long long)now[2], (unsigned long long)now[3]);
+            memcpy(last, now, sizeof now);
+        }
+        Sleep(2);
+    }
+    (void)argument;
+}
+
 static DWORD WINAPI watchdog(void *argument) {
     Sleep((DWORD)(uintptr_t)argument * 1000);
     rt_finish(41, "watchdog timeout");
@@ -741,6 +881,29 @@ static void reached_main(const uint64_t regs[16], uint64_t address, uint32_t tag
     (void)address;
     (void)tag;
     printf("REACHED main: argc=%" PRIu64 " argv[0]=%s\n", regs[7], *(const char **)(uintptr_t)regs[6]);
+}
+
+/* VOX_PROBE=offset[,offset...] (testing): those functions run in the interpreter, and each call logs its first
+ * argument and the dword 0x14 into it, whenever that pair changes, plus the calls each second. */
+static void probed(const uint64_t regs[16], uint64_t address, uint32_t tag) {
+    static uint64_t last_object[8];
+    static uint32_t last_state[8], calls[8];
+    static ULONGLONG next[8];
+    tag &= 7;
+    ++calls[tag];
+    const uint64_t object = regs[7];
+    const uint32_t state = object > 0x10000 ? *(const uint32_t *)(uintptr_t)(object + 0x14) : 0xFFFFFFFF;
+    const ULONGLONG now = GetTickCount64();
+    if (object != last_object[tag] || state != last_state[tag]) {
+        printf("PROBE +%#llx this %#llx state %u\n", (unsigned long long)(address - bb_image_base), (unsigned long long)object, state);
+        last_object[tag] = object;
+        last_state[tag] = state;
+    }
+    if (now >= next[tag]) {
+        if (next[tag]) printf("PROBE +%#llx %u calls in the last second\n", (unsigned long long)(address - bb_image_base), calls[tag]);
+        calls[tag] = 0;
+        next[tag] = now + 1000;
+    }
 }
 
 static ABI void guest_exit_callback(void) { puts("Guest: process finalizer callback reached"); }
@@ -779,7 +942,7 @@ int main(int argc, char **argv) {
     const int plain = argc < 2 || argv[1][0] == '-';
     const char *elf_dir = plain ? "." : argv[1], *names = plain ? "names.tsv" : (argc > 2 ? argv[2] : NULL);
     if (!plain && !names) {
-        fprintf(stderr, "usage: vox [--english | --engrish | --user-tl] [--unlock-all]\n   or: vox ELF_DIR NAMES.TSV [--timeout seconds] [--app0 folder] [--user folder] [the same options]\n");
+        fprintf(stderr, "usage: vox [--english | --engrish | --user-tl] [--unlock-all] [--debug] [--neo] [--fps N]\n   or: vox ELF_DIR NAMES.TSV [--timeout seconds] [--app0 folder] [--user folder] [the same options]\n");
         return 2;
     }
     unsigned timeout = plain ? 0 : 60;
@@ -792,6 +955,9 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--app0") && i + 1 < argc) app0 = argv[++i];
         else if (!strcmp(argv[i], "--user") && i + 1 < argc) user = argv[++i];
         else if (!strcmp(argv[i], "--unlock-all")) unlock_all = 1;
+        else if (!strcmp(argv[i], "--debug")) debug_menu = 1;
+        else if (!strcmp(argv[i], "--neo")) rt_neo_mode = 1;
+        else if (!strcmp(argv[i], "--fps") && i + 1 < argc) fps = (unsigned)atoi(argv[++i]);
         else if (!strcmp(argv[i], "--english")) rt_overlay_folder = "translation_english";
         else if (!strcmp(argv[i], "--engrish")) rt_overlay_folder = "translation";
         else if (!strcmp(argv[i], "--user-tl")) rt_overlay_folder = "translation_user";
@@ -823,7 +989,7 @@ int main(int argc, char **argv) {
         uint64_t sdk = 0;
         if (proc) memcpy(&sdk, image + proc->vaddr + 16, 8);
         voxgpu_register_kernel();
-        const VoxGpuConfig config = {"A Certain Magical Virtual-On", "CUSA08425", user, (uint32_t)sdk, 0x00800000, 1920, 1080};
+        const VoxGpuConfig config = {"A Certain Magical Virtual-On", "CUSA08425", user, (uint32_t)sdk, 0x00800000, 1920, 1080, fps};
         const int result = voxgpu_init(&config);
         printf("Renderer: SDK %#x, voxgpu_init %d\n", (unsigned)sdk, result);
         if (result) fail("%s", "renderer initialization failed");
@@ -844,14 +1010,30 @@ int main(int argc, char **argv) {
 
     /* The game's main (from _start's code): left to the interpreter so that this probe sees the call,
      * which a recompiled caller would make directly. */
-    if (!getenv("BB_RECOMP_OFF")) _putenv("BB_RECOMP_OFF=0x" MAIN_OFFSET_TEXT);
+    const char *probe_list = getenv("VOX_PROBE");
+    if (!getenv("BB_RECOMP_OFF")) {
+        static char off[512];
+        snprintf(off, sizeof(off), "BB_RECOMP_OFF=0x" MAIN_OFFSET_TEXT "%s%s%s", fps ? ",0xbe0" : "", probe_list ? "," : "", probe_list ? probe_list : "");
+        _putenv(off);
+    }
     bbcpu_set_probe(bb_image_base + MAIN_OFFSET, reached_main, 0);
+    if (fps) patch_whole_frame_reads();
+    if (probe_list) {
+        char list[256];
+        snprintf(list, sizeof(list), "%s", probe_list);
+        uint32_t tag = 0;
+        for (char *item = strtok(list, ","); item && tag < 8; item = strtok(NULL, ","))
+            bbcpu_set_probe(bb_image_base + strtoull(item, NULL, 16), probed, tag++);
+    }
     if (!getenv("BB_RECOMP_LIB")) puts("BB_RECOMP_LIB not set: everything runs in the interpreter");
     bbcpu_recomp_load(bb_image_base);
     if (timeout) CreateThread(NULL, 0, watchdog, (void *)(uintptr_t)timeout, 0, NULL);
     stall_event = CreateEventA(NULL, TRUE, FALSE, NULL);
     if (gpu_enabled) CreateThread(NULL, 0, flip_heartbeat, NULL, 0, NULL);
     if (unlock_all) CreateThread(NULL, 0, unlock_everything, NULL, 0, NULL);
+    if (debug_menu) CreateThread(NULL, 0, debug_everything, NULL, 0, NULL);
+    if (fps) CreateThread(NULL, 0, variable_step, NULL, 0, NULL);
+    if (getenv("VOX_WATCH")) CreateThread(NULL, 0, watch_debug, NULL, 0, NULL);
     if (getenv("VOX_PROFILE")) CreateThread(NULL, 0, profiler, (void *)(uintptr_t)atoi(getenv("VOX_PROFILE")), 0, NULL);
 
     rt_thread_attach();

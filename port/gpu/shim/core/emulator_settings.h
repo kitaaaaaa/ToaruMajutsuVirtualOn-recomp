@@ -1,10 +1,12 @@
-// vox: the settings the video core reads, fixed: no validation, no dumps, pipeline cache off.
+// vox: the settings the video core reads, fixed but for the vblank rate: no validation, no dumps, pipeline cache off.
 // Otherwise upstream's defaults, except the VideoOut resolution, which is the console's.
 #pragma once
 #include <string>
 #include "common/types.h"
 
 enum GpuReadbacksMode : int { Disabled, Relaxed, Precise };
+
+extern u32 g_vblank_hz; // voxgpu_init: VoxGpuConfig's vblank_hz
 
 class EmulatorSettingsImpl {
 public:
@@ -18,7 +20,7 @@ public:
     std::string GetPresentMode() const { return "Mailbox"; }
     int GetRcasAttenuation() const { return 250; }
     u32 GetReadbacksMode() const { return GpuReadbacksMode::Disabled; }
-    u32 GetVblankFrequency() const { return 60; }
+    u32 GetVblankFrequency() const { return g_vblank_hz; }
     // vox: on. The CP runs packets in order and signals an EOP at once; a real one has read ahead by
     // then. Without a copy the game reuses a buffer the CP hasn't finished, as soon as it hears "done".
     bool IsCopyGpuBuffers() const { return true; }

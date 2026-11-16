@@ -29,6 +29,7 @@
 #include "voxgpu.h"
 
 Frontend::WindowSDL* g_window = nullptr;
+u32 g_vblank_hz = 60;
 
 namespace Libraries::GnmDriver {
 void RegisterLib(Core::Loader::SymbolsResolver* sym);
@@ -205,6 +206,9 @@ extern "C" int voxgpu_init(const VoxGpuConfig* config) {
         return -1;
     }
     g_sdk_version = static_cast<s32>(config->sdk_version);
+    if (config->vblank_hz) {
+        g_vblank_hz = config->vblank_hz;
+    }
     if (config->user_dir) {
         SetUserPaths(config->user_dir);
     }

@@ -1,6 +1,7 @@
 # Builds and runs the host once. Log: port\work\run.log.
-# Args: [-Timeout 30] [-Lines 70] [-Interp] [-English | -Engrish | -UserTl] [-UnlockAll]
-param([int]$Timeout = 30, [int]$Lines = 70, [switch]$Interp, [switch]$NoBuild, [switch]$English, [switch]$Engrish, [switch]$UserTl, [switch]$UnlockAll)
+# Args: [-Timeout 30] [-Lines 70] [-Interp] [-English | -Engrish | -UserTl] [-UnlockAll] [-DebugMenu] [-Loose] [-Neo] [-Fps N]
+# -Loose plays from extracted\loose, the game with its CPKs extracted and no cpk folder.
+param([int]$Timeout = 30, [int]$Lines = 70, [switch]$Interp, [switch]$NoBuild, [switch]$English, [switch]$Engrish, [switch]$UserTl, [switch]$UnlockAll, [switch]$DebugMenu, [switch]$Loose, [switch]$Neo, [int]$Fps = 0)
 $port = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Split-Path -Parent $port
 Set-Location "$port\work"
@@ -16,7 +17,11 @@ if ($English) { $language += '--english' }
 if ($Engrish) { $language += '--engrish' }
 if ($UserTl) { $language += '--user-tl' }
 if ($UnlockAll) { $language += '--unlock-all' }
-& "$port\out\vox.exe" . names.tsv --timeout $Timeout --app0 "$root\extracted\uroot" --user "$port\work\user" @language 2>&1 | ForEach-Object { "$_" } | Out-File -Encoding utf8 run.log
+if ($DebugMenu) { $language += '--debug' }
+if ($Neo) { $language += '--neo' }
+if ($Fps) { $language += '--fps', $Fps }
+$app0 = if ($Loose) { "$root\extracted\loose" } else { "$root\extracted\uroot" }
+& "$port\out\vox.exe" . names.tsv --timeout $Timeout --app0 $app0 --user "$port\work\user" @language 2>&1 | ForEach-Object { "$_" } | Out-File -Encoding utf8 run.log
 $code = $LASTEXITCODE
 $all = Get-Content run.log
 $body = $all | Where-Object { $_ -notmatch '^(Names:|Module |UNRESOLVED DATA|Image at|Recompiled:)' }

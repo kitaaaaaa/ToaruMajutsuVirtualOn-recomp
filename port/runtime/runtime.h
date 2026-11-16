@@ -24,6 +24,7 @@ void rt_set_procparam(void *param);
 void rt_set_folders(const char *app0, const char *user);
 /* --english, --engrish, --user-tl: the folder of translation overlays to play with, or NULL. */
 extern const char *rt_overlay_folder;
+extern int rt_neo_mode;
 /* The host path for a guest path; 0 if there is none. */
 int rt_host_path(const char *guest, char *out, size_t size);
 

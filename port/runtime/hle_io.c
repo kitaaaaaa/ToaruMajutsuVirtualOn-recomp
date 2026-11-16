@@ -49,6 +49,30 @@ static uint32_t automatic_buttons(void) {
     if (mode == 2) return 0x2000u;
     return (t / 20) % 2 ? 0x8u : 0x4000u; /* Options, Cross */
 }
+/* VOX_PAD_SCRIPT=<file> (testing): presses at set times. Each line is "<seconds after the first pad read> <PS4 buttons,
+ * hex> [<hold ms, default 150>]"; L2 and R2 (0x100, 0x200) also set their triggers. Bits PS4 pads don't use push a stick
+ * all the way: 0x1000000-0x8000000 the left one up, down, left, right, 0x10000000-0x80000000 the right one the same. */
+static uint32_t scripted_buttons(void) {
+    static struct { double at; uint32_t buttons; int hold; } steps[256];
+    static int count = -1;
+    static ULONGLONG start;
+    if (count < 0) {
+        count = 0;
+        start = GetTickCount64();
+        FILE *f = getenv("VOX_PAD_SCRIPT") ? fopen(getenv("VOX_PAD_SCRIPT"), "r") : NULL;
+        char line[128];
+        while (f && count < 256 && fgets(line, sizeof line, f)) {
+            steps[count].hold = 150;
+            if (sscanf(line, "%lf %x %d", &steps[count].at, &steps[count].buttons, &steps[count].hold) >= 2) ++count;
+        }
+        if (f) { fclose(f); printf("HLE: pad script, %d presses\n", count); }
+    }
+    const double now = (double)(GetTickCount64() - start) / 1000.0;
+    uint32_t buttons = 0;
+    for (int i = 0; i < count; ++i)
+        if (now >= steps[i].at && now < steps[i].at + steps[i].hold / 1000.0) buttons |= steps[i].buttons;
+    return buttons;
+}
 /* The first connected controller. Asking XInput about an empty slot is slow, so a search for one runs
  * at most once a second. */
 static int controller_state(XINPUT_STATE *state) {
@@ -91,17 +115,32 @@ static void apply_controller(PadData *out) {
     const XINPUT_GAMEPAD *pad = &state.Gamepad;
     for (size_t i = 0; i < sizeof(buttons) / sizeof(*buttons); ++i)
         if (pad->wButtons & buttons[i].from) out->buttons |= buttons[i].to;
-    out->l2 = pad->bLeftTrigger;
-    out->r2 = pad->bRightTrigger;
+    if (pad->bLeftTrigger > out->l2) out->l2 = pad->bLeftTrigger;
+    if (pad->bRightTrigger > out->r2) out->r2 = pad->bRightTrigger;
     if (pad->bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) out->buttons |= 0x100;
     if (pad->bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) out->buttons |= 0x200;
-    convert_stick(pad->sThumbLX, pad->sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, &out->left_x, &out->left_y);
-    convert_stick(pad->sThumbRX, pad->sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, &out->right_x, &out->right_y);
+    /* A stick VOX_PAD_SCRIPT pushes stays pushed. */
+    if (out->left_x == 128 && out->left_y == 128)
+        convert_stick(pad->sThumbLX, pad->sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, &out->left_x, &out->left_y);
+    if (out->right_x == 128 && out->right_y == 128)
+        convert_stick(pad->sThumbRX, pad->sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, &out->right_x, &out->right_y);
 }
 static void read_state(PadData *out) {
     memset(out, 0, sizeof(*out));
-    out->buttons = automatic_buttons();
+    out->buttons = automatic_buttons() | scripted_buttons();
+    if (out->buttons & 0x100) out->l2 = 255;
+    if (out->buttons & 0x200) out->r2 = 255;
     out->left_x = out->left_y = out->right_x = out->right_y = 128;
+    const uint32_t sticks = out->buttons >> 24;
+    out->buttons &= 0xFFFFFF;
+    if (sticks & 0x01) out->left_y = 0;
+    if (sticks & 0x02) out->left_y = 255;
+    if (sticks & 0x04) out->left_x = 0;
+    if (sticks & 0x08) out->left_x = 255;
+    if (sticks & 0x10) out->right_y = 0;
+    if (sticks & 0x20) out->right_y = 255;
+    if (sticks & 0x40) out->right_x = 0;
+    if (sticks & 0x80) out->right_x = 255;
     out->orientation[3] = 1.0f;
     out->connected = 1;
     out->connected_count = 1;
