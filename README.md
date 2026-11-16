@@ -11,7 +11,7 @@ A native Windows port of the PS4 game *A Certain Magical Virtual-On* (とある�
 
 ## Status
 
-Menus, battles, story mode, movies and sound work. An Xbox controller is supported through XInput, with no rumble yet. This is early software: expect bugs, including an occasional freeze whose cause isn't fully understood.
+Menus, battles, story mode, movies and sound work. An Xbox controller is supported through XInput, with no rumble yet. This is early software: expect bugs.
 
 ## Building
 
@@ -33,6 +33,9 @@ Run `port\out\vox.exe`, by double-clicking it or from a command line with these 
 | `--engrish` | Budget English translation |
 | `--user-tl` | Installed fan translation, see below |
 | `--unlock-all` | Everything unlocked. Combines with any of the others |
+| `--debug` | The developers' debug menu and performance overlay, see below |
+| `--neo` | Run as a PS4 Pro: the game draws more objects in busy scenes |
+| `--fps <N>` | Run at up to N frames a second instead of 60, see below |
 | `--timeout <seconds>` | Close the game after this long. By default it stays open |
 | `--app0 <folder>` | Use the game files in this folder instead of `extracted\uroot` |
 | `--user <folder>` | Keep saves in this folder instead of `port\work\user` |
@@ -42,6 +45,14 @@ With none it plays in Japanese. The log is `port\work\run.log`, and the next lau
 `--unlock-all` opens every robot, colour, mission, title and gallery item, sets your points to 9,999,999, marks the main story chapters cleared and turns on the DLC stories and colours. **It changes your save** as soon as the game next saves, and turning it off won't undo that, so back up `port\work\user\savedata` first if you care. Some colours and gallery entries may have no files on the disc, so they could misbehave.
 
 Face buttons match by position, so Xbox B is PS4 Circle, which confirms in this version.
+
+**Debug menu.** `--debug` starts at the developers' "VOX DEBUG ROOT MENU" instead of the logos. Move with the D-pad and launch an entry with Circle: Battle goes straight into a match, Title to the title screen. In a game, hold L1+R1+Options to return to the menu. The overlay in the corner shows the game's CPU and GPU times. Its FPS figure is the display mode's rate, not a measurement.
+
+**High frame rates.** `--fps 120` runs the game at up to 120 frames a second at normal speed, if your PC keeps up and your display is set to 120 Hz or more. The game was made for a fixed 60, so a few things it times in whole frames needed fixes, and more may turn up. Without `--fps` everything runs as on a PS4.
+
+## Exporting the robot models
+
+`analysis\scripts\export_models.py` turns every robot, its colours, weapons and motions into glTF files you can open in Blender, from your own copy of the game. The steps and the format notes are in [PASSDOWN.md](PASSDOWN.md) and `analysis\scripts\MODEL_FORMAT_NOTES.md`. The output is the game's data: don't share it.
 
 ## Using the Vita fan translation
 

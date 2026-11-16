@@ -8,7 +8,7 @@ A static recompilation of the PS4 game *A Certain Magical Virtual-On* (とある
 
 **No game data goes in this repo, ever.** You need your own dump of the game. `.gitignore` is a whitelist for that reason. Don't add anything from `extracted`, `port\work`, `analysis\export`, Ghidra projects or the generated C, all of which derive from the game.
 
-## Current state (2026-11-07)
+## Current state (2026-11-16)
 
 Test machine: Windows 10, RTX 2080.
 
@@ -24,7 +24,11 @@ Test machine: Windows 10, RTX 2080.
 | PSN | Unimplemented `sceNp*` calls answer `ORBIS_NP_ERROR_SIGNED_OUT`; `sceRudp*` calls answer `0x80770001` (not initialized, from memory and unverified); `sceNetCtlUnregisterCallback` answers 0, so the Network and Co-op menus show their error and return instead of stopping (user-tested) |
 | Saves, trophies | Saves work; trophies are logged only |
 | Unlocks | `-UnlockAll` (`--unlock-all`) opens everything and turns on the DLC stories and colours. Tested as far as the game booting with it and overriding a loaded save; nobody has reported on the unlocked screens yet |
-| Model export | All 15 robots to glTF, with motions and weapons, and a set with weapons mounted by the game's own rules. PPRIMA has no armed model. See `analysis\scripts\MODEL_FORMAT_NOTES.md` |
+| Model export | All 15 robots to glTF, with motions and weapons, and a set with weapons mounted by the game's own rules. PPRIMA has no armed model. See Model export below |
+| Debug menu | `--debug` opens the developers' menu and performance overlay. Tested: Title, Battle, quitting back with L1+R1+Options. See Debug menu, Neo and frame rate below |
+| Neo (PS4 Pro) | `--neo`. Battles render and hold their frame rate with it |
+| Frame rate | `--fps 120` measured 116-120 flips a second in battle, at real-time game speed. Story mode and long sessions at 120 untested |
+| Loose files | The game reads `root+` files from `/app0` when no CPK mounts. Title and a battle tested from an extracted copy. Translation overlays don't apply then |
 
 ## Open problems, most urgent first
 
@@ -50,6 +54,45 @@ Smaller items:
 - Unmaps now update the renderer's mapping table, but the renderer's own caches aren't told about them, so stale entries are possible.
 - `liverpool.cpp` still holds diagnostics (`vox_recent`, the CP wait prints). They're useful for now.
 - A user report of "7 failed background operations" during Phase 5 was never explained.
+
+## Debug menu, Neo and frame rate
+
+All of this is in `port\runtime\loader.c`. Addresses are image offsets.
+
+**Debug menu (`--debug`).** The process manager (pointer at `+0x6D11F0`) launches the auto boot entry at its `+0xD0` ("BOOT") instead of drawing its "VOX DEBUG ROOT MENU" (rev 20527, built Dec 16 2017). The switch clears that entry once the game sets it, then sets the debug mode flag (`+0x6EB57C`) and the overlay flag (`+0x6EB580`) once the manager reaches its menu state.
+- Entries: Battle, NetworkRoom, NetworkRank, MissionSelect, StorySelect, Title, Boot, Exit. D-pad moves, Circle launches. With debug mode on, holding L1+R1+Options quits to the menu.
+- Overlay: NEO on or off, the game's CPU and GPU times, DLT, the output mode with **its configured rate, not a measured one** (59.94 whatever the real rate), and whether a CPK is mounted.
+- The game's own codes: debug mode is Up, Down, Up, Down, Left, Right, Left, Right then logical button `0x2000`; the overlay, with debug mode on, Up, Down, Up, Down then `0x2000` (`FUN_01001090`). No retail control produces `0x2000` or `0x1000`: every button, trigger and stick direction and the pad's remap table were checked. So they can't be entered on a normal game.
+- Quitting to the menu tears the scene down, which empties the battle renderer's list (`+0xD2F528`, first entry `+0x58`) but leaves its loader's state (`+0x1A8`) at done (`0x100`), so the next battle crashed on a null read at `+0x26618C`. The debug thread resets the state and the game reloads the list. The retail game never tears down.
+
+**Neo (`--neo`).** `sceKernelIsNeoMode` answers 1. The framework keeps it at `+0x294`. What it changes, seen in the code: `FUN_012142c0` draws every object group instead of one when some count reaches 21, and the GPU clock the engine assumes goes from 800 to 911 MHz. No change to the output resolution was found.
+
+**Frame rate (`--fps N`).** shadPS4's vblank timer was the 60 cap; it now runs at N (`VoxGpuConfig.vblank_hz`). The game shipped with a fixed step: its framework object (pointer at `+0x6BA108`) has a flag at `+0x2E0` that makes the frame delta (`+0x2D0`, the overlay's DLT) always 1. Cleared, the delta is the measured frame time over 1/60 s (`FUN_01000be0`), and above 5 it resets to 1. The game runs at real-time speed that way; the battle clock confirmed it.
+- Some code rounds the delta down: an integer counter plus the delta, or a loop run `(int)delta` times, which never move below 1. That froze the Story Select background. Each frame, right after the delta is stored (a probe at `+0xC7B`), the whole frames it completes go into `+0x2D4`, unused padding, and seven reads moved there (`whole_frame_reads`). Their functions run in the interpreter, as their bytes changed; no cost was measured.
+- They were found with a test build: every truncating conversion goes through `rc_f2i32` and `rc_f2i64` in bbcpu's `rc.h`, and a hook there logged each one whose value was a whole number plus or minus the delta. The hook and that build are local only (`work\unused\f2i_watch`, not in `port\patches`). Most logged sites were coincidences (positions, colour rounding), sorted by reading the code.
+- Known left: `FUN_0100b3b0` runs `max(1, (int)(speed * delta))` steps a frame, so whatever it drives probably runs twice as fast at 120. A one-byte change can't fix it without breaking slow motion. Not checked: the stage monorail trains, story mode, other stages.
+
+**Performance.** At 120 the GPU command thread was the limit, and most of its work was shadPS4's texture cache hashing whole images, about 1400 a second and 8 GB/s in battle, for a check made only when a GPU-written image is evicted. It now hashes 16 spread 4 KiB slices (`texture_cache.cpp`, `// vox:`): battles went from 75-100 to 116-120 flips a second. A CPU write that misses every slice would go unseen, and the GPU's data would be kept.
+
+**Loose files.** With no `cpk` folder the CPK mount fails cleanly and the game reads `root+/<path>` as `/app0/<path>`. Make such a folder with `cpk.py extract` of both discs, the extracted `root+` contents at its top, and the rest of `uroot` (all but `cpk`) beside them; hard links save the space. `run.ps1 -Loose` plays from `extracted\loose`. The overlay then reads "Not Use CpkFile".
+
+**Leftovers on the disc** (from reading files and code, not all confirmed unused): `se_menu_old`, the old Oratan menu sound bank, which the code never names; MX Composer stage-editor headers and samples in `root+/bg/param`; PC test textures (`common_textures/mesh_pattern` as png and bmp); sample shaders for PS3, Vita and Windows; 10 movies that are one identical 8 KB placeholder (`menu06`-`13`, `tutorial00`, `ed00`); the Windows E-mote driver DLLs; stage numbers 017 and 018 and voice folder 12 are missing.
+
+## Model export
+
+`analysis\scripts\export_models.py` exports every robot with `hmd2glb.py`, from files you extract from your own copy; the output is game data and stays out of the repo:
+
+```powershell
+python analysis\scripts\cpk.py extract extracted\uroot\cpk\disc00.cpk extracted\cpk_out "root+/chara/VR*" "root+/motion/*" "root+/param/*"
+python analysis\scripts\cpk.py extract extracted\uroot\cpk\disc01.cpk extracted\cpk_out "root+/chara/VR*" "root+/motion/*" "root+/param/*"
+python analysis\scripts\export_models.py extracted\cpk_out\root+ extracted\models
+```
+
+- Out come each robot's bodies per colour, its weapons, its low-detail models and `MANIFEST.txt`, as rigged, animated glTF binaries. Colours: C00 and C01 are types A and B, C02 and C03 the VOOT colours, C04 the special colour, `H` Fei-Yen's hyper mode.
+- The `armed` folder has each body with its default weapons mounted by the game's own setup (`MOUNTS` in `export_models.py`), so they follow every motion. PPRIMA has none: its floating units are placed by the game.
+- A weapon with no texture bank of its own uses the one `mdl_param` or `decken_model` pairs it with, or the nearest weapon's with the same material layout; the manifest says which.
+- `hmd2glb.py` also converts one model by hand, with its textures, motion banks and `+ids` weapon mounts; its docstring has the usage.
+- The formats, and what's verified and what isn't, are in `analysis\scripts\MODEL_FORMAT_NOTES.md`.
 
 ## Translation
 
@@ -104,7 +147,7 @@ port\prepare_game.ps1 -Pkg game.pkg   # or -Game <folder with eboot.bin>: your c
 port\out\vox.exe --english
 ```
 
-For development, `port\run.ps1` also rebuilds `vox.exe` unless given `-NoBuild`, and the game closes itself after `-Timeout` seconds, 30 by default. Run without the `ELF_DIR NAMES.TSV` arguments, `vox.exe` finds its folders from its own path and never times out. Either way the log is `port\work\run.log`.
+`run.ps1` takes `-DebugMenu`, `-Neo`, `-Fps N` and `-Loose` for the options above. For development, `port\run.ps1` also rebuilds `vox.exe` unless given `-NoBuild`, and the game closes itself after `-Timeout` seconds, 30 by default. Run without the `ELF_DIR NAMES.TSV` arguments, `vox.exe` finds its folders from its own path and never times out. Either way the log is `port\work\run.log`.
 
 Tested from a clean folder on the development machine, using every published file. Setup and the engine build took about 15 minutes on first run and the game about 2 minutes. `-Pkg` and PkgTool's download have not been run through this script.
 
@@ -125,6 +168,9 @@ The link's map file (`port\work\recomp\librecomp.map`) resolves `game+offset` fr
 | `VOX_LENIENT=1` | Unimplemented imports log and return 0 |
 | `VOX_NO_GPU=1` | Headless |
 | `VOX_PAD_AUTO=1` or `2` | Automatic button taps. **Don't use this unless the user asks for it.** It got in the way of their controller and wandered into the wrong mode |
+| `VOX_PAD_SCRIPT=<file>` | Presses at set times: lines of `<seconds> <PS4 buttons, hex> [<hold ms>]`, the bits above 0xFFFFFF pushing a stick. **The same rule applies: only when the user asks** |
+| `VOX_WATCH=1` | Logs the debug flags, the active pad's own bits, the pad remap table, DLT each second, the battle renderer's list and movie frame requests |
+| `VOX_PROBE=0x...,0x...` | Runs those functions in the interpreter and logs each call's first argument and the dword at `+0x14` in it, and calls per second |
 
 `port\capture_window.ps1 -Delays "20,40" -Prefix shot` screenshots only the game's window. It attaches to a running game and doesn't launch one.
 
@@ -135,6 +181,8 @@ Exit codes: 40 fault, 41 watchdog (`-Timeout` reached, which is normal), 42 stal
 - A machine-wide `INCLUDE` variable points at Watcom and breaks clang. The build scripts clear it.
 - Two Ghidra 12.1.4 installs share a settings folder unless the release is renamed. This copy has `application.release.name=VOX`. Set `JAVA_HOME` to `tools\jdk21\jdk-21.0.13+9` first.
 - `VirtualQuery` on multi-GB regions costs milliseconds per call. That was the cause of an early 1 FPS problem, so keep it off hot paths.
+- A system-wide thread snapshot takes about 2 s with a browser open. The profiler now lists threads once.
+- `VOX_PROBE` offsets need the `0x`: bbcpu's `BB_RECOMP_OFF` reads them that way, and without it the function stays recompiled and the probe never fires.
 
 ## Working with the user
 
