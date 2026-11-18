@@ -1,0 +1,115 @@
+1	Half of the match time remains.
+2	30 seconds of match time remain.
+3	10 seconds of match time remain.
+4	The lead has changed.
+5	Our side is in the lead!
+6	The other side is in the lead!
+7	Target's hit points are dropping.
+8	The target's movement is slowing.
+9	The target's damage is visible.
+10	Target's hit points are nearly gone.
+11	The target is at its limit!
+12	One more push to take it down!
+13	The target is down.
+15	The target's Boost Gauge seems to be full.
+16	The target has entered boost state.
+17	The target has pitted in.
+18	Danger, please be careful!
+19	Warning, please take cover!
+20	Please concentrate!
+21	Now's your chance!
+22	Let's build up a big lead!
+23	Let's go on the attack!
+24	Our ally's HP is in danger.
+25	Our ally isn't doing well.
+26	Our ally is being pushed back.
+27	Our ally's HP is nearly gone.
+28	Our ally is at the limit.
+29	Our ally is about to go down.
+30	Our ally is down.
+32	Our ally is being double-locked.
+33	Ally and enemy are closing in.
+34	Our ally has boosted.
+35	Our ally has pitted in.
+36	Hurry and go provide support!
+37	Hurry, prepare to rescue!
+38	Is it okay not to go help?
+39	Let's do it all in one go!
+40	Now, let's give it our all!
+41	Today's win is ours!
+42	Let's relax our shoulders.
+43	That's a Hit Clock Violation!
+44	Going well!
+45	Protect this lead!
+46	Perfect!
+47	Let's counterattack.
+48	Let's take it back.
+49	What matters is winning in the end!
+50	Chaaance!
+51	Let's back them up.
+52	50 seconds of match time remain.
+53	You're being sucked in~!
+54	Transition out of control!
+55	RW out of control!
+56	LW out of control!
+57	CW out of control!
+58	Controls paralyzed!?
+59	Numbed, can't move!
+60	Movement speed dropping!
+61	RW unusable!
+62	LW unusable!
+63	CW unusable!
+64	You've gone all lovestruck!
+65	Your attention's scattered!
+66	Where are you looking!?
+67	Please get it together!
+68	Virtuaroid frozen!
+69	Boost Gauge gone!?
+70	Stability abnormal!
+71	Acceleration unit failing!
+72	On the verge of overheating!
+73	Lock-on disabled!
+74	Taking continuous damage!
+75	Our ally has returned to battle!
+101	Oops, you touched a damage floor.
+102	The target touched a damage floor!
+103	Please select a tune-up.
+104	Executing the selected tune-up.
+105	Ueeh!? Everyone's tune-ups were chosen at random!?
+106	Boss battle soon. Repairing and tuning up your unit.
+107	Boss battle soon. Repairing your unit.
+108	A boss has appeared.
+109	A new boss appears!
+110	Boss destroyed!
+111	Wave start!
+112	A tough-looking enemy appears!
+113	Several tough enemies appear!
+114	A new tough-looking enemy appears!
+115	Whoa, a powerful enemy appears!
+116	Several powerful enemies appear! It's carnage!
+117	Warning! Yet another powerful enemy appears!
+118	10th unit destroyed. Nice going!
+119	20th unit destroyed. Keep it up!
+120	30th unit destroyed. You're on a roll!
+121	50th unit destroyed. Let's keep going like this!
+122	100th destroyed. Congratulations! Finally, triple digits!
+123	150th unit destroyed. U-um, haven't you broken enough yet? Stressed out?
+124	200th destroyed. I'll admit it. You're Academy City's No. 1 ace!!
+125	10 units destroyed.
+126	Goal!
+127	Another goal! Yay!
+128	Our ally scored!
+129	The opponent's goal...
+130	Restart.
+131	Victory. Congratulations.
+132	That was a crushing win for us!
+133	Too bad...
+134	It's a tie, so it's sudden death.
+135	Changed.
+136	Change available.
+137	Change isn't ready yet.
+138	The opponent has changed.
+139	The opponent is preparing to change.
+140	Mission clear!
+141	Mission failed...
+142	WAVE cleared.

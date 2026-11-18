@@ -1,0 +1,65 @@
+0	Player
+1	Play Category
+2	Max Room Size
+3	Invites
+4	Connection Limit
+5	Game Rules
+6	Rotation Format
+7	Rounds to Win
+8	Round Time
+9	Point Cap
+10	Handicap
+13	Mission
+14	None
+15	Connection 1+
+16	Connection 2+
+17	Connection 3+
+18	Connection 4 Only
+19	Standard
+20	Sparring
+21	Sparring+
+22	Deathmatch
+23	Mirror
+24	EX Code
+25	Tag Battle
+26	Loser Out
+27	Winner Out
+28	Unlimited
+36	Random
+37	Room Host
+38	Match Host
+39	Match Guest
+40	Any
+41	No Password
+42	Password Set
+43	Change Room Settings
+44	View Room Settings
+45	Pass My Turn
+46	Invite to Room
+47	Kick Guest
+48	Disband Room
+49	Leave Room
+50	%d Players
+51	First to %d Sets
+52	Enter the password.
+53	Player Ranking
+54	Total Mission Score Ranking
+55	Multiplayer Count Ranking
+56	Level Ranking
+57	Wins Ranking
+58	Win Streak Ranking
+59	All
+60	Story
+61	Mission
+62	Network
+63	Solo
+64	Multi
+80	Friends
+81	All
+82	In Menus
+83	In Battle
+84	Stage: %s
+88	Yes
+89	Black Room
+90	(Enter with the <icon B_C><icon B_X><icon B_T><icon B_S> buttons)
+91	Inviting to the room.

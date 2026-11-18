@@ -1,0 +1,261 @@
+0	Mikoto Misaka's melee attack voice.
+1	Mikoto Misaka's ranged attack voice.
+2	Mikoto Misaka's dash voice.
+3	Mikoto Misaka's transition voice.
+4	Mikoto Misaka's jump voice.
+5	Mikoto Misaka's idling voice.
+6	Mikoto Misaka's point get voice.
+7	Mikoto Misaka's enemy wave clear voice.
+8	Mikoto Misaka's voice for entering a mission.
+9	Mikoto Misaka's voice for winning a match.
+10	Mikoto Misaka's voice for taking heavy damage.
+11	Mikoto Misaka's voice for being low on HP.
+12	Mikoto Misaka's voice for status ailments.
+13	Mikoto Misaka's voice for being defeated.
+14	Mikoto Misaka's voice for losing a match.
+15	Mikoto Misaka's Boost Gauge MAX voice.
+16	Mikoto Misaka's Boost Weapon use voice.
+17	Mikoto Misaka's Boost Time end voice.
+18	Mikoto Misaka's character select voice.
+19	Mikoto Misaka's title call voice.
+20	Kuroko Shirai's melee attack voice.
+21	Kuroko Shirai's ranged attack voice.
+22	Kuroko Shirai's dash voice.
+23	Kuroko Shirai's transition voice.
+24	Kuroko Shirai's jump voice.
+25	Kuroko Shirai's idling voice.
+26	Kuroko Shirai's point get voice.
+27	Kuroko Shirai's enemy wave clear voice.
+28	Kuroko Shirai's voice for entering a mission.
+29	Kuroko Shirai's voice for winning a match.
+30	Kuroko Shirai's voice for taking heavy damage.
+31	Kuroko Shirai's voice for being low on HP.
+32	Kuroko Shirai's voice for status ailments.
+33	Kuroko Shirai's voice for being defeated.
+34	Kuroko Shirai's voice for losing a match.
+35	Kuroko Shirai's Boost Gauge MAX voice.
+36	Kuroko Shirai's Boost Weapon use voice.
+37	Kuroko Shirai's Boost Time end voice.
+38	Kuroko Shirai's character select voice.
+39	Kuroko Shirai's title call voice.
+40	Touma Kamijou's melee attack voice.
+41	Touma Kamijou's ranged attack voice.
+42	Touma Kamijou's dash voice.
+43	Touma Kamijou's transition voice.
+44	Touma Kamijou's jump voice.
+45	Touma Kamijou's idling voice.
+46	Touma Kamijou's point get voice.
+47	Touma Kamijou's enemy wave clear voice.
+48	Touma Kamijou's voice for entering a mission.
+49	Touma Kamijou's voice for winning a match.
+50	Touma Kamijou's voice for taking heavy damage.
+51	Touma Kamijou's voice for being low on HP.
+52	Touma Kamijou's voice for status ailments.
+53	Touma Kamijou's voice for being defeated.
+54	Touma Kamijou's voice for losing a match.
+55	Touma Kamijou's Boost Gauge MAX voice.
+56	Touma Kamijou's Boost Weapon use voice.
+57	Touma Kamijou's Boost Time end voice.
+58	Touma Kamijou's character select voice.
+59	Touma Kamijou's title call voice.
+60	Index's melee attack voice.
+61	Index's ranged attack voice.
+62	Index's dash voice.
+63	Index's transition voice.
+64	Index's jump voice.
+65	Index's idling voice.
+66	Index's point get voice.
+67	Index's enemy wave clear voice.
+68	Index's voice for entering a mission.
+69	Index's voice for winning a match.
+70	Index's voice for taking heavy damage.
+71	Index's voice for being low on HP.
+72	Index's voice for status ailments.
+73	Index's voice for being defeated.
+74	Index's voice for losing a match.
+75	Index's Boost Gauge MAX voice.
+76	Index's Boost Weapon use voice.
+77	Index's Boost Time end voice.
+78	Index's character select voice (BAL-BADOS).
+79	Index's title call voice.
+80	Ruiko Saten's melee attack voice.
+81	Ruiko Saten's ranged attack voice.
+82	Ruiko Saten's dash voice.
+83	Ruiko Saten's transition voice.
+84	Ruiko Saten's jump voice.
+85	Ruiko Saten's idling voice.
+86	Ruiko Saten's point get voice.
+87	Ruiko Saten's enemy wave clear voice.
+88	Ruiko Saten's voice for entering a mission.
+89	Ruiko Saten's voice for winning a match.
+90	Ruiko Saten's voice for taking heavy damage.
+91	Ruiko Saten's voice for being low on HP.
+92	Ruiko Saten's voice for status ailments.
+93	Ruiko Saten's voice for being defeated.
+94	Ruiko Saten's voice for losing a match.
+95	Ruiko Saten's Boost Gauge MAX voice.
+96	Ruiko Saten's Boost Weapon use voice.
+97	Ruiko Saten's Boost Time end voice.
+98	Ruiko Saten's character select voice.
+99	Ruiko Saten's title call voice.
+100	Kazari Uiharu's melee attack voice.
+101	Kazari Uiharu's ranged attack voice.
+102	Kazari Uiharu's dash voice.
+103	Kazari Uiharu's transition voice.
+104	Kazari Uiharu's jump voice.
+105	Kazari Uiharu's idling voice.
+106	Kazari Uiharu's point get voice.
+107	Kazari Uiharu's enemy wave clear voice.
+108	Kazari Uiharu's voice for entering a mission.
+109	Kazari Uiharu's voice for winning a match.
+110	Kazari Uiharu's voice for taking heavy damage.
+111	Kazari Uiharu's voice for being low on HP.
+112	Kazari Uiharu's voice for status ailments.
+113	Kazari Uiharu's voice for being defeated.
+114	Kazari Uiharu's voice for losing a match.
+115	Kazari Uiharu's Boost Gauge MAX voice.
+116	Kazari Uiharu's Boost Weapon use voice.
+117	Kazari Uiharu's Boost Time end voice.
+118	Kazari Uiharu's character select voice.
+119	Kazari Uiharu's title call voice.
+120	Accelerator's melee attack voice.
+121	Accelerator's ranged attack voice.
+122	Accelerator's dash voice.
+123	Accelerator's transition voice.
+124	Accelerator's jump voice.
+125	Accelerator's idling voice.
+126	Accelerator's point get voice.
+127	Accelerator's enemy wave clear voice.
+128	Accelerator's voice for entering a mission.
+129	Accelerator's voice for winning a match.
+130	Accelerator's voice for taking heavy damage.
+131	Accelerator's voice for being low on HP.
+132	Accelerator's voice for status ailments.
+133	Accelerator's voice for being defeated.
+134	Accelerator's voice for losing a match.
+135	Accelerator's Boost Gauge MAX voice.
+136	Accelerator's Boost Weapon use voice.
+137	Accelerator's Boost Time end voice.
+138	Accelerator's character select voice.
+139	Accelerator's title call voice.
+140	Misaki Shokuhou's melee attack voice.
+141	Misaki Shokuhou's ranged attack voice.
+142	Misaki Shokuhou's dash voice.
+143	Misaki Shokuhou's transition voice.
+144	Misaki Shokuhou's jump voice.
+145	Misaki Shokuhou's idling voice.
+146	Misaki Shokuhou's point get voice.
+147	Misaki Shokuhou's enemy wave clear voice.
+148	Misaki Shokuhou's voice for entering a mission.
+149	Misaki Shokuhou's voice for winning a match.
+150	Misaki Shokuhou's voice for taking heavy damage.
+151	Misaki Shokuhou's voice for being low on HP.
+152	Misaki Shokuhou's voice for status ailments.
+153	Misaki Shokuhou's voice for being defeated.
+154	Misaki Shokuhou's voice for losing a match.
+155	Misaki Shokuhou's Boost Gauge MAX voice.
+156	Misaki Shokuhou's Boost Weapon use voice.
+157	Misaki Shokuhou's Boost Time end voice.
+158	Misaki Shokuhou's character select voice.
+159	Misaki Shokuhou's title call voice.
+160	Motoharu Tsuchimikado's melee attack voice.
+161	Motoharu Tsuchimikado's ranged attack voice.
+162	Motoharu Tsuchimikado's dash voice.
+163	Motoharu Tsuchimikado's transition voice.
+164	Motoharu Tsuchimikado's jump voice.
+165	Motoharu Tsuchimikado's idling voice.
+166	Motoharu Tsuchimikado's point get voice.
+167	Motoharu Tsuchimikado's enemy wave clear voice.
+168	Motoharu Tsuchimikado's voice for entering a mission.
+169	Motoharu Tsuchimikado's voice for winning a match.
+170	Motoharu Tsuchimikado's voice for taking heavy damage.
+171	Motoharu Tsuchimikado's voice for being low on HP.
+172	Motoharu Tsuchimikado's voice for status ailments.
+173	Motoharu Tsuchimikado's voice for being defeated.
+174	Motoharu Tsuchimikado's voice for losing a match.
+175	Motoharu Tsuchimikado's Boost Gauge MAX voice.
+176	Motoharu Tsuchimikado's Boost Weapon use voice.
+177	Motoharu Tsuchimikado's Boost Time end voice.
+178	Motoharu Tsuchimikado's character select voice.
+179	Motoharu Tsuchimikado's title call voice.
+180	Kaori Kanzaki's melee attack voice.
+181	Kaori Kanzaki's ranged attack voice.
+182	Kaori Kanzaki's dash voice.
+183	Kaori Kanzaki's transition voice.
+184	Kaori Kanzaki's jump voice.
+185	Kaori Kanzaki's idling voice.
+186	Kaori Kanzaki's point get voice.
+187	Kaori Kanzaki's enemy wave clear voice.
+188	Kaori Kanzaki's voice for entering a mission.
+189	Kaori Kanzaki's voice for winning a match.
+190	Kaori Kanzaki's voice for taking heavy damage.
+191	Kaori Kanzaki's voice for being low on HP.
+192	Kaori Kanzaki's voice for status ailments.
+193	Kaori Kanzaki's voice for being defeated.
+194	Kaori Kanzaki's voice for losing a match.
+195	Kaori Kanzaki's Boost Gauge MAX voice.
+196	Kaori Kanzaki's Boost Weapon use voice.
+197	Kaori Kanzaki's Boost Time end voice.
+198	Kaori Kanzaki's character select voice.
+199	Kaori Kanzaki's title call voice.
+200	Lessar's melee attack voice.
+201	Lessar's ranged attack voice.
+202	Lessar's dash voice.
+203	Lessar's transition voice.
+204	Lessar's jump voice.
+205	Lessar's idling voice.
+206	Lessar's point get voice.
+207	Lessar's enemy wave clear voice.
+208	Lessar's voice for entering a mission.
+209	Lessar's voice for winning a match.
+210	Lessar's voice for taking heavy damage.
+211	Lessar's voice for being low on HP.
+212	Lessar's voice for status ailments.
+213	Lessar's voice for being defeated.
+214	Lessar's voice for losing a match.
+215	Lessar's Boost Gauge MAX voice.
+216	Lessar's Boost Weapon use voice.
+217	Lessar's Boost Time end voice.
+218	Lessar's character select voice.
+219	Lessar's title call voice.
+220	Acqua of the Back's melee attack voice.
+221	Acqua of the Back's ranged attack voice.
+222	Acqua of the Back's dash voice.
+223	Acqua of the Back's transition voice.
+224	Acqua of the Back's jump voice.
+225	Acqua of the Back's idling voice.
+226	Acqua of the Back's point get voice.
+227	Acqua of the Back's enemy wave clear voice.
+228	Acqua of the Back's voice for entering a mission.
+229	Acqua of the Back's voice for winning a match.
+230	Acqua of the Back's voice for taking heavy damage.
+231	Acqua of the Back's voice for being low on HP.
+232	Acqua of the Back's voice for status ailments.
+233	Acqua of the Back's voice for being defeated.
+234	Acqua of the Back's voice for losing a match.
+235	Acqua of the Back's Boost Gauge MAX voice.
+236	Acqua of the Back's Boost Weapon use voice.
+237	Acqua of the Back's Boost Time end voice.
+238	Acqua of the Back's character select voice.
+239	Acqua of the Back's title call voice.
+240	Ririn Furashina's melee attack voice.
+241	Ririn Furashina's ranged attack voice.
+242	Ririn Furashina's dash voice.
+243	Ririn Furashina's transition voice.
+244	Ririn Furashina's jump voice.
+245	Ririn Furashina's idling voice.
+246	Ririn Furashina's point get voice.
+247	Ririn Furashina's enemy wave clear voice.
+248	Ririn Furashina's voice for entering a mission.
+249	Ririn Furashina's voice for winning a match.
+250	Ririn Furashina's voice for taking heavy damage.
+251	Ririn Furashina's voice for being low on HP.
+252	Ririn Furashina's voice for status ailments.
+253	Ririn Furashina's voice for being defeated.
+254	Ririn Furashina's voice for losing a match.
+255	Ririn Furashina's Boost Gauge MAX voice.
+256	Ririn Furashina's Boost Weapon use voice.
+257	Ririn Furashina's Boost Time end voice.
+258	Ririn Furashina's character select voice.
+259	Ririn Furashina's title call voice.
+260	Index's character select voice (BAL-RlooN).

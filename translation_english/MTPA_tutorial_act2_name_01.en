@@ -1,0 +1,195 @@
+0	<color COLOR_YELLOW>Hold <icon LS> up for 1 sec</color>
+1	<color COLOR_YELLOW>Hold <icon LS> down for 1 sec</color>
+2	<color COLOR_YELLOW>Hold <icon LS> left for 1 sec</color>
+3	<color COLOR_YELLOW>Hold <icon LS> right for 1 sec</color>
+4	<color COLOR_YELLOW>Hold <icon LS> up-left for 1 sec</color>
+5	<color COLOR_YELLOW>Hold <icon LS> up-right for 1 sec</color>
+6	<color COLOR_YELLOW>Hold <icon LS> down-left for 1 sec</color>
+7	<color COLOR_YELLOW>Hold <icon LS> down-right for 1 sec</color>
+8	<color COLOR_YELLOW>Hold <icon RS> left for 1 sec</color>
+9	<color COLOR_YELLOW>Hold <icon RS> right for 1 sec</color>
+10	<color COLOR_YELLOW>Press <icon LS> up + <input DASH></color>
+11	<color COLOR_YELLOW>Press <icon LS> down + <input DASH></color>
+12	<color COLOR_YELLOW>Press <icon LS> left + <input DASH></color>
+13	<color COLOR_YELLOW>Press <icon LS> right + <input DASH></color>
+14	<color COLOR_YELLOW>Press <icon LS> up-left + <input DASH></color>
+15	<color COLOR_YELLOW>Press <icon LS> up-right + <input DASH></color>
+16	<color COLOR_YELLOW>Press <icon LS> down-left + <input DASH></color>
+17	<color COLOR_YELLOW>Press <icon LS> down-right + <input DASH></color>
+18	<color COLOR_YELLOW>Press <input JUMP></color>
+19	<color COLOR_YELLOW>In a jump, press <icon LS> up and <input DASH></color>
+20	<color COLOR_YELLOW>In a jump, press <icon LS> down and <input DASH></color>
+21	<color COLOR_YELLOW>In a jump, press <icon LS> left and <input DASH></color>
+22	<color COLOR_YELLOW>In a jump, press <icon LS> right and <input DASH></color>
+23	<color COLOR_YELLOW>In a jump, press <icon LS> up-left and <input DASH></color>
+24	<color COLOR_YELLOW>In a jump, press <icon LS> up-right and <input DASH></color>
+25	<color COLOR_YELLOW>In a jump, press <icon LS> down-left and <input DASH></color>
+26	<color COLOR_YELLOW>In a jump, press <icon LS> down-right and <input DASH></color>
+27	<color COLOR_YELLOW>Press <input LOCK></color>
+28	<color COLOR_YELLOW>Press <input CHANGE></color>
+29	<color COLOR_YELLOW>While dashing, press <icon LS> right and <input LOCK></color>
+30	<color COLOR_YELLOW>While dashing, press <icon LS> left and <input LOCK></color>
+31	<color COLOR_YELLOW>In an air dash, press <icon LS> right and <input LOCK></color>
+32	<color COLOR_YELLOW>In an air dash, press <icon LS> left and <input LOCK></color>
+33	<color COLOR_YELLOW>In a right transition, press <icon LS> + <input DASH></color>
+34	<color COLOR_YELLOW>In a left transition, press <icon LS> + <input DASH></color>
+35	<color COLOR_YELLOW>In a right transition, press <input JUMP></color>
+36	<color COLOR_YELLOW>In a left transition, press <input JUMP></color>
+37	<color COLOR_YELLOW>While dashing, press <icon LS> right and <input DASH></color>
+38	<color COLOR_YELLOW>While dashing, press <icon LS> left and <input DASH></color>
+39	<color COLOR_YELLOW>While dashing, press <icon LS> up-right and <input DASH></color>
+40	<color COLOR_YELLOW>While dashing, press <icon LS> up-left and <input DASH></color>
+41	<color COLOR_YELLOW>In a forward dash, press <input DASH></color>
+42	<color COLOR_YELLOW>In a back dash, press <input DASH></color>
+43	<color COLOR_YELLOW>In a right dash, press <input DASH></color>
+44	<color COLOR_YELLOW>In a left dash, press <input DASH></color>
+45	<color COLOR_YELLOW>In a forward-right dash, press <input DASH></color>
+46	<color COLOR_YELLOW>In a forward-left dash, press <input DASH></color>
+47	<color COLOR_YELLOW>In a back-right dash, press <input DASH></color>
+48	<color COLOR_YELLOW>In a back-left dash, press <input DASH></color>
+49	<color COLOR_YELLOW>While jumping, press <input JUMP></color>
+50	<color COLOR_YELLOW>In a forward air dash, press <input DASH></color>
+51	<color COLOR_YELLOW>In a back air dash, press <input DASH></color>
+52	<color COLOR_YELLOW>In a right air dash, press <input DASH></color>
+53	<color COLOR_YELLOW>In a left air dash, press <input DASH></color>
+54	<color COLOR_YELLOW>In a forward-right air dash, press <input DASH></color>
+55	<color COLOR_YELLOW>In a forward-left air dash, press <input DASH></color>
+56	<color COLOR_YELLOW>In a back-right air dash, press <input DASH></color>
+57	<color COLOR_YELLOW>In a back-left air dash, press <input DASH></color>
+58	<color COLOR_YELLOW>In a right transition, press <input LOCK></color>
+59	<color COLOR_YELLOW>In a left transition, press <input LOCK></color>
+60	<color COLOR_YELLOW>In an air right transition, press <input LOCK></color>
+61	<color COLOR_YELLOW>In an air left transition, press <input LOCK></color>
+62	<color COLOR_YELLOW>Press <input RW></color>
+63	<color COLOR_YELLOW>Press <icon LS> up + <input RW></color>
+64	<color COLOR_YELLOW>Press <icon LS> down + <input RW></color>
+65	<color COLOR_YELLOW>Press <icon LS> right + <input RW></color>
+66	<color COLOR_YELLOW>Press <icon LS> left + <input RW></color>
+67	<color COLOR_YELLOW>Press <icon LS> up-right + <input RW></color>
+68	<color COLOR_YELLOW>Press <icon LS> up-left + <input RW></color>
+69	<color COLOR_YELLOW>Press <icon LS> down-right + <input RW></color>
+70	<color COLOR_YELLOW>Press <icon LS> down-left + <input RW></color>
+71	<color COLOR_YELLOW>Press <input RW> + <input DASH> at once</color>
+72	<color COLOR_YELLOW>In a forward dash, press <input RW></color>
+73	<color COLOR_YELLOW>In a back dash, press <input RW></color>
+74	<color COLOR_YELLOW>In a right dash, press <input RW></color>
+75	<color COLOR_YELLOW>In a left dash, press <input RW></color>
+76	<color COLOR_YELLOW>In a forward-right dash, press <input RW></color>
+77	<color COLOR_YELLOW>In a forward-left dash, press <input RW></color>
+78	<color COLOR_YELLOW>In a back-right dash, press <input RW></color>
+79	<color COLOR_YELLOW>In a back-left dash, press <input RW></color>
+80	<color COLOR_YELLOW>While jumping, press <input RW></color>
+81	<color COLOR_YELLOW>While jumping, press <input RW> + <input DASH> at once</color>
+82	<color COLOR_YELLOW>In a forward air dash, press <input RW></color>
+83	<color COLOR_YELLOW>In a back air dash, press <input RW></color>
+84	<color COLOR_YELLOW>In a right air dash, press <input RW></color>
+85	<color COLOR_YELLOW>In a left air dash, press <input RW></color>
+86	<color COLOR_YELLOW>In a forward-right air dash, press <input RW></color>
+87	<color COLOR_YELLOW>In a forward-left air dash, press <input RW></color>
+88	<color COLOR_YELLOW>In a back-right air dash, press <input RW></color>
+89	<color COLOR_YELLOW>In a back-left air dash, press <input RW></color>
+90	<color COLOR_YELLOW>In a right transition, press <input RW></color>
+91	<color COLOR_YELLOW>In a left transition, press <input RW></color>
+92	<color COLOR_YELLOW>Press <input LW></color>
+93	<color COLOR_YELLOW>Press <icon LS> up + <input LW></color>
+94	<color COLOR_YELLOW>Press <icon LS> down + <input LW></color>
+95	<color COLOR_YELLOW>Press <icon LS> right + <input LW></color>
+96	<color COLOR_YELLOW>Press <icon LS> left + <input LW></color>
+97	<color COLOR_YELLOW>Press <icon LS> up-right + <input LW></color>
+98	<color COLOR_YELLOW>Press <icon LS> up-left + <input LW></color>
+99	<color COLOR_YELLOW>Press <icon LS> down-right + <input LW></color>
+100	<color COLOR_YELLOW>Press <icon LS> down-left + <input LW></color>
+101	<color COLOR_YELLOW>Press <input LW> + <input DASH> at once</color>
+102	<color COLOR_YELLOW>In a forward dash, press <input LW></color>
+103	<color COLOR_YELLOW>In a back dash, press <input LW></color>
+104	<color COLOR_YELLOW>In a right dash, press <input LW></color>
+105	<color COLOR_YELLOW>In a left dash, press <input LW></color>
+106	<color COLOR_YELLOW>In a forward-right dash, press <input LW></color>
+107	<color COLOR_YELLOW>In a forward-left dash, press <input LW></color>
+108	<color COLOR_YELLOW>In a back-right dash, press <input LW></color>
+109	<color COLOR_YELLOW>In a back-left dash, press <input LW></color>
+110	<color COLOR_YELLOW>While jumping, press <input LW></color>
+111	<color COLOR_YELLOW>While jumping, press <input LW> + <input DASH> at once</color>
+112	<color COLOR_YELLOW>In a forward air dash, press <input LW></color>
+113	<color COLOR_YELLOW>In a back air dash, press <input LW></color>
+114	<color COLOR_YELLOW>In a right air dash, press <input LW></color>
+115	<color COLOR_YELLOW>In a left air dash, press <input LW></color>
+116	<color COLOR_YELLOW>In a forward-right air dash, press <input LW></color>
+117	<color COLOR_YELLOW>In a forward-left air dash, press <input LW></color>
+118	<color COLOR_YELLOW>In a back-right air dash, press <input LW></color>
+119	<color COLOR_YELLOW>In a back-left air dash, press <input LW></color>
+120	<color COLOR_YELLOW>In a right transition, press <input LW></color>
+121	<color COLOR_YELLOW>In a left transition, press <input LW></color>
+122	<color COLOR_YELLOW>Press <input RW> + <input LW> at once</color>
+123	<color COLOR_YELLOW><icon LS> up, <input RW> + <input LW> at once</color>
+124	<color COLOR_YELLOW><icon LS> down, <input RW> + <input LW> at once</color>
+125	<color COLOR_YELLOW><icon LS> right, <input RW> + <input LW> at once</color>
+126	<color COLOR_YELLOW><icon LS> left, <input RW> + <input LW> at once</color>
+127	<color COLOR_YELLOW><icon LS> up-right, <input RW> + <input LW> at once</color>
+128	<color COLOR_YELLOW><icon LS> up-left, <input RW> + <input LW> at once</color>
+129	<color COLOR_YELLOW><icon LS> down-right, <input RW> + <input LW> at once</color>
+130	<color COLOR_YELLOW><icon LS> down-left, <input RW> + <input LW> at once</color>
+131	<color COLOR_YELLOW>Press <input RW> + <input LW> + <input DASH> at once</color>
+132	<color COLOR_YELLOW>In a forward dash, <input RW> + <input LW> at once</color>
+133	<color COLOR_YELLOW>In a back dash, <input RW> + <input LW> at once</color>
+134	<color COLOR_YELLOW>In a right dash, <input RW> + <input LW> at once</color>
+135	<color COLOR_YELLOW>In a left dash, <input RW> + <input LW> at once</color>
+136	<color COLOR_YELLOW>In a forward-right dash, <input RW> + <input LW> at once</color>
+137	<color COLOR_YELLOW>In a forward-left dash, <input RW> + <input LW> at once</color>
+138	<color COLOR_YELLOW>In a back-right dash, <input RW> + <input LW> at once</color>
+139	<color COLOR_YELLOW>In a back-left dash, <input RW> + <input LW> at once</color>
+140	<color COLOR_YELLOW>While jumping, <input RW> + <input LW> at once</color>
+141	<color COLOR_YELLOW>While jumping, <input RW> + <input LW> + <input DASH> at once</color>
+142	<color COLOR_YELLOW>In a forward air dash, <input RW> + <input LW></color>
+143	<color COLOR_YELLOW>In a back air dash, <input RW> + <input LW></color>
+144	<color COLOR_YELLOW>In a right air dash, <input RW> + <input LW></color>
+145	<color COLOR_YELLOW>In a left air dash, <input RW> + <input LW></color>
+146	<color COLOR_YELLOW>In a forward-right air dash, <input RW> + <input LW></color>
+147	<color COLOR_YELLOW>In a forward-left air dash, <input RW> + <input LW></color>
+148	<color COLOR_YELLOW>In a back-right air dash, <input RW> + <input LW></color>
+149	<color COLOR_YELLOW>In a back-left air dash, <input RW> + <input LW></color>
+150	<color COLOR_YELLOW>In a right transition, <input RW> + <input LW></color>
+151	<color COLOR_YELLOW>In a left transition, <input RW> + <input LW></color>
+152	<color COLOR_YELLOW>Press <input MELEE></color>
+153	<color COLOR_YELLOW>In a melee attack, press <input MELEE></color>
+154	<color COLOR_YELLOW>While dashing, press <input MELEE></color>
+155	<color COLOR_YELLOW>While jumping, press <input MELEE></color>
+156	<color COLOR_YELLOW>In an air dash, press <input MELEE></color>
+157	<color COLOR_YELLOW>With the enemy down, press <input MELEE></color>
+158	<color COLOR_YELLOW>Guard with <icon LS> down + <input MELEE></color>
+159	<color COLOR_YELLOW>Guard with <icon LS> down + <input MELEE></color>
+160	<color COLOR_YELLOW>Guard with <icon LS> down + <input MELEE></color>
+161	<color COLOR_YELLOW>Guard with <icon LS> down + <input MELEE></color>
+162	<color COLOR_YELLOW>Knock the enemy down with any attack</color>
+163	<color COLOR_YELLOW>Knock the enemy down with a <input MELEE> attack</color>
+164	<color COLOR_YELLOW>When enemy stability is low, <input RW> + <input DASH></color>
+165	<color COLOR_YELLOW>Press <icon TOUCH></color>
+166	<color COLOR_YELLOW>Activate a Boost Weapon</color>
+167	<color COLOR_YELLOW>In a forward air dash, <input RW> + <input LW> + <input DASH></color>
+168	<color COLOR_YELLOW><input RW>: RW attack</color>
+169	<color COLOR_YELLOW>Bring the ring enemy's HP to 0</color>
+170	<color COLOR_YELLOW><input RW>: <input RW> attack</color>
+171	<color COLOR_YELLOW>Bring the ringside enemy's HP to 0</color>
+172	<color COLOR_YELLOW>Stand still on the pit area</color>
+173	<color COLOR_YELLOW>Win the tag battle</color>
+174	<color COLOR_YELLOW>Touch the ball on the map</color>
+175	<color COLOR_YELLOW>Move to the enemy goal in Keep state</color>
+176	<color COLOR_YELLOW>Attack the enemy holding the ball</color>
+177	<color COLOR_YELLOW>Code Attack with <input MELEE></color>
+178	<color COLOR_YELLOW>Press <input RW></color>
+179	<color COLOR_YELLOW><input RW> + <input DASH> at once</color>
+180	<color COLOR_YELLOW>Press <input LW></color>
+181	<color COLOR_YELLOW><input LW> + <input DASH> at once</color>
+182	<color COLOR_YELLOW><input RW> + <input LW> at once</color>
+183	<color COLOR_YELLOW><input RW> + <input LW> + <input DASH> at once</color>
+184	<color COLOR_YELLOW>Win the match</color>
+185	<color COLOR_YELLOW>Keep the opponent holding the ball</color>
+186	<color COLOR_YELLOW>With the enemy down, press <input MELEE></color>
+187	<color COLOR_YELLOW>With the enemy down, press <input MELEE></color>
+188	<color COLOR_YELLOW>With the enemy down, press <input MELEE></color>
+189	<color COLOR_YELLOW>Guard with <icon LS> down + <input MELEE></color>
+190	<color COLOR_YELLOW>Guard with <icon LS> down + <input MELEE></color>
+191	<color COLOR_YELLOW>Guard with <icon LS> down + <input MELEE></color>
+192	<color COLOR_YELLOW>Code Attack with <input MELEE></color>
+193	<color COLOR_YELLOW>Code Attack with <input MELEE></color>
+194	<color COLOR_YELLOW>Code Attack with <input MELEE></color>

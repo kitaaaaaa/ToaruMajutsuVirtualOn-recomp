@@ -1,0 +1,187 @@
+863288426496	All right! We're starting the third remedial class\non basic Virtuaroid controls!
+863288426497	This time it's about the weapon Virtuaroids carry\nin their right hand, the RW (right weapon)!
+803158884354	...Komoe-sensei, may I ask a question?
+863288426499	Oh, already, Kamijou-chan? What is it?
+803158884356	Why exactly am I taking remedial class with a middle\nschooler from another school!?
+816043786245	Shut up. Got a problem with that?
+803158884358	No, I was just wondering why you're here.
+863288426503	She joined this remedial class of her own accord.\nShe's a very hard worker!
+816043786248	Well, I just thought going back to the basics and\nrestudying once in a while wouldn't hurt. That's all.
+803158884361	I see, so that's it. I figured it was just\nan excuse to see me...
+816043786250	Wh-Whaaat!? Are you stupid!?
+816043786251	"I'd like to take a class together just once," or\nanything like that, I'm nyot thinking that at all!?
+803158884364	I'm kidding. Besides, you're not the type\nto be all girly like that.
+816043786253	Th-That's right. I'm not that type... Ugh.
+876173328398	Touma-sama, I feel like you're going to get\nstabbed someday.
+803158884367	Don't suddenly say such alarming things!?
+863288426512	Okay, okay, time to get back to the lesson.
+863288426513	Each Virtuaroid has three kinds of\nattack weapons.
+876173328402	The three are the RW (right weapon), LW (left weapon)\nand CW (center weapon).
+863288426515	Like I said at the start, today I'll explain how to use\nthe right-hand weapon, the RW!
+863288426516	By the way, in this remedial class we'll be using\nTemjin, which has easy-to-handle weapons.
+863288426517	Now, let the lesson begin!
+863288426518	Input <input RW> to make an RW attack.
+876173328407	In Temjin's case, it fires a beam shot\nfrom its launcher.
+863288426520	Attacking drains the weapon gauge.
+863288426521	If the gauge is empty, inputting <input RW> won't\nproduce an attack, so be careful.
+863288426522	A drained attack gauge recovers over time!
+863288426523	You can attack while moving, too!
+863288426524	While moving with <icon LS>, input <input RW> to make\nan RW attack on the move.
+876173328413	If you attack while locked on to the opponent,\nyou'll fire toward them.
+863288426526	You can also make an RW attack different from\nthe normal one.
+863288426527	Input <input RW> and <input DASH> at the same time\nto change it into a stronger RW attack.
+863288426528	This is the turbo RW attack!
+876173328417	In Temjin's case, it fires straight ahead\nfrom its transformed launcher.
+863288426530	Now let's try attacking with the RW.
+863288426531	That's how it goes! Now, it's quiz time!
+863288426532	The normal RW attack and turbo RW attack differ a bit\nin their properties. Can you tell how?
+803158884389	Umm, the power...?
+863288426534	That's not wrong, but it's only 40 points!
+816043786279	The normal RW attack homes in well,\nbut the shot is slow.
+816043786280	The turbo RW attack doesn't home in, but it can\nfire a fast shot... Something like that?
+863288426537	Wonderful! That answer gets a perfect 100 points!
+803158884394	Whoa, that's amazing, Misaka.
+816043786283	H-Hmph. This much is obvious!
+803158884396	You really don't need remedial class, do you?
+816043786285	<double><color COLOR_RED>Sh-Shut up!</color></double>
+863288426542	Next is the dash RW attack!
+803158884399	Hm? Dash RW attack? The RW is a shooting\nweapon, right?
+863288426544	Yes, this is a move to raise your accuracy.
+803158884401	A-Accuracy...?
+816043786290	A target 2 meters away or a target 20 meters away,\nwhich one is easier for you to hit?
+803158884403	Oh! So that's what it is!
+863288426548	Long-range attacks are handy, but the farther away\nthe target, the harder it is to hit.
+863288426549	The standard play is to shoot while closing in\nwith a dash!
+803158884406	Well, that makes sense. That was a blind spot for me.
+816043786295	You'd get it if you thought about it for a second.
+803158884408	Well, you see, Kamijou-san basically handles things\nwith his fists. I'm not used to projectiles.
+816043786297	When I think about it again, you're a scary guy...
+863288426554	Keep the chatter down. Now, on to the explanation!
+863288426555	Input <input RW> while dashing to make\na dash RW attack.
+863288426556	Some dash attacks behave differently\nfrom normal attacks.
+876173328445	In Temjin's case, the launcher's beam shots\nbecome rapid fire.
+863288426558	When the dash attack ends, the dash stops there too.
+863288426559	Now let's try the dash RW attack.
+863288426560	Okay, good work!
+863288426561	Temjin's RW attack during a forward dash is a tactic\noften used in real battles, too!
+863288426562	Close the distance while firing away.\nThat's what Temjin is known for...!
+863288426563	<double>Commonly called "Mae-Bi"!!</double>
+803158884420	...Because it moves forward (mae) and fires a beam (bi),\nit's "Mae-Bi"?
+816043786309	D-Don't ask me...
+863288426566	Next, I'll explain RW attacks during a jump.
+803158884423	Before that, Komoe-sensei. Temjin's right-hand\nweapon... does it have a name?
+863288426568	Of course it does!\nTemjin's RW is called the "Sleipnir."
+803158884425	Sleipnir...
+876173328458	Its biggest selling point is that it can transform into\na launcher, a sword and more, depending on distance.
+876173328459	The RW attack is done in launcher form, but...
+803158884428	Sleipnir, Sleipnir, huh...\nHeh, that's a nice name!
+876173328461	Umm, Touma-sama? Are you listening to me?
+803158884430	Komoe-sensei! Hurry and teach me the next controls!\nI'll show you the power of the Sleipnir!
+816043786319	Wh-Why's he suddenly so fired up...?
+863288426576	I suppose it's a boy's nature.\nLet's move on to the explanation, as he wishes.
+816043786321	Guys are such kids.
+863288426578	Attacks in the air are done during a jump.
+863288426579	Jump with <input JUMP>, then input <input RW> during it\nfor a jump RW attack.
+876173328468	Jumping locks on to the enemy, so it's easy to\naim your attacks their way, too.
+863288426581	You can also make turbo attacks during a jump.
+863288426582	Remember how to do a turbo attack?\nInput <input RW> and <input DASH> at the same time.
+863288426583	Do that during a jump, and it becomes\nan aerial turbo attack.
+863288426584	Now let's try RW attacks during a jump.
+863288426585	Looking good, Kamijou-chan!
+863288426586	Virtuaroids have all sorts of attacks, but none\nso fast they can't be seen.
+863288426587	If you watch closely, any attack can, in theory,\nbe dodged.
+863288426588	How to dodge, and how to keep from being dodged,\nyou could say that's the true joy of Virtual-On combat.
+863288426589	Keep thinking, and that's the shortcut to victory,\nKamijou-chan.
+803158884446	Yes! Thank you very much, Komoe-sensei!
+816043786335	Geez, someone's in a good mood. ...He's kind of cute.
+863288426592	Next is the air dash RW attack!
+863288426593	The air is handy since your view opens up,\nbut there's also nowhere to hide.
+803158884450	If you get sniped there, you're done for.
+863288426595	Yes. So you have to choose the right evasive means,\nlike jump cancels and transitions.
+863288426596	Also, as one of those evasive means,\nthe air dash RW attack comes in handy!
+803158884453	How so?
+863288426598	You deliberately charge at the opponent\nwhile attacking!
+803158884455	Whoa...
+816043786344	Sounds good to me. They say offense is the best\ndefense. I don't hate it.
+803158884457	...Stuff like this really shows your personality.
+816043786346	Excuse me...? What's that supposed to mean...?
+803158884459	K-Komoe-sensei! Please, explain the controls already!
+863288426604	Okay, okay, on to the explanation!
+863288426605	Remember how to air dash?
+863288426606	During a jump, you input <icon LS> toward where you want\nto dash, and <input DASH>, right?
+863288426607	Input <input RW> during that dash to make\nan air dash RW attack.
+863288426608	Now let's try the air dash RW attack.
+863288426609	How is it? Getting the hang of it?
+863288426610	One word of caution: don't overshoot the enemy\nwith your air dash.
+863288426611	If you overshoot the enemy, you'll lose\nyour precious lock-on!
+803158884468	So, don't go charging in blindly.
+803158884469	Staaare...
+816043786358	Wh-What are you looking at?
+803158884471	Nothing~
+863288426616	Finally, let's learn the transition RW attack.
+863288426617	A transition RW attack is, just like it says,\nan RW attack during a transition.
+876173328506	Unleashing attacks while closing in with a dash\nis the standard play, you could say.
+803158884475	Swing around with a transition, and...
+816043786364	<double>Bang,</double> right?
+863288426621	Yes, yes. Ranges differ by weapon, so gauge the\ndistance as you swing around with a transition.
+863288426622	Now, on to the explanation!
+863288426623	First, input <input LOCK> while dashing\nto go into a transition.
+863288426624	Input <input RW> during the transition to make\nan RW attack while transitioning!
+863288426625	Also, you can cancel a transition RW attack\nwith a dash, even partway through.
+863288426626	Now let's try the transition RW attack.
+863288426627	Okay, good work!
+863288426628	This time we used Temjin, the most standard one,\nbut attacks behave differently on each machine.
+863288426629	So if you try piloting other machines,\nthe differences might surprise you!
+863288426630	What matters most isn't the performance of the\nmachine or attacks, but whether you can use them well.
+803158884487	In other words, it all comes down to the pilot.
+863288426632	Kamijou-chan, that's well said!\nI'll give you a hanamaru!
+863288426633	That's it for today's remedial class.\nGet home safe!
+803158884490	Ahh, I'm wiped out.
+816043786379	That's my line. Looking after you\nisn't easy, you know.
+803158884492	Well, sorry about that~
+816043786381	A-As punishment... b-buy me a juice on the way home.\nOne from a vending machine is fine.
+803158884494	Why me...
+816043786383	<double>I-I taught you all kinds of stuff, didn't I?</double>
+803158884496	Sigh... Fine, fine.\nOne vending machine juice, just one.
+816043786385	Ah... Okay! Then it's settled, let's hurry home!
+803158884498	Yeah, yeah. Ahh, such misfortune.
+863288426643	Make sure you come to the next remedial class!\n...Ufufu, ah, youth.
+803158884500	Hmm, this is pretty tough.
+876173328533	Do you need some advice, Touma-sama?
+803158884502	Please, Ririna.
+876173328535	Okie-doke. Input <input RW> for an RW attack,\nwhich for Temjin is a beam shot.
+876173328536	While moving with <icon LS>, input <input RW> to\nattack on the move.
+876173328537	Also, inputting <input RW><input DASH> makes\na powerful turbo RW attack.
+876173328538	Each attack drains the weapon gauge.\nThe stronger it is, the more gauge it uses.
+876173328539	If you attack with the gauge at zero, it misfires\nand nothing happens, so be careful.
+803158884508	Attack with <input RW>, and turbo attack is <input RW><input DASH>...\nGot it, I'll give it a try!
+803158884509	Shooting while moving is hard...\nCan't I just hit them with the gun, Ririna?
+876173328542	You can't... What's with that <color COLOR_RED>gorilla</color> idea?\nI'll explain again, so listen closely.
+876173328543	While moving with <icon LS>, input <input DASH> to dash\nin that direction.
+876173328544	Input <input RW> while dashing to make\na dash RW attack.
+876173328545	Once started, a dash lasts a set time, so just\ninput <input RW> while you're naturally running.
+876173328546	First, let's try the simplest one, the forward dash.
+803158884515	Starting with a forward dash, huh. Roger.
+803158884516	<double>Goooo! Sleipnir!</double>
+876173328549	Hey, hey, Touma-sama. Being fired up is fine,\nbut you're not hitting the enemy at all.
+803158884518	Give me some advice... <double>Ririnaaaaa!</double>
+876173328551	You don't have to shout, I can hear you. Geez.
+876173328552	Jump with <input JUMP>, then input <input RW> during it\nfor a jump RW attack.
+876173328553	Input <input RW><input DASH> during a jump to turn\nthe aerial attack into a turbo attack.
+876173328554	What you need to watch out for in the controls\nis an accidental air dash.
+876173328555	If you input <input DASH> while moving,\nyou'll trigger an air dash.
+876173328556	When attacking, it's good to be careful\nnot to input movement.
+803158884525	Watch out for accidental dashes, huh. Thanks! Ririnaaa!
+803158884526	Whoa, whoa... The controls are getting all tangled up.
+876173328559	It's easy once you get the hang of it, Touma-sama.
+876173328560	First, input <icon LS> and <input DASH> during a jump\nto air dash that way for a set time.
+876173328561	Input <input RW> during that dash to make\nan air dash RW attack.
+876173328562	Besides movement, you use 3 commands:\njump, turbo and RW.
+876173328563	Input these 3 with a good rhythm. Just being\nconscious of rhythm makes it surprisingly smooth.
+803158884532	Input the commands with a good rhythm, huh.\nOkay, I'll try it.
+803158884533	Ririna, can I get some advice!
+876173328566	Coming up! <input LOCK> while dashing triggers\na transition, right?
+876173328567	Input <input RW> during that transition to\nattack while transitioning.
+876173328568	During a transition it aims at the enemy\nautomatically, but attacks have a proper range.
+876173328569	Adjust to a distance that's not too close or too far\nwith transitions while you attack.
+803158884538	I see, being too close is no good either...\nOkay, I'll try it!

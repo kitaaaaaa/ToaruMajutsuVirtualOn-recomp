@@ -1,0 +1,261 @@
+0	Mikoto Misaka: Melee
+1	Mikoto Misaka: Ranged
+2	Mikoto Misaka: Dash
+3	Mikoto Misaka: Transition
+4	Mikoto Misaka: Jump
+5	Mikoto Misaka: Idling
+6	Mikoto Misaka: Point Get
+7	Mikoto Misaka: Wave Cleared
+8	Mikoto Misaka: Mission Entry
+9	Mikoto Misaka: Win
+10	Mikoto Misaka: Big Damage
+11	Mikoto Misaka: Low HP
+12	Mikoto Misaka: Ailment
+13	Mikoto Misaka: Defeated
+14	Mikoto Misaka: Loss
+15	Mikoto Misaka: Boost Gauge MAX
+16	Mikoto Misaka: Boost Weapon Use
+17	Mikoto Misaka: Boost Time End
+18	Mikoto Misaka: Character Select
+19	Mikoto Misaka: Title Call
+20	Kuroko Shirai: Melee
+21	Kuroko Shirai: Ranged
+22	Kuroko Shirai: Dash
+23	Kuroko Shirai: Transition
+24	Kuroko Shirai: Jump
+25	Kuroko Shirai: Idling
+26	Kuroko Shirai: Point Get
+27	Kuroko Shirai: Wave Cleared
+28	Kuroko Shirai: Mission Entry
+29	Kuroko Shirai: Win
+30	Kuroko Shirai: Big Damage
+31	Kuroko Shirai: Low HP
+32	Kuroko Shirai: Ailment
+33	Kuroko Shirai: Defeated
+34	Kuroko Shirai: Loss
+35	Kuroko Shirai: Boost Gauge MAX
+36	Kuroko Shirai: Boost Weapon Use
+37	Kuroko Shirai: Boost Time End
+38	Kuroko Shirai: Character Select
+39	Kuroko Shirai: Title Call
+40	Touma Kamijou: Melee
+41	Touma Kamijou: Ranged
+42	Touma Kamijou: Dash
+43	Touma Kamijou: Transition
+44	Touma Kamijou: Jump
+45	Touma Kamijou: Idling
+46	Touma Kamijou: Point Get
+47	Touma Kamijou: Wave Cleared
+48	Touma Kamijou: Mission Entry
+49	Touma Kamijou: Win
+50	Touma Kamijou: Big Damage
+51	Touma Kamijou: Low HP
+52	Touma Kamijou: Ailment
+53	Touma Kamijou: Defeated
+54	Touma Kamijou: Loss
+55	Touma Kamijou: Boost Gauge MAX
+56	Touma Kamijou: Boost Weapon Use
+57	Touma Kamijou: Boost Time End
+58	Touma Kamijou: Character Select
+59	Touma Kamijou: Title Call
+60	Index: Melee
+61	Index: Ranged
+62	Index: Dash
+63	Index: Transition
+64	Index: Jump
+65	Index: Idling
+66	Index: Point Get
+67	Index: Wave Cleared
+68	Index: Mission Entry
+69	Index: Win
+70	Index: Big Damage
+71	Index: Low HP
+72	Index: Ailment
+73	Index: Defeated
+74	Index: Loss
+75	Index: Boost Gauge MAX
+76	Index: Boost Weapon Use
+77	Index: Boost Time End
+78	Index: Character Select 1
+79	Index: Title Call
+80	Ruiko Saten: Melee
+81	Ruiko Saten: Ranged
+82	Ruiko Saten: Dash
+83	Ruiko Saten: Transition
+84	Ruiko Saten: Jump
+85	Ruiko Saten: Idling
+86	Ruiko Saten: Point Get
+87	Ruiko Saten: Wave Cleared
+88	Ruiko Saten: Mission Entry
+89	Ruiko Saten: Win
+90	Ruiko Saten: Big Damage
+91	Ruiko Saten: Low HP
+92	Ruiko Saten: Ailment
+93	Ruiko Saten: Defeated
+94	Ruiko Saten: Loss
+95	Ruiko Saten: Boost Gauge MAX
+96	Ruiko Saten: Boost Weapon Use
+97	Ruiko Saten: Boost Time End
+98	Ruiko Saten: Character Select
+99	Ruiko Saten: Title Call
+100	Kazari Uiharu: Melee
+101	Kazari Uiharu: Ranged
+102	Kazari Uiharu: Dash
+103	Kazari Uiharu: Transition
+104	Kazari Uiharu: Jump
+105	Kazari Uiharu: Idling
+106	Kazari Uiharu: Point Get
+107	Kazari Uiharu: Wave Cleared
+108	Kazari Uiharu: Mission Entry
+109	Kazari Uiharu: Win
+110	Kazari Uiharu: Big Damage
+111	Kazari Uiharu: Low HP
+112	Kazari Uiharu: Ailment
+113	Kazari Uiharu: Defeated
+114	Kazari Uiharu: Loss
+115	Kazari Uiharu: Boost Gauge MAX
+116	Kazari Uiharu: Boost Weapon Use
+117	Kazari Uiharu: Boost Time End
+118	Kazari Uiharu: Character Select
+119	Kazari Uiharu: Title Call
+120	Accelerator: Melee
+121	Accelerator: Ranged
+122	Accelerator: Dash
+123	Accelerator: Transition
+124	Accelerator: Jump
+125	Accelerator: Idling
+126	Accelerator: Point Get
+127	Accelerator: Wave Cleared
+128	Accelerator: Mission Entry
+129	Accelerator: Win
+130	Accelerator: Big Damage
+131	Accelerator: Low HP
+132	Accelerator: Ailment
+133	Accelerator: Defeated
+134	Accelerator: Loss
+135	Accelerator: Boost Gauge MAX
+136	Accelerator: Boost Weapon Use
+137	Accelerator: Boost Time End
+138	Accelerator: Character Select
+139	Accelerator: Title Call
+140	Misaki Shokuhou: Melee
+141	Misaki Shokuhou: Ranged
+142	Misaki Shokuhou: Dash
+143	Misaki Shokuhou: Transition
+144	Misaki Shokuhou: Jump
+145	Misaki Shokuhou: Idling
+146	Misaki Shokuhou: Point Get
+147	Misaki Shokuhou: Wave Cleared
+148	Misaki Shokuhou: Mission Entry
+149	Misaki Shokuhou: Win
+150	Misaki Shokuhou: Big Damage
+151	Misaki Shokuhou: Low HP
+152	Misaki Shokuhou: Ailment
+153	Misaki Shokuhou: Defeated
+154	Misaki Shokuhou: Loss
+155	Misaki Shokuhou: Boost Gauge MAX
+156	Misaki Shokuhou: Boost Weapon Use
+157	Misaki Shokuhou: Boost Time End
+158	Misaki Shokuhou: Character Select
+159	Misaki Shokuhou: Title Call
+160	Motoharu Tsuchimikado: Melee
+161	Motoharu Tsuchimikado: Ranged
+162	Motoharu Tsuchimikado: Dash
+163	Motoharu Tsuchimikado: Transition
+164	Motoharu Tsuchimikado: Jump
+165	Motoharu Tsuchimikado: Idling
+166	Motoharu Tsuchimikado: Point Get
+167	Motoharu Tsuchimikado: Wave Cleared
+168	Motoharu Tsuchimikado: Mission Entry
+169	Motoharu Tsuchimikado: Win
+170	Motoharu Tsuchimikado: Big Damage
+171	Motoharu Tsuchimikado: Low HP
+172	Motoharu Tsuchimikado: Ailment
+173	Motoharu Tsuchimikado: Defeated
+174	Motoharu Tsuchimikado: Loss
+175	Motoharu Tsuchimikado: Boost Gauge MAX
+176	Motoharu Tsuchimikado: Boost Weapon Use
+177	Motoharu Tsuchimikado: Boost Time End
+178	Motoharu Tsuchimikado: Character Select
+179	Motoharu Tsuchimikado: Title Call
+180	Kaori Kanzaki: Melee
+181	Kaori Kanzaki: Ranged
+182	Kaori Kanzaki: Dash
+183	Kaori Kanzaki: Transition
+184	Kaori Kanzaki: Jump
+185	Kaori Kanzaki: Idling
+186	Kaori Kanzaki: Point Get
+187	Kaori Kanzaki: Wave Cleared
+188	Kaori Kanzaki: Mission Entry
+189	Kaori Kanzaki: Win
+190	Kaori Kanzaki: Big Damage
+191	Kaori Kanzaki: Low HP
+192	Kaori Kanzaki: Ailment
+193	Kaori Kanzaki: Defeated
+194	Kaori Kanzaki: Loss
+195	Kaori Kanzaki: Boost Gauge MAX
+196	Kaori Kanzaki: Boost Weapon Use
+197	Kaori Kanzaki: Boost Time End
+198	Kaori Kanzaki: Character Select
+199	Kaori Kanzaki: Title Call
+200	Lessar: Melee
+201	Lessar: Ranged
+202	Lessar: Dash
+203	Lessar: Transition
+204	Lessar: Jump
+205	Lessar: Idling
+206	Lessar: Point Get
+207	Lessar: Wave Cleared
+208	Lessar: Mission Entry
+209	Lessar: Win
+210	Lessar: Big Damage
+211	Lessar: Low HP
+212	Lessar: Ailment
+213	Lessar: Defeated
+214	Lessar: Loss
+215	Lessar: Boost Gauge MAX
+216	Lessar: Boost Weapon Use
+217	Lessar: Boost Time End
+218	Lessar: Character Select
+219	Lessar: Title Call
+220	Acqua of the Back: Melee
+221	Acqua of the Back: Ranged
+222	Acqua of the Back: Dash
+223	Acqua of the Back: Transition
+224	Acqua of the Back: Jump
+225	Acqua of the Back: Idling
+226	Acqua of the Back: Point Get
+227	Acqua of the Back: Wave Cleared
+228	Acqua of the Back: Mission Entry
+229	Acqua of the Back: Win
+230	Acqua of the Back: Big Damage
+231	Acqua of the Back: Low HP
+232	Acqua of the Back: Ailment
+233	Acqua of the Back: Defeated
+234	Acqua of the Back: Loss
+235	Acqua of the Back: Boost Gauge MAX
+236	Acqua of the Back: Boost Weapon Use
+237	Acqua of the Back: Boost Time End
+238	Acqua of the Back: Character Select
+239	Acqua of the Back: Title Call
+240	Ririn Furashina: Melee
+241	Ririn Furashina: Ranged
+242	Ririn Furashina: Dash
+243	Ririn Furashina: Transition
+244	Ririn Furashina: Jump
+245	Ririn Furashina: Idling
+246	Ririn Furashina: Point Get
+247	Ririn Furashina: Wave Cleared
+248	Ririn Furashina: Mission Entry
+249	Ririn Furashina: Win
+250	Ririn Furashina: Big Damage
+251	Ririn Furashina: Low HP
+252	Ririn Furashina: Ailment
+253	Ririn Furashina: Defeated
+254	Ririn Furashina: Loss
+255	Ririn Furashina: Boost Gauge MAX
+256	Ririn Furashina: Boost Weapon Use
+257	Ririn Furashina: Boost Time End
+258	Ririn Furashina: Character Select
+259	Ririn Furashina: Title Call
+260	Index: Character Select 2

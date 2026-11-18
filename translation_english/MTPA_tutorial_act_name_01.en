@@ -1,0 +1,195 @@
+0	<color COLOR_YELLOW>Move Forward</color>
+1	<color COLOR_YELLOW>Move Back</color>
+2	<color COLOR_YELLOW>Move Left</color>
+3	<color COLOR_YELLOW>Move Right</color>
+4	<color COLOR_YELLOW>Move Fwd-Left</color>
+5	<color COLOR_YELLOW>Move Fwd-Right</color>
+6	<color COLOR_YELLOW>Move Back-Left</color>
+7	<color COLOR_YELLOW>Move Back-Right</color>
+8	<color COLOR_YELLOW>Turn Left</color>
+9	<color COLOR_YELLOW>Turn Right</color>
+10	<color COLOR_YELLOW>Dash Forward</color>
+11	<color COLOR_YELLOW>Dash Back</color>
+12	<color COLOR_YELLOW>Dash Left</color>
+13	<color COLOR_YELLOW>Dash Right</color>
+14	<color COLOR_YELLOW>Dash Forward-Left</color>
+15	<color COLOR_YELLOW>Dash Forward-Right</color>
+16	<color COLOR_YELLOW>Dash Back-Left</color>
+17	<color COLOR_YELLOW>Dash Back-Right</color>
+18	<color COLOR_YELLOW>Jump</color>
+19	<color COLOR_YELLOW>Air Dash Forward</color>
+20	<color COLOR_YELLOW>Air Dash Back</color>
+21	<color COLOR_YELLOW>Air Dash Left</color>
+22	<color COLOR_YELLOW>Air Dash Right</color>
+23	<color COLOR_YELLOW>Air Dash Forward-Left</color>
+24	<color COLOR_YELLOW>Air Dash Forward-Right</color>
+25	<color COLOR_YELLOW>Air Dash Back-Left</color>
+26	<color COLOR_YELLOW>Air Dash Back-Right</color>
+27	<color COLOR_YELLOW>Lock-on</color>
+28	<color COLOR_YELLOW>Switch Lock 3 Times</color>
+29	<color COLOR_YELLOW>Dash > Right Transition</color>
+30	<color COLOR_YELLOW>Dash > Left Transition</color>
+31	<color COLOR_YELLOW>Air Dash > Right Transition</color>
+32	<color COLOR_YELLOW>Air Dash > Left Transition</color>
+33	<color COLOR_YELLOW>Right Transition > Dash</color>
+34	<color COLOR_YELLOW>Left Transition > Dash</color>
+35	<color COLOR_YELLOW>Right Transition > Jump</color>
+36	<color COLOR_YELLOW>Left Transition > Jump</color>
+37	<color COLOR_YELLOW>Vertical Turn Right</color>
+38	<color COLOR_YELLOW>Vertical Turn Left</color>
+39	<color COLOR_YELLOW>Vertical Turn Forward-Right</color>
+40	<color COLOR_YELLOW>Vertical Turn Forward-Left</color>
+41	<color COLOR_YELLOW>Forward Dash Cancel</color>
+42	<color COLOR_YELLOW>Back Dash Cancel</color>
+43	<color COLOR_YELLOW>Right Dash Cancel</color>
+44	<color COLOR_YELLOW>Left Dash Cancel</color>
+45	<color COLOR_YELLOW>Forward-Right Dash Cancel</color>
+46	<color COLOR_YELLOW>Forward-Left Dash Cancel</color>
+47	<color COLOR_YELLOW>Back-Right Dash Cancel</color>
+48	<color COLOR_YELLOW>Back-Left Dash Cancel</color>
+49	<color COLOR_YELLOW>Jump Cancel</color>
+50	<color COLOR_YELLOW>Forward Air Dash Cancel</color>
+51	<color COLOR_YELLOW>Back Air Dash Cancel</color>
+52	<color COLOR_YELLOW>Right Air Dash Cancel</color>
+53	<color COLOR_YELLOW>Left Air Dash Cancel</color>
+54	<color COLOR_YELLOW>Forward-Right Air Dash Cancel</color>
+55	<color COLOR_YELLOW>Forward-Left Air Dash Cancel</color>
+56	<color COLOR_YELLOW>Back-Right Air Dash Cancel</color>
+57	<color COLOR_YELLOW>Back-Left Air Dash Cancel</color>
+58	<color COLOR_YELLOW>Right Transition Cancel</color>
+59	<color COLOR_YELLOW>Left Transition Cancel</color>
+60	<color COLOR_YELLOW>Air Right Transition Cancel</color>
+61	<color COLOR_YELLOW>Air Left Transition Cancel</color>
+62	<color COLOR_YELLOW>Basic RW Attack</color>
+63	<color COLOR_YELLOW>Fwd Move RW Attack</color>
+64	<color COLOR_YELLOW>Back Move RW Attack</color>
+65	<color COLOR_YELLOW>Right Move RW Attack</color>
+66	<color COLOR_YELLOW>Left Move RW Attack</color>
+67	<color COLOR_YELLOW>Fwd-Right Move RW Attack</color>
+68	<color COLOR_YELLOW>Fwd-Left Move RW Attack</color>
+69	<color COLOR_YELLOW>Back-Right Move RW Attack</color>
+70	<color COLOR_YELLOW>Back-Left Move RW Attack</color>
+71	<color COLOR_YELLOW>Turbo RW Attack</color>
+72	<color COLOR_YELLOW>Forward Dash RW Attack</color>
+73	<color COLOR_YELLOW>Back Dash RW Attack</color>
+74	<color COLOR_YELLOW>Right Dash RW Attack</color>
+75	<color COLOR_YELLOW>Left Dash RW Attack</color>
+76	<color COLOR_YELLOW>Forward-Right Dash RW Attack</color>
+77	<color COLOR_YELLOW>Forward-Left Dash RW Attack</color>
+78	<color COLOR_YELLOW>Back-Right Dash RW Attack</color>
+79	<color COLOR_YELLOW>Back-Left Dash RW Attack</color>
+80	<color COLOR_YELLOW>Jump RW Attack</color>
+81	<color COLOR_YELLOW>Jump Turbo RW Attack</color>
+82	<color COLOR_YELLOW>Forward Air Dash RW Attack</color>
+83	<color COLOR_YELLOW>Back Air Dash RW Attack</color>
+84	<color COLOR_YELLOW>Right Air Dash RW Attack</color>
+85	<color COLOR_YELLOW>Left Air Dash RW Attack</color>
+86	<color COLOR_YELLOW>Forward-Right Air Dash RW Attack</color>
+87	<color COLOR_YELLOW>Forward-Left Air Dash RW Attack</color>
+88	<color COLOR_YELLOW>Back-Right Air Dash RW Attack</color>
+89	<color COLOR_YELLOW>Back-Left Air Dash RW Attack</color>
+90	<color COLOR_YELLOW>Right Transition RW Attack</color>
+91	<color COLOR_YELLOW>Left Transition RW Attack</color>
+92	<color COLOR_YELLOW>Basic LW Attack</color>
+93	<color COLOR_YELLOW>Fwd Move LW Attack</color>
+94	<color COLOR_YELLOW>Back Move LW Attack</color>
+95	<color COLOR_YELLOW>Right Move LW Attack</color>
+96	<color COLOR_YELLOW>Left Move LW Attack</color>
+97	<color COLOR_YELLOW>Fwd-Right Move LW Attack</color>
+98	<color COLOR_YELLOW>Fwd-Left Move LW Attack</color>
+99	<color COLOR_YELLOW>Back-Right Move LW Attack</color>
+100	<color COLOR_YELLOW>Back-Left Move LW Attack</color>
+101	<color COLOR_YELLOW>Turbo LW Attack</color>
+102	<color COLOR_YELLOW>Forward Dash LW Attack</color>
+103	<color COLOR_YELLOW>Back Dash LW Attack</color>
+104	<color COLOR_YELLOW>Right Dash LW Attack</color>
+105	<color COLOR_YELLOW>Left Dash LW Attack</color>
+106	<color COLOR_YELLOW>Forward-Right Dash LW Attack</color>
+107	<color COLOR_YELLOW>Forward-Left Dash LW Attack</color>
+108	<color COLOR_YELLOW>Back-Right Dash LW Attack</color>
+109	<color COLOR_YELLOW>Back-Left Dash LW Attack</color>
+110	<color COLOR_YELLOW>Jump LW Attack</color>
+111	<color COLOR_YELLOW>Jump Turbo LW Attack</color>
+112	<color COLOR_YELLOW>Forward Air Dash LW Attack</color>
+113	<color COLOR_YELLOW>Back Air Dash LW Attack</color>
+114	<color COLOR_YELLOW>Right Air Dash LW Attack</color>
+115	<color COLOR_YELLOW>Left Air Dash LW Attack</color>
+116	<color COLOR_YELLOW>Forward-Right Air Dash LW Attack</color>
+117	<color COLOR_YELLOW>Forward-Left Air Dash LW Attack</color>
+118	<color COLOR_YELLOW>Back-Right Air Dash LW Attack</color>
+119	<color COLOR_YELLOW>Back-Left Air Dash LW Attack</color>
+120	<color COLOR_YELLOW>Right Transition LW Attack</color>
+121	<color COLOR_YELLOW>Left Transition LW Attack</color>
+122	<color COLOR_YELLOW>Basic CW Attack</color>
+123	<color COLOR_YELLOW>Fwd Move CW Attack</color>
+124	<color COLOR_YELLOW>Back Move CW Attack</color>
+125	<color COLOR_YELLOW>Right Move CW Attack</color>
+126	<color COLOR_YELLOW>Left Move CW Attack</color>
+127	<color COLOR_YELLOW>Fwd-Right Move CW Attack</color>
+128	<color COLOR_YELLOW>Fwd-Left Move CW Attack</color>
+129	<color COLOR_YELLOW>Back-Right Move CW Attack</color>
+130	<color COLOR_YELLOW>Back-Left Move CW Attack</color>
+131	<color COLOR_YELLOW>Turbo CW Attack</color>
+132	<color COLOR_YELLOW>Forward Dash CW Attack</color>
+133	<color COLOR_YELLOW>Back Dash CW Attack</color>
+134	<color COLOR_YELLOW>Right Dash CW Attack</color>
+135	<color COLOR_YELLOW>Left Dash CW Attack</color>
+136	<color COLOR_YELLOW>Forward-Right Dash CW Attack</color>
+137	<color COLOR_YELLOW>Forward-Left Dash CW Attack</color>
+138	<color COLOR_YELLOW>Back-Right Dash CW Attack</color>
+139	<color COLOR_YELLOW>Back-Left Dash CW Attack</color>
+140	<color COLOR_YELLOW>Jump CW Attack</color>
+141	<color COLOR_YELLOW>Jump Turbo CW Attack</color>
+142	<color COLOR_YELLOW>Forward Air Dash CW Attack</color>
+143	<color COLOR_YELLOW>Back Air Dash CW Attack</color>
+144	<color COLOR_YELLOW>Right Air Dash CW Attack</color>
+145	<color COLOR_YELLOW>Left Air Dash CW Attack</color>
+146	<color COLOR_YELLOW>Forward-Right Air Dash CW Attack</color>
+147	<color COLOR_YELLOW>Forward-Left Air Dash CW Attack</color>
+148	<color COLOR_YELLOW>Back-Right Air Dash CW Attack</color>
+149	<color COLOR_YELLOW>Back-Left Air Dash CW Attack</color>
+150	<color COLOR_YELLOW>Right Transition CW Attack</color>
+151	<color COLOR_YELLOW>Left Transition CW Attack</color>
+152	<color COLOR_YELLOW>Melee Attack: 1st Hit</color>
+153	<color COLOR_YELLOW>Melee Attack: 2nd Hit</color>
+154	<color COLOR_YELLOW>Dash Melee Attack</color>
+155	<color COLOR_YELLOW>Jump Melee Attack</color>
+156	<color COLOR_YELLOW>Air Dash Melee Attack</color>
+157	<color COLOR_YELLOW>Pursuit Attack</color>
+158	<color COLOR_YELLOW>Guard an RW Attack</color>
+159	<color COLOR_YELLOW>Guard an LW Attack</color>
+160	<color COLOR_YELLOW>Guard a CW Attack</color>
+161	<color COLOR_YELLOW>Guard a Melee Attack</color>
+162	<color COLOR_YELLOW>Down</color>
+163	<color COLOR_YELLOW>Melee Down</color>
+164	<color COLOR_YELLOW>Special Point</color>
+165	<color COLOR_YELLOW>Activate Boost Weapon</color>
+166	<color COLOR_YELLOW>Land Boost Weapon</color>
+167	<color COLOR_YELLOW>Land a Special Move</color>
+168	<color COLOR_YELLOW>Hit the Ringside Enemy VR</color>
+169	<color COLOR_YELLOW>Destroy the Ring Enemy VR</color>
+170	<color COLOR_YELLOW>Hit the Ring Enemy VR</color>
+171	<color COLOR_YELLOW>Destroy the Ringside Enemy VR</color>
+172	<color COLOR_YELLOW>Change</color>
+173	<color COLOR_YELLOW>Win a Tag Battle</color>
+174	<color COLOR_YELLOW>Pick Up the Ball</color>
+175	<color COLOR_YELLOW>Reach the Goal Holding the Ball</color>
+176	<color COLOR_YELLOW>Attack to Make Them Drop the Ball</color>
+177	<color COLOR_YELLOW>Hit the Enemy 3 Times with Code Attacks</color>
+178	<color COLOR_YELLOW>Pass</color>
+179	<color COLOR_YELLOW>Loop Pass</color>
+180	<color COLOR_YELLOW>Through Pass</color>
+181	<color COLOR_YELLOW>Loop Through Pass</color>
+182	<color COLOR_YELLOW>Back Pass</color>
+183	<color COLOR_YELLOW>Loop Back Pass</color>
+184	<color COLOR_YELLOW>Win with the EX Code</color>
+185	<color COLOR_YELLOW>Make Them Drop the Ball on Time-Out</color>
+186	<color COLOR_YELLOW>Pursuit Attack: 1st</color>
+187	<color COLOR_YELLOW>Pursuit Attack: 2nd</color>
+188	<color COLOR_YELLOW>Pursuit Attack: 3rd</color>
+189	<color COLOR_YELLOW>Guard a Melee Attack: 1st</color>
+190	<color COLOR_YELLOW>Guard a Melee Attack: 2nd</color>
+191	<color COLOR_YELLOW>Guard a Melee Attack: 3rd</color>
+192	<color COLOR_YELLOW>Code Attack: 1st</color>
+193	<color COLOR_YELLOW>Code Attack: 2nd</color>
+194	<color COLOR_YELLOW>Code Attack: 3rd</color>

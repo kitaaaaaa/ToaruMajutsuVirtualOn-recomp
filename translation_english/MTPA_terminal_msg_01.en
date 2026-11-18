@@ -1,0 +1,58 @@
+0	Play Time
+1	Player Rank
+2	Player Level
+3	Rank Points
+4	Total Mission Score
+5	Multiplayer Count
+6	Story Clears
+7	Total Battles
+8	Wins
+9	Win Rate
+10	Kills
+11	Best Win Streak
+12	All Battles
+13	Story
+14	Network
+15	Mission
+19	%d times
+20	%.1lf %%
+21	%d VR
+22	Rank Match
+25	Sort: Protected (Asc.)
+26	Sort: Date (Asc.)
+27	Sort: Category (Asc.)
+28	Sort: Rule (Asc.)
+29	Sort: Result (Asc.)
+30	Sort: VR (Asc.)
+31	Sort: Protected (Desc.)
+32	Sort: Date (Desc.)
+33	Sort: Category (Desc.)
+34	Sort: Rule (Desc.)
+35	Sort: Result (Desc.)
+36	Sort: VR (Desc.)
+37	Date
+38	Category
+39	Rule
+40	Result
+41	Room Match
+42	Standard
+43	Sparring
+44	Sparring+
+45	Deathmatch
+46	Mirror
+47	EX Code
+48	Tag Battle
+49	Win
+50	Draw
+51	Loss
+52	Motion: %s
+53	Title
+54	Backdrop Color
+55	Medals
+56	Graphics
+57	Voices
+59	Background Design
+60	Run Time
+61	Battles
+62	Total Wins
+63	Version Info

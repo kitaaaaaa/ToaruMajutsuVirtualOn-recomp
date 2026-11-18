@@ -1,0 +1,47 @@
+0	Movement
+1	Turning
+2	Dash
+3	Jump / Air Dash
+4	Lock-on
+5	Transition
+6	Vertical Turn
+7	Dash Cancel
+8	Jump Cancel
+9	Transition Cancel
+10	RW Attack
+11	Dash RW Attack
+12	Jump RW Attack
+13	Air Dash RW Attack
+14	Transition RW Attack
+15	LW Attack
+16	Dash LW Attack
+17	Jump LW Attack
+18	Air Dash LW Attack
+19	Transition LW Attack
+20	CW Attack
+21	Dash CW Attack
+22	Jump CW Attack
+23	Air Dash CW Attack
+24	Transition CW Attack
+25	Melee Attack
+26	Melee Variations
+27	Pursuit Attack
+28	Guard
+29	Down
+30	Special Point
+31	Super Move
+33	Sp. Move
+34	Battle Missions
+35	Consecutive Battle Missions
+36	Destruction
+37	Kill Attack
+38	Boss Battle
+39	Pit In
+40	Tag Match
+41	Ringside
+42	Change
+43	Explosion Code
+44	Stealing the Code
+45	Code Attack
+46	Pass
+47	Extra Notes

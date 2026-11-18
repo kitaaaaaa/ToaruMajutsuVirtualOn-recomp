@@ -103,7 +103,7 @@ The user found the Vita patch's story badly machine translated, so `-English` is
 | Option | Plays | Source |
 |---|---|---|
 | none | Japanese | The game |
-| `port\run.ps1 -English` (`vox.exe --english`) | The full translation | `translation_english\*.en`, git-ignored: it is the game's script in English |
+| `port\run.ps1 -English` (`vox.exe --english`) | The full translation | `translation_english\*.en` |
 | `port\run.ps1 -Engrish` (`vox.exe --engrish`) | The joke translation | `translation\*.en`, in this repo |
 | `port\run.ps1 -UserTl` (`vox.exe --user-tl`) | The user's own Vita fan patch, text only | Their copy, via `port\install_vita_patch.ps1 -Patch <rar or folder>` |
 

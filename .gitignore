@@ -7,6 +7,7 @@
 !/analysis/
 !/port/
 !/translation/
+!/translation_english/
 
 /analysis/*
 !/analysis/scripts/

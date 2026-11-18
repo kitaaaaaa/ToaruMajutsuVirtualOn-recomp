@@ -1,0 +1,66 @@
+0	Sets the in-game BGM volume.
+1	Sets the in-game SE volume.
+2	Sets the in-game voice volume.
+4	Sets controller vibration.
+7	Shows each character's special attacks and Boost Weapon.
+9	Sets the controller button assignments.
+10	Sets the controller button assignments.
+11	Sets the controller button assignments.
+12	Sets the controller button assignments.
+13	Sets the controller button assignments.
+14	Sets the controller button assignments.
+15	Sets the controller button assignments.
+16	Sets the controller button assignments.
+17	Sets all data displays at once.
+18	Sets the fixed reticle display.
+19	Sets the opponent Virtuaroid and distance display.
+20	Sets the lock-on warning display.
+21	Sets instructions to your ally.
+22	Sets instructions to your ally.
+23	Sets instructions to your ally.
+24	Sets instructions to your ally.
+25	Sets up auto matching.
+26	Sets Rank Match search by Rank Points.
+27	Sets Rank Match search by disconnect rate.
+28	Sets Rank Match search by connection status.
+29	Sets Rank Match search by the SHARE feature.
+30	Sets up the standby screen.
+31	Selects the player character.
+32	Selects the partner character.
+33	Selects the Enemy 1 character.
+34	Selects the Enemy 2 character.
+35	Sets the partner's behavior.
+36	Sets Enemy 1's behavior.
+37	Sets Enemy 2's behavior.
+38	Sets the difficulty.
+39	Selects the stage.
+40	Sets the match format.
+42	Sets the time limit.
+43	Sets the point count.
+44	Sets lock-on targeting by the opponent.
+45	Sets automatic HP recovery.
+46	Sets the Stability Gauge state.
+48	Sets the status ailment state.
+49	Sets the player's Boost Weapon.
+50	Sets the partner's Boost Weapon.
+51	Sets Enemy 1's Boost Weapon.
+52	Sets Enemy 2's Boost Weapon.
+53	Sets all display info at once.
+54	Sets the input history display.
+55	Sets the attack data display.
+56	Sets the received attack data display.
+57	Sets the Stability damage multiplier display.
+58	Resets the controller button assignments.
+59	Finishes setting the controller button assignments.
+60	Configures in-game settings.
+61	Shows each character's special attacks and Boost Weapon.
+62	Sets the on-screen display during battle.
+63	Sets the controller button assignments.
+64	Sets instructions to your ally.
+65	Sets player matching.
+66	Configures various training settings.
+67	Sets the training rules.
+68	Sets the training parameters.
+69	Sets the training info display.
+70	Changes the lock-on style.
+71	Sets the button assignments.

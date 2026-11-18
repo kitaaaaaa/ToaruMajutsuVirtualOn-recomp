@@ -1,0 +1,37 @@
+0	All weapon gauges full: during an air forward dash,\nhold <input DASH> and press <input LW>+<input RW>
+1	%s\nAn unguardable, fast, powerful rush\nthat knocks the foe far on a hit and\ndrops their Boost Gauge to 0.
+7	After detaching all bits, ground turbo CW
+8	After detaching all bits, jump turbo CW
+9	%s\nWings spread around your VR. Shots\nhitting them get laser counters;\ntouching them directly hurts you.
+16	With all bits detached:\nIn air <input LWSUB>+<input RWSUB> or <input DASH>+<input LW>+<input RW>
+17	With all bits detached:\nOn ground <input LWSUB>+<input RWSUB> or <input DASH>+<input LW>+<input RW>
+18	%s\nWings spread around your VR. Shots\nhitting them get laser counters;\ntouching them directly hurts you.
+19	%s\nA strong railgun that pierces\nobstacles. A hit stops Stability\nrecovery and halves the foe's speed.
+21	%s\nTeleports behind the opponent, then for a time\nfollows them while raining down spears;\na hit lowers their speed for a while.
+22	All weapon gauges full: during an air forward dash,\nhold <input DASH> and press <input LW>+<input RW>
+23	In air <input MELEE>+<input RW>
+24	%s\nWinds up the bat for a full swing; a hit deals\nheavy damage to the opponent. Usable until it\nhits an enemy or strikes out.
+26	%s\nTwo drones fly out, pin the foe\nbetween them and fire thin beams,\nthen drop where they are as mines.
+27	While jumping <input DASH>+<input LW>+<input RW>
+28	Standing turn <input LW>
+29	%s\nA compressed shot that slowly homes\nin, pulling the foe. On contact it\nexpands and pins the foe in place.
+31	%s\nSummons a dragon and 8 ice pillars.\nAfter the strong dragon charges, the\npillars launch and blast an area.
+32	All weapon gauges full: during an air forward dash,\nhold <input DASH> and press <input LW>+<input RW>
+33	In air <input MELEE>+<input RW>
+34	%s\nDraws and fires a forward slash;\npress again to detonate. It pierces\nobstacles and breaks the foe's guard.
+36	%s\nDrives the drill into the ground, creating a\nwide-area earthquake attack centered on your VR.
+37	All weapon gauges full: during an air forward dash,\nhold <input DASH> and press <input LW>+<input RW>
+38	In air <input MELEE>+<input RW>
+39	%s\nSummons Ascalon, instantly moves in front of\nthe opponent from any position, and slashes\ndown from overhead with Ascalon.
+40	All weapon gauges full: during an air forward dash,\nhold <input DASH> and press <input LW>+<input RW>
+41	All weapon gauges full: during a ground forward dash,\nhold <input DASH> and press <input LW>+<input RW>
+42	%s\nGrabs the opponent with 4 beams fired from your\nVR. While they are held, it deals powerful continuous\ndamage.
+43	During an air forward dash, hold <input JUMP> and press <input LW>+<input RW>\nAll weapon gauges full
+44	TBD
+45	%s\nTransforms and charges at the enemy, spinning at\nultra-high speed. Fast and powerful; a hit\ndeals heavy damage.
+46	During transition <input MELEE>+<input RW>
+47	During transition <input MELEE>+<input LW>
+48	During transition <input MELEE>+<input LW>+<input RW>
+49	Arm bit detached in the air,\nleg bits detached on the ground, then\nIn air <input MELEE>+<input DASH>+<input RW> or <input MELEE>+<input DASH>+<input LW>
+50	Arm bit detached in the air,\nother arm and leg bits detached on the ground, then\nIn air <input MELEE>+<input DASH>+<input RW> or <input MELEE>+<input DASH>+<input LW>
+51	Both arm bits off in the air,\nleg bits detached on the ground, then\nIn air <input MELEE>+<input DASH>+<input RW> or <input MELEE>+<input DASH>+<input LW>

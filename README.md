@@ -29,7 +29,7 @@ Run `port\out\vox.exe`, by double-clicking it or from a command line with these 
 
 | Option | Effect |
 |---|---|
-| `--english` | Full English translation. Its text isn't in this repository: it needs a `translation_english` folder |
+| `--english` | Full English translation |
 | `--engrish` | Budget English translation |
 | `--user-tl` | Installed fan translation, see below |
 | `--unlock-all` | Everything unlocked. Combines with any of the others |
