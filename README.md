@@ -15,7 +15,15 @@ Menus, battles, story mode, movies and sound work. An Xbox controller is support
 
 ## Building
 
-You need Windows, Git, Python 3, Visual Studio with "Desktop development with C++", a Vulkan GPU, and about 10 GB free plus 12 GB for the game. Your game must be a fake-signed `.pkg` or an already extracted folder containing `eboot.bin`.
+You need Windows, a Vulkan GPU, and about 10 GB free plus 12 GB for the game. Your game must be a fake-signed `.pkg` or an already extracted folder containing `eboot.bin`.
+
+**The easy way:** double-click `Launch.bat`. The first time, it asks for your `.pkg` or the game's `eboot.bin`, builds everything and starts the game. Later double-clicks just start the game, and options passed to it go to `vox.exe`, for example `Launch.bat --english`.
+
+- **Nothing to install:** it downloads what's missing, Python and Git included. Without Visual Studio, it fetches Microsoft's C/C++ headers and libraries with [xwin](https://github.com/Jake-Shadle/xwin), which asks you to accept Microsoft's license first.
+- **Cleanup:** once the game is built, it deletes the tools and sources it downloaded. Rebuilding later downloads them again.
+- **If a step fails:** it keeps its downloads, so running it again carries on from there.
+
+**By hand,** with Git, Python 3 and Visual Studio's "Desktop development with C++" installed:
 
 ```powershell
 port\setup.ps1                        # fetch tools and sources
