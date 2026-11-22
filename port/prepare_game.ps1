@@ -14,7 +14,7 @@ $out = "$port\out"
 $llvm = "$root\tools\llvm\bin"
 $uroot = "$root\extracted\uroot"
 $elfTool = "$port\bloodborne-recomp\tools\recomp\ps4elf.py"
-$env:INCLUDE = $null
+$env:INCLUDE = $env:VOX_INCLUDE # set by launch.ps1 when the headers come from xwin
 $ProgressPreference = 'SilentlyContinue'
 $sw = [Diagnostics.Stopwatch]::StartNew()
 

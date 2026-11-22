@@ -7,7 +7,7 @@ $clang = "$root\tools\llvm\bin\clang.exe"
 $gen = "$port\work\recomp\gen"
 $objDir = "$port\work\recomp\obj"
 New-Item -ItemType Directory -Force $objDir | Out-Null
-$env:INCLUDE = $null
+$env:INCLUDE = $env:VOX_INCLUDE # set by launch.ps1 when the headers come from xwin
 
 $jobs = [Math]::Max(2, [int]$env:NUMBER_OF_PROCESSORS - 2)
 $running = @()

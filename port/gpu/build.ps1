@@ -10,7 +10,7 @@ $ninja = "$root\tools\ninja\ninja.exe"
 $build = "$gpu\build"
 
 # Machine-wide it points at Watcom's headers, which break the MSVC ones.
-$env:INCLUDE = $null
+$env:INCLUDE = $env:VOX_INCLUDE # set by launch.ps1 when the headers come from xwin
 
 if (-not (Test-Path "$build\build.ninja")) {
     & $cmake -S $gpu -B $build -G Ninja "-DCMAKE_MAKE_PROGRAM=$($ninja -replace '\\', '/')" `

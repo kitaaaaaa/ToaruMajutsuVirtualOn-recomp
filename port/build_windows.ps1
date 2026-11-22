@@ -12,7 +12,7 @@ $obj = "$out\obj"
 New-Item -ItemType Directory -Force $obj | Out-Null
 
 # The machine-wide INCLUDE points at Watcom's headers: this process must not see it.
-$env:INCLUDE = $null
+$env:INCLUDE = $env:VOX_INCLUDE # set by launch.ps1 when the headers come from xwin
 
 $flags = @('-std=gnu11', '-O2', '-g', '-w', '-mcx16', '-DZYDIS_STATIC_BUILD', '-DZYCORE_STATIC_BUILD',
     '-include', "$bbcpu\src\win\win_compat.h", "-I$bbcpu\src\win\include", "-I$bbcpu\src", "-I$deps\include")

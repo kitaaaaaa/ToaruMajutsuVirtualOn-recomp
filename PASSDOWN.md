@@ -54,6 +54,7 @@ Smaller items:
 - Unmaps now update the renderer's mapping table, but the renderer's own caches aren't told about them, so stale entries are possible.
 - `liverpool.cpp` still holds diagnostics (`vox_recent`, the CP wait prints). They're useful for now.
 - A user report of "7 failed background operations" during Phase 5 was never explained.
+- **To replace later:** without Visual Studio, `Launch.bat` (`port\launch.ps1`) gets Microsoft's CRT and Windows SDK through xwin, which needs the builder to accept Microsoft's license. llvm-mingw's open-source headers and libraries would remove that, but change the target the whole port builds for.
 
 ## Debug menu, Neo and frame rate
 

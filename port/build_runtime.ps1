@@ -8,7 +8,7 @@ $deps = "$port\deps"
 $out = "$port\out"
 $work = "$port\work"
 $tools = "$port\bloodborne-recomp\tools\recomp"
-$env:INCLUDE = $null
+$env:INCLUDE = $env:VOX_INCLUDE # set by launch.ps1 when the headers come from xwin
 
 New-Item -ItemType Directory -Force "$out\obj", $work | Out-Null
 python -I "$port\runtime\gen_names.py" "$root\tools\src\shadPS4\src\core\aerolib\aerolib.inl" "$work\names.tsv"

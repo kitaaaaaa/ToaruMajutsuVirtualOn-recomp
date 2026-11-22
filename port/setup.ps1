@@ -23,7 +23,7 @@ function Fetch($url, $name) {
         Copy-Item "$Cache\$name" $path
         return $path
     }
-    "downloading $name"
+    Write-Host "downloading $name"
     Invoke-WebRequest $url -OutFile "$path.part"
     Move-Item "$path.part" $path
     return $path
@@ -80,7 +80,7 @@ if (-not ((Test-Path "$port\deps\lib\Zydis.lib") -and (Test-Path "$port\deps\lib
     Pin $zydis 'https://github.com/zyantific/zydis.git' 'a2278f1d254e492f6a6b39f6cb5d1f5d515659dc'
     git -C $zydis submodule update -q --init --depth 1
     if ($LASTEXITCODE -ne 0) { 'FAILED fetching Zycore'; exit 1 }
-    $env:INCLUDE = $null # machine-wide INCLUDE variables can point at other compilers' headers
+    $env:INCLUDE = $env:VOX_INCLUDE # machine-wide INCLUDE can point at other compilers' headers; launch.ps1 sets this for xwin
     $llvm = "$tools\llvm\bin" -replace '\\', '/'
     $install = "$port\deps" -replace '\\', '/'
     # Zycore first: installing Zydis doesn't install it, though Zydis's headers and users need it.
